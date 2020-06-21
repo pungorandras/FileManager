@@ -207,11 +207,13 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
     }
 
     private fun getSDCardPath(): File? {
-        val storage = File("/storage").listFiles()
+        val storage: Array<File>? = File("/storage").listFiles()
         var sdCardPath: File? = null
-        for (element in storage) {
-            if (element.name != "emulated" && element.name != "self")
-                sdCardPath = element
+        if (storage != null) {
+            for (element in storage) {
+                if (element.name != "emulated" && element.name != "self")
+                    sdCardPath = element
+            }
         }
 
         return sdCardPath
