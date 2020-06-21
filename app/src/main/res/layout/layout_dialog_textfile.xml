@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/name"
+        android:textColor="@color/colorPrimary"
+        android:textSize="20sp" />
+
+    <EditText
+        android:id="@+id/name_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="15dp"
+        android:padding="8dp"
+        android:background="@drawable/edittext_border"
+        android:hint="@string/type_a_name_here"
+        android:layout_below="@+id/name"/>
+
+    <TextView
+        android:id="@+id/notes"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/notes"
+        android:textSize="20sp"
+        android:textColor="@color/colorPrimary"
+        android:layout_below="@+id/name_input"/>
+
+    <EditText
+        android:id="@+id/text_input"
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:padding="8dp"
+        android:gravity="top"
+        android:background="@drawable/edittext_border"
+        android:hint="Your notes"
+        android:layout_below="@+id/notes" />
+
+</RelativeLayout>

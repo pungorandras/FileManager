@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent"
+    android:background="@color/background"
+    tools:context=".FileManagerActivity">
+
+    <LinearLayout
+        android:id="@+id/switch_source"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:baselineAligned="false"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <Button
+            android:id="@+id/Internal"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/top_button_height"
+            android:layout_weight="1"
+            android:textColor="@color/text"
+            android:backgroundTint="@color/button"
+            android:drawableLeft="@drawable/phone_storage"
+            android:text="@string/phone_storage" />
+
+        <Button
+            android:id="@+id/SDCard"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/top_button_height"
+            android:layout_weight="1"
+            android:textColor="@color/text"
+            android:backgroundTint="@color/button"
+            android:drawableLeft="@drawable/sdcard"
+            android:text="@string/sd_card" />
+    </LinearLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvFiles"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:scrollbars="vertical"
+        android:scrollbarThumbVertical="@color/scrollbar"
+        android:scrollbarSize="6dp"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/switch_source" />
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/bottom_button_height"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <ImageButton
+            android:id="@+id/create_textfile"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:backgroundTint="@color/button"
+            android:src="@drawable/create_textfile" />
+
+        <ImageButton
+            android:id="@+id/create_folder"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:backgroundTint="@color/button"
+            android:src="@drawable/create_folder" />
+
+        <ImageButton
+            android:id="@+id/select_all"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:backgroundTint="@color/button"
+            android:src="@drawable/select_all" />
+
+        <ImageButton
+            android:id="@+id/delete_selected"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:backgroundTint="@color/button"
+            android:src="@drawable/delete" />
+
+        <ImageButton
+            android:id="@+id/copy_selected"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:backgroundTint="@color/button"
+            android:src="@drawable/copy" />
+
+        <ImageButton
+            android:id="@+id/move_selected"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:backgroundTint="@color/button"
+            android:src="@drawable/move" />
+
+        <ImageButton
+            android:id="@+id/search"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:backgroundTint="@color/button"
+            android:src="@drawable/search" />
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
