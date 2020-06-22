@@ -42,6 +42,5 @@
     <string name="text">Text</string>
     <string name="cannot_copy_into_itself">You cannot copy the folder into itself!</string>
     <string name="sd_permission_denied">SDCard permissions denied!</string>
-    <string name="doesnt_exist">Doesn\'t exist!</string>
     <string name="cannot_move_into_itself">You cannot move the folder into itself!</string>
 </resources>

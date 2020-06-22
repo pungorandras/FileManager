@@ -121,10 +121,7 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
             rvFiles.adapter = fileManagerAdapter
             fileManagerAdapter.setFiles(AsyncGetAllFiles().execute(this).get())
             fileManagerAdapter.itemClickListener = this
-        } catch (e: Exception) {
-            Toast.makeText(applicationContext, getString(R.string.doesnt_exist), Toast.LENGTH_SHORT)
-                .show()
-        }
+        } catch (e: Exception) {}
     }
 
     override fun onRequestPermissionsResult(
