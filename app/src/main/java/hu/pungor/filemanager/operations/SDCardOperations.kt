@@ -43,10 +43,13 @@ class SDCardOperations {
     }
 
     fun getChildren(dstPath: File, activity: FileManagerActivity): DocumentFile? {
-        var id = DocumentsContract.getTreeDocumentId(activity.getUri())
-        id += dstPath.toString().removePrefix(activity.sdCardPath.toString())
-        val childrenUri = DocumentsContract.buildDocumentUriUsingTree(activity.getUri(), id)
+        try {
+            var id = DocumentsContract.getTreeDocumentId(activity.getUri())
+            id += dstPath.toString().removePrefix(activity.sdCardPath.toString())
+            val childrenUri = DocumentsContract.buildDocumentUriUsingTree(activity.getUri(), id)
+            return DocumentFile.fromTreeUri(activity, childrenUri)
+        } catch (e: Exception) {}
 
-        return DocumentFile.fromTreeUri(activity, childrenUri)
+        return null
     }
 }

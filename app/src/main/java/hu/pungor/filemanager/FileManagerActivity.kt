@@ -58,12 +58,20 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
         }
 
         Internal.setOnClickListener {
-                currentPath = rootPath
-                loadFilesWithPermissionCheck()
+            currentPath = rootPath
+            Internal.backgroundTintList =
+                applicationContext.resources.getColorStateList(R.color.button_pressed)
+            SDCard.backgroundTintList =
+                applicationContext.resources.getColorStateList(R.color.button)
+            loadFilesWithPermissionCheck()
         }
 
         SDCard.setOnClickListener {
             sdCardPath = getSDCardPath()
+            Internal.backgroundTintList =
+                applicationContext.resources.getColorStateList(R.color.button)
+            SDCard.backgroundTintList =
+                applicationContext.resources.getColorStateList(R.color.button_pressed)
             sdCardPermissions(sdCardPath!!)
             currentPath = sdCardPath!!
             loadFilesWithPermissionCheck()
@@ -96,6 +104,11 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
         search.setOnClickListener {
             buttonClickOperations.searchButtonOperations(this)
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        loadFiles()
     }
 
     @NeedsPermission(

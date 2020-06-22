@@ -26,8 +26,8 @@
             android:layout_height="@dimen/top_button_height"
             android:layout_weight="1"
             android:textColor="@color/text"
-            android:backgroundTint="@color/button"
-            android:drawableLeft="@drawable/phone_storage"
+            android:backgroundTint="@color/button_pressed"
+            android:drawableStart="@drawable/phone_storage"
             android:text="@string/phone_storage" />
 
         <Button
@@ -37,7 +37,7 @@
             android:layout_weight="1"
             android:textColor="@color/text"
             android:backgroundTint="@color/button"
-            android:drawableLeft="@drawable/sdcard"
+            android:drawableStart="@drawable/sdcard"
             android:text="@string/sd_card" />
     </LinearLayout>
 
