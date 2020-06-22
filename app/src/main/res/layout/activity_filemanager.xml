@@ -4,11 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/background"
     app:layout_constraintBottom_toBottomOf="parent"
     app:layout_constraintEnd_toEndOf="parent"
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintTop_toTopOf="parent"
-    android:background="@color/background"
     tools:context=".FileManagerActivity">
 
     <LinearLayout
@@ -25,29 +25,29 @@
             android:layout_width="0dp"
             android:layout_height="@dimen/top_button_height"
             android:layout_weight="1"
-            android:textColor="@color/text"
             android:backgroundTint="@color/button_pressed"
             android:drawableStart="@drawable/phone_storage"
-            android:text="@string/phone_storage" />
+            android:text="@string/phone_storage"
+            android:textColor="@color/text" />
 
         <Button
             android:id="@+id/SDCard"
             android:layout_width="0dp"
             android:layout_height="@dimen/top_button_height"
             android:layout_weight="1"
-            android:textColor="@color/text"
             android:backgroundTint="@color/button"
             android:drawableStart="@drawable/sdcard"
-            android:text="@string/sd_card" />
+            android:text="@string/sd_card"
+            android:textColor="@color/text" />
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvFiles"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:scrollbars="vertical"
-        android:scrollbarThumbVertical="@color/scrollbar"
         android:scrollbarSize="6dp"
+        android:scrollbarThumbVertical="@color/scrollbar"
+        android:scrollbars="vertical"
         app:layout_constraintBottom_toTopOf="@+id/linearLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -63,57 +63,57 @@
 
         <ImageButton
             android:id="@+id/create_textfile"
-            android:layout_weight="1"
             android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_weight="1"
             android:backgroundTint="@color/button"
             android:src="@drawable/create_textfile" />
 
         <ImageButton
             android:id="@+id/create_folder"
-            android:layout_weight="1"
             android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_weight="1"
             android:backgroundTint="@color/button"
             android:src="@drawable/create_folder" />
 
         <ImageButton
             android:id="@+id/select_all"
-            android:layout_weight="1"
             android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_weight="1"
             android:backgroundTint="@color/button"
             android:src="@drawable/select_all" />
 
         <ImageButton
             android:id="@+id/delete_selected"
-            android:layout_weight="1"
             android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_weight="1"
             android:backgroundTint="@color/button"
             android:src="@drawable/delete" />
 
         <ImageButton
             android:id="@+id/copy_selected"
-            android:layout_weight="1"
             android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_weight="1"
             android:backgroundTint="@color/button"
             android:src="@drawable/copy" />
 
         <ImageButton
             android:id="@+id/move_selected"
-            android:layout_weight="1"
             android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_weight="1"
             android:backgroundTint="@color/button"
             android:src="@drawable/move" />
 
         <ImageButton
             android:id="@+id/search"
-            android:layout_weight="1"
             android:layout_width="0dp"
             android:layout_height="match_parent"
+            android:layout_weight="1"
             android:backgroundTint="@color/button"
             android:src="@drawable/search" />
     </LinearLayout>

@@ -76,9 +76,11 @@ class AlertDialogMessages {
             LayoutInflater.from(activity).inflate(R.layout.custom_text_alertdialog, null)
 
         if (copyOrMove == "copy")
-            customText.findViewById<TextView>(R.id.custom_text).text = activity.getString(R.string.cannot_copy_into_itself)
+            customText.findViewById<TextView>(R.id.custom_text).text =
+                activity.getString(R.string.cannot_copy_into_itself)
         else if (copyOrMove == "move")
-            customText.findViewById<TextView>(R.id.custom_text).text =activity.getString(R.string.cannot_move_into_itself)
+            customText.findViewById<TextView>(R.id.custom_text).text =
+                activity.getString(R.string.cannot_move_into_itself)
 
         val builder = AlertDialog.Builder(activity)
             .setCustomTitle(customTitle)

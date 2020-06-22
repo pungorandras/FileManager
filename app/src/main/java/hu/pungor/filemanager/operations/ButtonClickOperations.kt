@@ -5,9 +5,9 @@ import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
-import hu.pungor.filemanager.alertdialog.AlertDialogMessages
 import hu.pungor.filemanager.FileManagerActivity
 import hu.pungor.filemanager.R
+import hu.pungor.filemanager.alertdialog.AlertDialogMessages
 import kotlinx.android.synthetic.main.activity_filemanager.*
 import permissions.dispatcher.PermissionRequest
 import java.io.File
@@ -17,17 +17,19 @@ class ButtonClickOperations(activity: FileManagerActivity) {
     private val fileOperations = FileOperations(activity)
     private val alertDialogMessages =
         AlertDialogMessages()
-    
+
     var fileTreeDepth = 0
     lateinit var result: List<File>
     private lateinit var latestPathBeforeAction: File
 
     fun createTextFileBuilder(activity: FileManagerActivity) {
         val dialogView =
-            LayoutInflater.from(activity.applicationContext).inflate(R.layout.layout_dialog_textfile, null)
+            LayoutInflater.from(activity.applicationContext)
+                .inflate(R.layout.layout_dialog_textfile, null)
         val customTitle =
             LayoutInflater.from(activity.applicationContext).inflate(R.layout.custom_title, null)
-        customTitle.findViewById<TextView>(R.id.title_text).text = activity.getString(R.string.create_new_textfile)
+        customTitle.findViewById<TextView>(R.id.title_text).text =
+            activity.getString(R.string.create_new_textfile)
 
         val builder = AlertDialog.Builder(activity)
             .setView(dialogView)
@@ -49,7 +51,8 @@ class ButtonClickOperations(activity: FileManagerActivity) {
             LayoutInflater.from(activity.applicationContext).inflate(R.layout.layout_dialog, null)
         val customTitle =
             LayoutInflater.from(activity.applicationContext).inflate(R.layout.custom_title, null)
-        customTitle.findViewById<TextView>(R.id.title_text).text = activity.getString(R.string.create_new_folder)
+        customTitle.findViewById<TextView>(R.id.title_text).text =
+            activity.getString(R.string.create_new_folder)
 
         val builder = AlertDialog.Builder(activity)
             .setView(dialogView)
@@ -81,11 +84,15 @@ class ButtonClickOperations(activity: FileManagerActivity) {
 
     fun deleteSelectedBuilder(activity: FileManagerActivity) {
         val selectedList = activity.fileManagerAdapter.getSelectedList()
-        val message = if(selectedList.size == 1) activity.getString(R.string.delete_item) + selectedList[0].name else activity.getString(R.string.delete_selected_items)
+        val message =
+            if (selectedList.size == 1) activity.getString(R.string.delete_item) + selectedList[0].name else activity.getString(
+                R.string.delete_selected_items
+            )
 
         val customTitle =
             LayoutInflater.from(activity).inflate(R.layout.custom_title, null)
-        customTitle.findViewById<TextView>(R.id.title_text).text = activity.getString(R.string.are_you_sure)
+        customTitle.findViewById<TextView>(R.id.title_text).text =
+            activity.getString(R.string.are_you_sure)
         val customText =
             LayoutInflater.from(activity).inflate(R.layout.custom_text_alertdialog, null)
         customText.findViewById<TextView>(R.id.custom_text).text = message
@@ -188,7 +195,7 @@ class ButtonClickOperations(activity: FileManagerActivity) {
             activity.fileManagerAdapter.clearSelectedList = true
             activity.fileManagerAdapter.btnCopyPressed = false
 
-            if(latestPathBeforeAction != activity.currentPath)
+            if (latestPathBeforeAction != activity.currentPath)
                 activity.fileManagerAdapter.clearSelectedList()
 
             setButton(activity.create_textfile, activity)
@@ -201,7 +208,7 @@ class ButtonClickOperations(activity: FileManagerActivity) {
             activity.fileManagerAdapter.clearSelectedList = true
             activity.fileManagerAdapter.btnMovePressed = false
 
-            if(latestPathBeforeAction != activity.currentPath)
+            if (latestPathBeforeAction != activity.currentPath)
                 activity.fileManagerAdapter.clearSelectedList()
 
             setButton(activity.create_textfile, activity)
@@ -214,8 +221,10 @@ class ButtonClickOperations(activity: FileManagerActivity) {
             val dialogView = LayoutInflater.from(activity.applicationContext)
                 .inflate(R.layout.layout_dialog, null)
             val customTitle =
-                LayoutInflater.from(activity.applicationContext).inflate(R.layout.custom_title, null)
-            customTitle.findViewById<TextView>(R.id.title_text).text = activity.getString(R.string.search)
+                LayoutInflater.from(activity.applicationContext)
+                    .inflate(R.layout.custom_title, null)
+            customTitle.findViewById<TextView>(R.id.title_text).text =
+                activity.getString(R.string.search)
 
             val builder = AlertDialog.Builder(activity)
                 .setView(dialogView)
@@ -299,13 +308,16 @@ class ButtonClickOperations(activity: FileManagerActivity) {
         }
     }
 
-    fun showRationaleForStoragePermissionsBuilder(request: PermissionRequest, activity: FileManagerActivity) {
+    fun showRationaleForStoragePermissionsBuilder(
+        request: PermissionRequest,
+        activity: FileManagerActivity
+    ) {
         val alertDialog = AlertDialog.Builder(activity)
             .setTitle(activity.getString(R.string.attention))
             .setMessage(activity.getString(R.string.rationale))
             .setCancelable(false)
             .setPositiveButton(activity.getString(R.string.proceed)) { dialog, id -> request.proceed() }
-            .setNegativeButton(activity.getString(R.string.exit)) { dialog, id -> request.cancel()}
+            .setNegativeButton(activity.getString(R.string.exit)) { dialog, id -> request.cancel() }
             .create()
         alertDialog.show()
     }

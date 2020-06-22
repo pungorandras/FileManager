@@ -4,7 +4,6 @@ import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.LayerDrawable
 import android.net.Uri
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -268,8 +267,8 @@ class FileManagerAdapter : RecyclerView.Adapter<FileManagerAdapter.FileManagerVi
 
     fun addAllToSelectedList() {
         for (element in fileList)
-            if(!selectedList.contains(element))
-            selectedList.add(element)
+            if (!selectedList.contains(element))
+                selectedList.add(element)
     }
 
     inner class FileManagerViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {

@@ -12,9 +12,9 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:maxLines="1"
+        android:text="@string/title"
         android:textAlignment="center"
         android:textColor="@color/colorPrimary"
-        android:text="@string/title"
         android:textSize="20sp"
         android:textStyle="bold" />
 

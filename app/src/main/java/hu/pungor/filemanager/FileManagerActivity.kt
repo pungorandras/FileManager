@@ -122,7 +122,8 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
             fileManagerAdapter.setFiles(AsyncGetAllFiles().execute(this).get())
             fileManagerAdapter.itemClickListener = this
         } catch (e: Exception) {
-            Toast.makeText(applicationContext, getString(R.string.doesnt_exist), Toast.LENGTH_SHORT).show()
+            Toast.makeText(applicationContext, getString(R.string.doesnt_exist), Toast.LENGTH_SHORT)
+                .show()
         }
     }
 
@@ -161,7 +162,8 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
                 val extension = uri.substring(uri.lastIndexOf(".") + 1).toLowerCase(Locale.ROOT)
                 val mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension)
 
-                val name = if(fileManagerAdapter.btnSearchPressed) uriWithoutPrefix else currentFile.name
+                val name =
+                    if (fileManagerAdapter.btnSearchPressed) uriWithoutPrefix else currentFile.name
 
                 if (currentFile.isDirectory)
                     mutableFileList += AboutFile(name, "", uri, TYPE_FOLDER, false)
@@ -240,20 +242,22 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
                 val storageVolume = storageManager.getStorageVolume(sdCardRootPath)
                 val intent = storageVolume?.createAccessIntent(null)
                 startActivityForResult(intent, 1000)
-            } catch (e: Exception) {}
+            } catch (e: Exception) {
+            }
         }
 
-        if(Build.VERSION.SDK_INT < 24){
+        if (Build.VERSION.SDK_INT < 24) {
             try {
                 startActivityForResult(Intent(Intent.ACTION_OPEN_DOCUMENT_TREE), 1001)
-            } catch (e: Exception) {}
+            } catch (e: Exception) {
+            }
         }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         try {
             super.onActivityResult(requestCode, resultCode, data!!)
-            if (requestCode == 1000 || requestCode ==1001) {
+            if (requestCode == 1000 || requestCode == 1001) {
                 val uri = data.data
                 grantUriPermission(
                     packageName, uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION or
@@ -265,7 +269,11 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
             }
 
         } catch (e: Exception) {
-            Toast.makeText(applicationContext, getString(R.string.sd_permission_denied), Toast.LENGTH_SHORT)
+            Toast.makeText(
+                applicationContext,
+                getString(R.string.sd_permission_denied),
+                Toast.LENGTH_SHORT
+            )
                 .show()
         }
     }
@@ -279,7 +287,7 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
                 return uriPermission.uri
             }
         } catch (e: Exception) {
-           sdCardPermissions(sdCardPath!!)
+            sdCardPermissions(sdCardPath!!)
         }
         return null
     }

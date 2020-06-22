@@ -7,12 +7,13 @@ import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.FileProvider
-import hu.pungor.filemanager.*
+import hu.pungor.filemanager.FileManagerActivity
+import hu.pungor.filemanager.R
 import hu.pungor.filemanager.alertdialog.AlertDialogMessages
+import hu.pungor.filemanager.loadFilesWithPermissionCheck
 import hu.pungor.filemanager.model.AboutFile
 import java.io.File
 import java.io.FileWriter
-import java.lang.Exception
 
 class FileOperations(activity: FileManagerActivity) {
 
@@ -41,7 +42,11 @@ class FileOperations(activity: FileManagerActivity) {
         activity.startActivity(intent)
     }
 
-    fun openFolder(file: AboutFile, activity: FileManagerActivity, operations: ButtonClickOperations) {
+    fun openFolder(
+        file: AboutFile,
+        activity: FileManagerActivity,
+        operations: ButtonClickOperations
+    ) {
         if (file.mimeType == FileManagerActivity.TYPE_FOLDER) {
             if (activity.fileManagerAdapter.btnSearchPressed)
                 operations.fileTreeDepth++
@@ -129,7 +134,8 @@ class FileOperations(activity: FileManagerActivity) {
 
         val customTitle =
             LayoutInflater.from(activity).inflate(R.layout.custom_title, null)
-        customTitle.findViewById<TextView>(R.id.title_text).text = activity.getString(R.string.rename_upper)
+        customTitle.findViewById<TextView>(R.id.title_text).text =
+            activity.getString(R.string.rename_upper)
 
         val builder = AlertDialog.Builder(view.context)
             .setView(dialogView)
@@ -143,8 +149,7 @@ class FileOperations(activity: FileManagerActivity) {
                     if (activity.currentPath.toString().contains(activity.sdCardPath.toString())) {
                         sdCardOperations.renameOnSDCard(currentItem, newName, activity)
                         activity.loadFiles()
-                    }
-                    else {
+                    } else {
                         file.renameTo(
                             File(
                                 activity.currentPath,

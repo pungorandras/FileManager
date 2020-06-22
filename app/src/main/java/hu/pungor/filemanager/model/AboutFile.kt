@@ -1,6 +1,6 @@
 package hu.pungor.filemanager.model
 
-class AboutFile (
+class AboutFile(
     var name: String,
     val info: String,
     val uri: String,

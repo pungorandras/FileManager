@@ -15,7 +15,8 @@ class SDCardOperations {
         val sdCardFile = getChildren(dstPath, activity)?.createFile("", file.name)
         val buffer = ByteArray(8 * 1024)
         val bufferedInput = BufferedInputStream(FileInputStream(file))
-        val bufferedOutput = sdCardFile?.uri?.let { BufferedOutputStream(activity.contentResolver.openOutputStream(it)) }
+        val bufferedOutput =
+            sdCardFile?.uri?.let { BufferedOutputStream(activity.contentResolver.openOutputStream(it)) }
 
         while (bufferedInput.read(buffer, 0, buffer.size) >= 0) {
             bufferedOutput?.write(buffer, 0, buffer.size)
@@ -48,7 +49,8 @@ class SDCardOperations {
             id += dstPath.toString().removePrefix(activity.sdCardPath.toString())
             val childrenUri = DocumentsContract.buildDocumentUriUsingTree(activity.getUri(), id)
             return DocumentFile.fromTreeUri(activity, childrenUri)
-        } catch (e: Exception) {}
+        } catch (e: Exception) {
+        }
 
         return null
     }
