@@ -13,13 +13,17 @@ class SDCardOperations {
 
     fun copyToSDCard(dstPath: File, file: File, activity: FileManagerActivity) {
         val sdCardFile = getChildren(dstPath, activity)?.createFile("", file.name)
-        val buffer = ByteArray(8 * 1024)
+        val bufferSize = 8 * 1024
         val bufferedInput = BufferedInputStream(FileInputStream(file))
         val bufferedOutput =
             sdCardFile?.uri?.let { BufferedOutputStream(activity.contentResolver.openOutputStream(it)) }
 
-        while (bufferedInput.read(buffer, 0, buffer.size) >= 0) {
-            bufferedOutput?.write(buffer, 0, buffer.size)
+        bufferedInput.use { input ->
+            bufferedOutput.use { output ->
+                if (output != null) {
+                    input.copyTo(output, bufferSize)
+                }
+            }
         }
     }
 

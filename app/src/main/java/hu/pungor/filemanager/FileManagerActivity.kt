@@ -61,19 +61,25 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
             currentPath = rootPath
             Internal.backgroundTintList =
                 applicationContext.resources.getColorStateList(R.color.button_pressed)
-            SDCard.backgroundTintList =
-                applicationContext.resources.getColorStateList(R.color.button)
+            if (sdCardPath != null) {
+                SDCard.backgroundTintList =
+                    applicationContext.resources.getColorStateList(R.color.button)
+            }
             loadFilesWithPermissionCheck()
         }
 
         SDCard.setOnClickListener {
             sdCardPath = getSDCardPath()
-            Internal.backgroundTintList =
-                applicationContext.resources.getColorStateList(R.color.button)
-            SDCard.backgroundTintList =
-                applicationContext.resources.getColorStateList(R.color.button_pressed)
-            sdCardPermissions(sdCardPath!!)
-            currentPath = sdCardPath!!
+
+            if (sdCardPath != null) {
+                Internal.backgroundTintList =
+                    applicationContext.resources.getColorStateList(R.color.button)
+                SDCard.backgroundTintList =
+                    applicationContext.resources.getColorStateList(R.color.button_pressed)
+                sdCardPermissions(sdCardPath!!)
+                currentPath = sdCardPath!!
+            }
+
             loadFilesWithPermissionCheck()
         }
 
@@ -121,7 +127,8 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
             rvFiles.adapter = fileManagerAdapter
             fileManagerAdapter.setFiles(AsyncGetAllFiles().execute(this).get())
             fileManagerAdapter.itemClickListener = this
-        } catch (e: Exception) {}
+        } catch (e: Exception) {
+        }
     }
 
     override fun onRequestPermissionsResult(
