@@ -50,7 +50,7 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
 
         loadFilesWithPermissionCheck()
 
-        SDCardPathIsNull()
+        sdCardPathIsNull()
 
         Internal.setOnClickListener {
             currentPath = rootPath
@@ -75,7 +75,7 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
                 sdCardPermissions(sdCardPath!!)
                 currentPath = sdCardPath!!
             } else
-                SDCardPathIsNull()
+                sdCardPathIsNull()
 
             loadFilesWithPermissionCheck()
         }
@@ -231,7 +231,7 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
         return sdCardPath
     }
 
-    private fun SDCardPathIsNull() {
+    private fun sdCardPathIsNull() {
         if (sdCardPath == null) {
             SDCard.isEnabled = false
             SDCard.backgroundTintList =
