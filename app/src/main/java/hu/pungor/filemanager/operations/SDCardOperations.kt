@@ -25,6 +25,10 @@ class SDCardOperations {
                 }
             }
         }
+
+        bufferedInput.close()
+        bufferedOutput?.flush()
+        bufferedOutput?.close()
     }
 
     fun createTextFileOnSDCard(name: String, notes: String, activity: FileManagerActivity) {

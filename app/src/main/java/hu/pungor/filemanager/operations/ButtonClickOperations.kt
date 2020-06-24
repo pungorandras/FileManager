@@ -273,13 +273,25 @@ class ButtonClickOperations(activity: FileManagerActivity) {
             activity.currentPath = latestPathBeforeAction
             activity.fileManagerAdapter.btnSearchPressed = false
             activity.loadFiles()
-
             activity.Internal.isEnabled = true
-            activity.Internal.backgroundTintList =
-                activity.applicationContext.resources.getColorStateList(R.color.button)
-            activity.SDCard.isEnabled = true
-            activity.SDCard.backgroundTintList =
-                activity.applicationContext.resources.getColorStateList(R.color.button)
+
+            if (activity.currentPath.toString().contains(activity.rootPath.toString()))
+                activity.Internal.backgroundTintList =
+                    activity.applicationContext.resources.getColorStateList(R.color.button_pressed)
+            else
+                activity.Internal.backgroundTintList =
+                    activity.applicationContext.resources.getColorStateList(R.color.button)
+
+            if (activity.sdCardPath != null) {
+                activity.SDCard.isEnabled = true
+
+                if (activity.currentPath.toString().contains(activity.sdCardPath.toString()))
+                    activity.SDCard.backgroundTintList =
+                        activity.applicationContext.resources.getColorStateList(R.color.button_pressed)
+                else
+                    activity.SDCard.backgroundTintList =
+                        activity.applicationContext.resources.getColorStateList(R.color.button)
+            }
 
             setButton(activity.create_textfile, activity)
             setButton(activity.create_folder, activity)

@@ -50,12 +50,7 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
 
         loadFilesWithPermissionCheck()
 
-        if (sdCardPath == null) {
-            SDCard.isEnabled = false
-            SDCard.backgroundTintList =
-                applicationContext.resources.getColorStateList(R.color.disabled)
-            SDCard.text = getString(R.string.no_sdcard)
-        }
+        SDCardPathIsNull()
 
         Internal.setOnClickListener {
             currentPath = rootPath
@@ -65,6 +60,7 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
                 SDCard.backgroundTintList =
                     applicationContext.resources.getColorStateList(R.color.button)
             }
+
             loadFilesWithPermissionCheck()
         }
 
@@ -78,7 +74,8 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
                     applicationContext.resources.getColorStateList(R.color.button_pressed)
                 sdCardPermissions(sdCardPath!!)
                 currentPath = sdCardPath!!
-            }
+            } else
+                SDCardPathIsNull()
 
             loadFilesWithPermissionCheck()
         }
@@ -110,11 +107,6 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
         search.setOnClickListener {
             buttonClickOperations.searchButtonOperations(this)
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        loadFiles()
     }
 
     @NeedsPermission(
@@ -237,6 +229,15 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
         }
 
         return sdCardPath
+    }
+
+    private fun SDCardPathIsNull() {
+        if (sdCardPath == null) {
+            SDCard.isEnabled = false
+            SDCard.backgroundTintList =
+                applicationContext.resources.getColorStateList(R.color.disabled)
+            SDCard.text = getString(R.string.no_sdcard)
+        }
     }
 
     private fun sdCardPermissions(sdCardRootPath: File) {
