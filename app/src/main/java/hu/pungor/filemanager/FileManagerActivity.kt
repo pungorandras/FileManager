@@ -346,11 +346,21 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
                         fileOperations.shareFile(view, position, this)
                         true
                     }
+                    R.id.copy -> {
+                        //TODO
+                        true
+                    }
+                    R.id.move -> {
+                        //TODO
+                        true
+                    }
                     R.id.rename -> {
                         fileOperations.renameFile(view, position, this)
                         true
                     }
                     R.id.delete -> {
+                        fileManagerAdapter.popupMenuPressed = true
+                        fileManagerAdapter.backupSelectedList()
                         fileManagerAdapter.clearSelectedList()
                         fileManagerAdapter.addToSelectedList(fileManagerAdapter.getItem(position))
                         buttonClickOperations.deleteSelectedBuilder(this)

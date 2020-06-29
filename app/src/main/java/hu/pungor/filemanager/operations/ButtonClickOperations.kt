@@ -103,9 +103,14 @@ class ButtonClickOperations(activity: FileManagerActivity) {
             .setCancelable(false)
             .setPositiveButton(activity.getString(R.string.yes)) { dialog, which ->
                 fileOperations.deleteSelectedFiles(activity)
+                activity.fileManagerAdapter.popupMenuPressed = false
             }
             .setNegativeButton(activity.getString(R.string.no)) { dialog, which ->
-                activity.fileManagerAdapter.clearSelectedList()
+                if (activity.fileManagerAdapter.popupMenuPressed) {
+                    activity.fileManagerAdapter.popupMenuPressed = false
+                    activity.fileManagerAdapter.clearSelectedList()
+                    activity.fileManagerAdapter.restoreSelectedList()
+                }
             }
 
         if (!selectedList.isNullOrEmpty())

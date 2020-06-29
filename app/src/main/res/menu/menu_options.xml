@@ -12,6 +12,16 @@
         android:title="@string/share_with"
         app:showAsAction="ifRoom" />
     <item
+        android:id="@+id/copy"
+        android:icon="@drawable/copy"
+        android:title="@string/copy_to"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/move"
+        android:icon="@drawable/move"
+        android:title="@string/move_to"
+        app:showAsAction="ifRoom" />
+    <item
         android:id="@+id/rename"
         android:icon="@drawable/rename"
         android:title="@string/rename"

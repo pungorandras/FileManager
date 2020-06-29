@@ -42,4 +42,6 @@
     <string name="sd_permission_denied">SDCard permissions denied!</string>
     <string name="cannot_move_into_itself">You cannot move the folder into itself!</string>
     <string name="open_with">Open with…</string>
+    <string name="copy_to">Copy to…</string>
+    <string name="move_to">Move to…</string>
 </resources>

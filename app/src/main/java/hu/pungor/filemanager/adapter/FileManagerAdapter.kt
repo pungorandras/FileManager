@@ -27,12 +27,14 @@ class FileManagerAdapter : RecyclerView.Adapter<FileManagerAdapter.FileManagerVi
 
     private val fileList = mutableListOf<AboutFile>()
     private var selectedList = mutableListOf<AboutFile>()
+    private var selectedListBackup = mutableListOf<AboutFile>()
 
     var clearSelectedList = true
     var btnSelectAllPressed = false
     var btnCopyPressed = false
     var btnMovePressed = false
     var btnSearchPressed = false
+    var popupMenuPressed = false
 
     var itemClickListener: FileItemClickListener? = null
 
@@ -249,6 +251,14 @@ class FileManagerAdapter : RecyclerView.Adapter<FileManagerAdapter.FileManagerVi
 
     fun getSelectedList(): List<AboutFile> {
         return selectedList
+    }
+
+    fun backupSelectedList() {
+        selectedListBackup = selectedList.toMutableList()
+    }
+
+    fun restoreSelectedList() {
+        selectedList = selectedListBackup.toMutableList()
     }
 
     fun addToSelectedList(file: AboutFile) {
