@@ -25,6 +25,7 @@ import kotlinx.android.synthetic.main.activity_filemanager.*
 import permissions.dispatcher.*
 import java.io.File
 import java.util.*
+import java.util.regex.Pattern
 
 
 @Suppress("DEPRECATION")
@@ -220,10 +221,11 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
     private fun getSDCardPath(): File? {
         val storage: Array<File>? = File("/storage").listFiles()
         var sdCardPath: File? = null
+        val pattern = Pattern.compile("([A-Z]|[0-9]){4}-([A-Z]|[0-9]){4}")
 
         if (storage != null) {
             for (element in storage) {
-                if (element.name != "emulated" && element.name != "self")
+                if (pattern.matcher(element.name).matches())
                     sdCardPath = element
             }
         }
@@ -251,7 +253,7 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
             }
         }
 
-        if (Build.VERSION.SDK_INT < 24) {
+        if (Build.VERSION.SDK_INT < 24 && getUri() == null) {
             try {
                 startActivityForResult(Intent(Intent.ACTION_OPEN_DOCUMENT_TREE), 1001)
             } catch (e: Exception) {
@@ -329,31 +331,19 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
     }
 
     override fun onItemLongClick(position: Int, view: View): Boolean {
-        if (!fileManagerAdapter.btnSearchPressed && !fileManagerAdapter.popupMenuButtonPressed && !fileManagerAdapter.btnCopyPressed && !fileManagerAdapter.btnMovePressed) {
+        if (!fileManagerAdapter.btnSearchPressed && !fileManagerAdapter.btnCopyPressed && !fileManagerAdapter.btnMovePressed) {
             val wrapper = ContextThemeWrapper(this, R.style.NoPopupAnimation)
             val popup = PopupMenu(wrapper, view, Gravity.END)
             popup.inflate(R.menu.menu_options)
 
             popup.setOnMenuItemClickListener { item ->
                 when (item.itemId) {
+                    R.id.open_with -> {
+                        fileOperations.openUnknown(fileManagerAdapter.getItem(position), this)
+                        true
+                    }
                     R.id.share -> {
                         fileOperations.shareFile(view, position, this)
-                        true
-                    }
-                    R.id.copy -> {
-                        fileManagerAdapter.backupSelectedList()
-                        fileManagerAdapter.popupMenuButtonPressed = true
-                        fileManagerAdapter.clearSelectedList()
-                        fileManagerAdapter.addToSelectedList(fileManagerAdapter.getItem(position))
-                        copy_selected.performClick()
-                        true
-                    }
-                    R.id.move -> {
-                        fileManagerAdapter.backupSelectedList()
-                        fileManagerAdapter.popupMenuButtonPressed = true
-                        fileManagerAdapter.clearSelectedList()
-                        fileManagerAdapter.addToSelectedList(fileManagerAdapter.getItem(position))
-                        move_selected.performClick()
                         true
                     }
                     R.id.rename -> {
@@ -361,11 +351,9 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
                         true
                     }
                     R.id.delete -> {
-                        fileManagerAdapter.backupSelectedList()
-                        fileManagerAdapter.popupMenuButtonPressed = true
                         fileManagerAdapter.clearSelectedList()
                         fileManagerAdapter.addToSelectedList(fileManagerAdapter.getItem(position))
-                        delete_selected.performClick()
+                        buttonClickOperations.deleteSelectedBuilder(this)
                         true
                     }
                     else -> false

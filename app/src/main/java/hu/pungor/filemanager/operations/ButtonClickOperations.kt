@@ -103,13 +103,9 @@ class ButtonClickOperations(activity: FileManagerActivity) {
             .setCancelable(false)
             .setPositiveButton(activity.getString(R.string.yes)) { dialog, which ->
                 fileOperations.deleteSelectedFiles(activity)
-                activity.fileManagerAdapter.popupMenuButtonPressed = false
             }
             .setNegativeButton(activity.getString(R.string.no)) { dialog, which ->
-                if (activity.fileManagerAdapter.popupMenuButtonPressed) {
-                    activity.fileManagerAdapter.popupMenuButtonPressed = false
-                    activity.fileManagerAdapter.restoreSelectedList()
-                }
+                activity.fileManagerAdapter.clearSelectedList()
             }
 
         if (!selectedList.isNullOrEmpty())
@@ -137,7 +133,6 @@ class ButtonClickOperations(activity: FileManagerActivity) {
             activity.fileManagerAdapter.btnCopyPressed = false
 
             fileOperations.copySelectedFiles(activity)
-            latestPathBeforeAction = activity.currentPath
 
             setButton(activity.create_textfile, activity)
             setButton(activity.select_all, activity)
@@ -145,11 +140,6 @@ class ButtonClickOperations(activity: FileManagerActivity) {
             setButton(activity.move_selected, activity)
             activity.search.setImageResource(R.drawable.search)
             activity.copy_selected.setImageResource(R.drawable.copy)
-
-            if (activity.fileManagerAdapter.popupMenuButtonPressed) {
-                activity.fileManagerAdapter.popupMenuButtonPressed = false
-                activity.fileManagerAdapter.clearSelectedList()
-            }
         } else
             alertDialogMessages.noItemsSelected(activity)
     }
@@ -173,7 +163,6 @@ class ButtonClickOperations(activity: FileManagerActivity) {
             activity.fileManagerAdapter.btnMovePressed = false
 
             fileOperations.moveSelectedFiles(activity)
-            latestPathBeforeAction = activity.currentPath
 
             setButton(activity.create_textfile, activity)
             setButton(activity.select_all, activity)
@@ -181,11 +170,6 @@ class ButtonClickOperations(activity: FileManagerActivity) {
             setButton(activity.copy_selected, activity)
             activity.search.setImageResource(R.drawable.search)
             activity.move_selected.setImageResource(R.drawable.move)
-
-            if (activity.fileManagerAdapter.popupMenuButtonPressed) {
-                activity.fileManagerAdapter.popupMenuButtonPressed = false
-                activity.fileManagerAdapter.clearSelectedList()
-            }
         } else
             alertDialogMessages.noItemsSelected(activity)
     }
@@ -300,11 +284,6 @@ class ButtonClickOperations(activity: FileManagerActivity) {
             setButton(activity.copy_selected, activity)
             setButton(activity.move_selected, activity)
             activity.search.setImageResource(R.drawable.search)
-        }
-
-        if (activity.fileManagerAdapter.popupMenuButtonPressed) {
-            activity.fileManagerAdapter.popupMenuButtonPressed = false
-            activity.fileManagerAdapter.restoreSelectedList()
         }
     }
 

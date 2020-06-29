@@ -2,19 +2,14 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:id="@+id/open_with"
+        android:icon="@drawable/open_with"
+        android:title="@string/open_with"
+        app:showAsAction="ifRoom" />
+    <item
         android:id="@+id/share"
         android:icon="@drawable/share"
         android:title="@string/share_with"
-        app:showAsAction="ifRoom" />
-    <item
-        android:id="@+id/copy"
-        android:icon="@drawable/copy"
-        android:title="@string/copy_to"
-        app:showAsAction="ifRoom" />
-    <item
-        android:id="@+id/move"
-        android:icon="@drawable/move"
-        android:title="@string/move_to"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/rename"

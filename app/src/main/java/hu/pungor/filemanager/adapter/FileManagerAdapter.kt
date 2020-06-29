@@ -27,10 +27,8 @@ class FileManagerAdapter : RecyclerView.Adapter<FileManagerAdapter.FileManagerVi
 
     private val fileList = mutableListOf<AboutFile>()
     private var selectedList = mutableListOf<AboutFile>()
-    private var selectedListBackup = mutableListOf<AboutFile>()
 
     var clearSelectedList = true
-    var popupMenuButtonPressed = false
     var btnSelectAllPressed = false
     var btnCopyPressed = false
     var btnMovePressed = false
@@ -57,11 +55,11 @@ class FileManagerAdapter : RecyclerView.Adapter<FileManagerAdapter.FileManagerVi
         setDrawableOnLoad(holder, position)
 
         holder.file_icon.setOnClickListener {
-            if (file.selected && !popupMenuButtonPressed && !btnCopyPressed && !btnMovePressed && !btnSearchPressed) {
+            if (file.selected && !btnCopyPressed && !btnMovePressed && !btnSearchPressed) {
                 file.selected = false
                 removeFromSelectedList(file)
                 setDrawableOnLoad(holder, position)
-            } else if (holder.file_icon.drawable != null && !popupMenuButtonPressed && !btnCopyPressed && !btnMovePressed && !btnSearchPressed) {
+            } else if (holder.file_icon.drawable != null && !btnCopyPressed && !btnMovePressed && !btnSearchPressed) {
                 file.selected = true
                 selectedList.add(file)
                 val layerDrawable = tickOverlay(holder, holder.file_icon.drawable)
@@ -208,7 +206,7 @@ class FileManagerAdapter : RecyclerView.Adapter<FileManagerAdapter.FileManagerVi
     private fun setSelectedOnLoad(files: List<AboutFile>): List<AboutFile> {
         for (element in files) {
             for (selected in selectedList) {
-                if (element.uri == selected.uri && !popupMenuButtonPressed)
+                if (element.uri == selected.uri)
                     element.selected = true
             }
         }
@@ -251,14 +249,6 @@ class FileManagerAdapter : RecyclerView.Adapter<FileManagerAdapter.FileManagerVi
 
     fun getSelectedList(): List<AboutFile> {
         return selectedList
-    }
-
-    fun backupSelectedList() {
-        selectedListBackup = selectedList.toMutableList()
-    }
-
-    fun restoreSelectedList() {
-        selectedList = selectedListBackup.toMutableList()
     }
 
     fun addToSelectedList(file: AboutFile) {
