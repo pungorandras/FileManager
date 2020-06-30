@@ -13,7 +13,6 @@ import android.view.Gravity
 import android.view.View
 import android.webkit.MimeTypeMap
 import android.widget.PopupMenu
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import hu.pungor.filemanager.adapter.FileManagerAdapter
@@ -22,7 +21,10 @@ import hu.pungor.filemanager.operations.AsyncGetAllFiles
 import hu.pungor.filemanager.operations.ButtonClickOperations
 import hu.pungor.filemanager.operations.FileOperations
 import kotlinx.android.synthetic.main.activity_filemanager.*
-import permissions.dispatcher.*
+import permissions.dispatcher.NeedsPermission
+import permissions.dispatcher.OnShowRationale
+import permissions.dispatcher.PermissionRequest
+import permissions.dispatcher.RuntimePermissions
 import java.io.File
 import java.util.*
 import java.util.regex.Pattern
@@ -73,7 +75,8 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
                     applicationContext.resources.getColorStateList(R.color.button)
                 SDCard.backgroundTintList =
                     applicationContext.resources.getColorStateList(R.color.button_pressed)
-                sdCardPermissions(sdCardPath!!)
+                if (getUri() == null)
+                    sdCardPermissions(sdCardPath!!)
                 currentPath = sdCardPath!!
             } else
                 sdCardPathIsNull()
@@ -139,14 +142,6 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
     )
     fun showRationaleForStoragePermissions(request: PermissionRequest) {
         buttonClickOperations.showRationaleForStoragePermissionsBuilder(request, this)
-    }
-
-    @OnPermissionDenied(
-        Manifest.permission.READ_EXTERNAL_STORAGE,
-        Manifest.permission.WRITE_EXTERNAL_STORAGE
-    )
-    fun onPermissionDenied() {
-        Toast.makeText(this, getString(R.string.permission_denied), Toast.LENGTH_SHORT).show()
     }
 
     fun fillList(fileList: List<File>): List<AboutFile> {
@@ -243,7 +238,7 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
     }
 
     private fun sdCardPermissions(sdCardRootPath: File) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && Build.VERSION.SDK_INT < 29) {
             try {
                 val storageManager = getSystemService(STORAGE_SERVICE) as StorageManager
                 val storageVolume = storageManager.getStorageVolume(sdCardRootPath)
@@ -251,11 +246,9 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
                 startActivityForResult(intent, 1000)
             } catch (e: Exception) {
             }
-        }
-
-        if (Build.VERSION.SDK_INT < 24 && getUri() == null) {
+        } else {
             try {
-                startActivityForResult(Intent(Intent.ACTION_OPEN_DOCUMENT_TREE), 1001)
+                buttonClickOperations.sdCardPermissionsBuilder(this)
             } catch (e: Exception) {
             }
         }
@@ -274,14 +267,7 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
                         Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 contentResolver.takePersistableUriPermission(uri!!, takeFlags)
             }
-
         } catch (e: Exception) {
-            Toast.makeText(
-                applicationContext,
-                getString(R.string.sd_permission_denied),
-                Toast.LENGTH_SHORT
-            )
-                .show()
         }
     }
 

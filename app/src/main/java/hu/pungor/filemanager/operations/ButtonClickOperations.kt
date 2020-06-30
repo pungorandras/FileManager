@@ -1,5 +1,6 @@
 package hu.pungor.filemanager.operations
 
+import android.content.Intent
 import android.view.LayoutInflater
 import android.widget.EditText
 import android.widget.ImageButton
@@ -316,5 +317,26 @@ class ButtonClickOperations(activity: FileManagerActivity) {
             .setNegativeButton(activity.getString(R.string.exit)) { dialog, id -> request.cancel() }
             .create()
         alertDialog.show()
+    }
+
+    fun sdCardPermissionsBuilder(activity: FileManagerActivity) {
+        val customTitle =
+            LayoutInflater.from(activity).inflate(R.layout.custom_title, null)
+        customTitle.findViewById<TextView>(R.id.title_text).text = activity.getString(
+            R.string.info
+        )
+        val customText =
+            LayoutInflater.from(activity).inflate(R.layout.custom_text_alertdialog, null)
+        customText.findViewById<TextView>(R.id.custom_text).text =
+            activity.getString(R.string.sdcard_permission)
+
+        val builder = AlertDialog.Builder(activity)
+            .setCustomTitle(customTitle)
+            .setView(customText)
+            .setCancelable(false)
+            .setPositiveButton(activity.getString(R.string.ok)) { dialog, which ->
+                activity.startActivityForResult(Intent(Intent.ACTION_OPEN_DOCUMENT_TREE), 1001)
+            }
+        builder.show()
     }
 }
