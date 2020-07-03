@@ -46,5 +46,5 @@
     <string name="move_to">Áthelyezés ide…</string>
     <string name="sdcard_permission">A következő felugró ablakban ki kell választanod az SD-kártyádat, hogy megadd az írási engedélyt!</string>
     <string name="welcome">Üdvözöllek!</string>
-    <string name="welcome_message">"Köszi, hogy használod az app-omat! \n "  "Github: https://git.io/JJkLg \n" "Email: pungorandras@gmail.com"</string>
+    <string name="welcome_message">"Köszi, hogy használod az app-omat! \n "  "Github: git.io/JJkLg \n" "Email: pungorandras@gmail.com"</string>
 </resources>
