@@ -38,7 +38,7 @@
         android:layout_below="@+id/notes"
         android:background="@drawable/edittext_border"
         android:gravity="top"
-        android:hint="Your notes"
+        android:hint="@string/your_notes"
         android:padding="8dp" />
 
 </RelativeLayout>

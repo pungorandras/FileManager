@@ -89,7 +89,7 @@ class FileManagerAdapter : RecyclerView.Adapter<FileManagerAdapter.FileManagerVi
                         dataSource: DataSource?,
                         isFirstResource: Boolean
                     ): Boolean {
-                        if (file.selected) {
+                        if (file.selected && !popupMenuPressed) {
                             val layerDrawable = tickOverlay(holder, resource)
                             holder.file_icon.setImageDrawable(layerDrawable)
                             return true
@@ -117,7 +117,7 @@ class FileManagerAdapter : RecyclerView.Adapter<FileManagerAdapter.FileManagerVi
                         dataSource: DataSource?,
                         isFirstResource: Boolean
                     ): Boolean {
-                        if (file.selected) {
+                        if (file.selected && !popupMenuPressed) {
                             val layerDrawable = tickOverlay(holder, resource)
                             holder.file_icon.setImageDrawable(layerDrawable)
                             return true
@@ -146,7 +146,7 @@ class FileManagerAdapter : RecyclerView.Adapter<FileManagerAdapter.FileManagerVi
                         dataSource: DataSource?,
                         isFirstResource: Boolean
                     ): Boolean {
-                        if (file.selected) {
+                        if (file.selected && !popupMenuPressed) {
                             val layerDrawable = tickOverlay(holder, resource)
                             holder.file_icon.setImageDrawable(layerDrawable)
                             return true
@@ -176,7 +176,7 @@ class FileManagerAdapter : RecyclerView.Adapter<FileManagerAdapter.FileManagerVi
                         dataSource: DataSource?,
                         isFirstResource: Boolean
                     ): Boolean {
-                        if (file.selected) {
+                        if (file.selected && !popupMenuPressed) {
                             val layerDrawable = tickOverlay(holder, resource)
                             holder.file_icon.setImageDrawable(layerDrawable)
                             return true

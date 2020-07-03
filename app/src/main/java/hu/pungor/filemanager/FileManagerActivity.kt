@@ -333,7 +333,11 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
                         true
                     }
                     R.id.copy -> {
-                        //TODO
+                        fileManagerAdapter.popupMenuPressed = true
+                        fileManagerAdapter.backupSelectedList()
+                        fileManagerAdapter.clearSelectedList()
+                        fileManagerAdapter.addToSelectedList(fileManagerAdapter.getItem(position))
+                        buttonClickOperations.copySelectedOperation(this)
                         true
                     }
                     R.id.move -> {

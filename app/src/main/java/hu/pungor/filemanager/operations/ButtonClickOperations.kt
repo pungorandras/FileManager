@@ -139,6 +139,7 @@ class ButtonClickOperations(activity: FileManagerActivity) {
             activity.fileManagerAdapter.btnCopyPressed = false
 
             fileOperations.copySelectedFiles(activity)
+            activity.fileManagerAdapter.popupMenuPressed = false
 
             setButton(activity.create_textfile, activity)
             setButton(activity.select_all, activity)
@@ -169,6 +170,7 @@ class ButtonClickOperations(activity: FileManagerActivity) {
             activity.fileManagerAdapter.btnMovePressed = false
 
             fileOperations.moveSelectedFiles(activity)
+            activity.fileManagerAdapter.popupMenuPressed = false
 
             setButton(activity.create_textfile, activity)
             setButton(activity.select_all, activity)
@@ -259,7 +261,7 @@ class ButtonClickOperations(activity: FileManagerActivity) {
                 }
                 .setNegativeButton(activity.getString(R.string.cancel), null)
             builder.show()
-        } else {
+        } else if (activity.fileManagerAdapter.btnSearchPressed) {
             activity.currentPath = latestPathBeforeAction
             activity.fileManagerAdapter.btnSearchPressed = false
             activity.loadFiles()
@@ -290,6 +292,14 @@ class ButtonClickOperations(activity: FileManagerActivity) {
             setButton(activity.copy_selected, activity)
             setButton(activity.move_selected, activity)
             activity.search.setImageResource(R.drawable.search)
+        }
+
+        if (activity.fileManagerAdapter.popupMenuPressed) {
+            activity.fileManagerAdapter.popupMenuPressed = false
+            activity.fileManagerAdapter.clearSelectedList()
+
+            if (activity.currentPath == latestPathBeforeAction)
+                activity.fileManagerAdapter.setFiles(AsyncGetAllFiles().execute(activity).get())
         }
     }
 
