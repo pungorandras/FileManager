@@ -10,9 +10,12 @@ import android.os.storage.StorageManager
 import android.util.Log
 import android.view.ContextThemeWrapper
 import android.view.Gravity
+import android.view.LayoutInflater
 import android.view.View
 import android.webkit.MimeTypeMap
 import android.widget.PopupMenu
+import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import hu.pungor.filemanager.adapter.FileManagerAdapter
@@ -51,9 +54,15 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_filemanager)
 
+        val prefs = getSharedPreferences("prefs", MODE_PRIVATE)
+        val firstStart = prefs.getBoolean("firstStart", true)
+
         loadFilesWithPermissionCheck()
 
         sdCardPathIsNull()
+
+        if (firstStart)
+            showOnFirstStart()
 
         Internal.setOnClickListener {
             currentPath = rootPath
@@ -111,6 +120,28 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
         search.setOnClickListener {
             buttonClickOperations.searchButtonOperations(this)
         }
+    }
+
+    private fun showOnFirstStart() {
+        val customTitle =
+            LayoutInflater.from(applicationContext).inflate(R.layout.custom_title, null)
+        customTitle.findViewById<TextView>(R.id.title_text).text = getString(R.string.welcome)
+        val customText =
+            LayoutInflater.from(this).inflate(R.layout.custom_text_alertdialog, null)
+        customText.findViewById<TextView>(R.id.custom_text).text =
+            getString(R.string.welcome_message)
+
+        AlertDialog.Builder(this)
+            .setView(customText)
+            .setCustomTitle(customTitle)
+            .setCancelable(false)
+            .setPositiveButton(getString(R.string.ok), null)
+            .show()
+
+        val prefs = getSharedPreferences("prefs", MODE_PRIVATE)
+        val editor = prefs.edit()
+        editor.putBoolean("firstStart", false)
+        editor.apply()
     }
 
     @NeedsPermission(
