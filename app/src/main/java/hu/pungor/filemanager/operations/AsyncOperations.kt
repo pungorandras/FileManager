@@ -3,6 +3,8 @@ package hu.pungor.filemanager.operations
 import android.app.ProgressDialog
 import android.content.DialogInterface
 import android.os.AsyncTask
+import android.view.LayoutInflater
+import android.widget.TextView
 import androidx.documentfile.provider.DocumentFile
 import hu.pungor.filemanager.FileManagerActivity
 import hu.pungor.filemanager.R
@@ -31,7 +33,13 @@ class AsyncCopySelected(private val activity: FileManagerActivity) :
     private var selectedListSize = 0.0
 
     override fun onPreExecute() {
-        progressDialog.setTitle(activity.getString(R.string.copying))
+        val customTitle =
+            LayoutInflater.from(activity).inflate(R.layout.custom_title, null)
+        customTitle.findViewById<TextView>(R.id.title_text).text = activity.getString(
+            R.string.copying
+        )
+
+        progressDialog.setCustomTitle(customTitle)
         progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL)
         progressDialog.max = 100
         progressDialog.progress = 0
@@ -154,7 +162,13 @@ class AsyncDeleteSelected(private val activity: FileManagerActivity) :
     private var selectedListSize = 0.0
 
     override fun onPreExecute() {
-        progressDialog.setTitle(activity.getString(R.string.deleting))
+        val customTitle =
+            LayoutInflater.from(activity).inflate(R.layout.custom_title, null)
+        customTitle.findViewById<TextView>(R.id.title_text).text = activity.getString(
+            R.string.deleting
+        )
+
+        progressDialog.setCustomTitle(customTitle)
         progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL)
         progressDialog.max = 100
         progressDialog.progress = 0
@@ -270,7 +284,13 @@ class AsyncMoveSelected(private val activity: FileManagerActivity) :
     private var selectedListSize = 0.0
 
     override fun onPreExecute() {
-        progressDialog.setTitle(activity.getString(R.string.moving))
+        val customTitle =
+            LayoutInflater.from(activity).inflate(R.layout.custom_title, null)
+        customTitle.findViewById<TextView>(R.id.title_text).text = activity.getString(
+            R.string.moving
+        )
+        
+        progressDialog.setCustomTitle(customTitle)
         progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL)
         progressDialog.max = 100
         progressDialog.progress = 0
