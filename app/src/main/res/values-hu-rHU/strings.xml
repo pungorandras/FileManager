@@ -28,8 +28,8 @@
     <string name="no">Nem</string>
     <string name="new_folder">Új mappa látrehozása</string>
     <string name="are_you_sure">BIZTOS VAGY BENNE?</string>
-    <string name="delete_selected_items">Kiválasztott fájlok törlése</string>
-    <string name="delete_item">"Fájl törlése: "</string>
+    <string name="delete_selected_items">Kiválasztott elemek törlése</string>
+    <string name="delete_item">"Elem törlése: "</string>
     <string name="your_notes">Jegyzeteid</string>
     <string name="create_new_textfile">ÚJ SZÖVEGES FÁJL LÉTREHOZÁSA</string>
     <string name="name">Név:</string>
