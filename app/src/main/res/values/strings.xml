@@ -45,4 +45,7 @@
     <string name="sdcard_permission">In the next dialog you need to choose your SD card to grant write permission!</string>
     <string name="welcome">Welcome!</string>
     <string name="welcome_message">"Thanks for using my app! \n " + "Github: git.io/JJkLg \n" + "Email: pungorandras@gmail.com"</string>
+    <string name="copying">Copying…</string>
+    <string name="deleting">Deleting…</string>
+    <string name="moving">Moving…</string>
 </resources>

@@ -5,6 +5,7 @@ import android.content.DialogInterface
 import android.os.AsyncTask
 import androidx.documentfile.provider.DocumentFile
 import hu.pungor.filemanager.FileManagerActivity
+import hu.pungor.filemanager.R
 import hu.pungor.filemanager.alertdialog.AlertDialogMessages
 import hu.pungor.filemanager.model.AboutFile
 import java.io.File
@@ -19,7 +20,7 @@ class AsyncGetAllFiles() : AsyncTask<FileManagerActivity, Void, List<AboutFile>>
 }
 
 @Suppress("DEPRECATION")
-class AsyncCopySelected(activity: FileManagerActivity) :
+class AsyncCopySelected(private val activity: FileManagerActivity) :
     AsyncTask<FileManagerActivity, Int, FileManagerActivity>() {
 
     private val progressDialog = ProgressDialog(activity)
@@ -30,14 +31,14 @@ class AsyncCopySelected(activity: FileManagerActivity) :
     private var selectedListSize = 0.0
 
     override fun onPreExecute() {
-        progressDialog.setTitle("Copying...")
+        progressDialog.setTitle(activity.getString(R.string.copying))
         progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL)
         progressDialog.max = 100
         progressDialog.progress = 0
         progressDialog.setCancelable(false)
         progressDialog.setButton(
             DialogInterface.BUTTON_NEGATIVE,
-            "Cancel"
+            activity.getString(R.string.cancel)
         ) { dialog, which ->
             this.cancel(true)
         }
@@ -144,7 +145,7 @@ class AsyncCopySelected(activity: FileManagerActivity) :
 }
 
 @Suppress("DEPRECATION")
-class AsyncDeleteSelected(activity: FileManagerActivity) :
+class AsyncDeleteSelected(private val activity: FileManagerActivity) :
     AsyncTask<FileManagerActivity, Int, FileManagerActivity>() {
 
     private val progressDialog = ProgressDialog(activity)
@@ -153,14 +154,14 @@ class AsyncDeleteSelected(activity: FileManagerActivity) :
     private var selectedListSize = 0.0
 
     override fun onPreExecute() {
-        progressDialog.setTitle("Deleting...")
+        progressDialog.setTitle(activity.getString(R.string.deleting))
         progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL)
         progressDialog.max = 100
         progressDialog.progress = 0
         progressDialog.setCancelable(false)
         progressDialog.setButton(
             DialogInterface.BUTTON_NEGATIVE,
-            "Cancel"
+            activity.getString(R.string.cancel)
         ) { dialog, which ->
             this.cancel(true)
         }
@@ -257,7 +258,7 @@ class AsyncDeleteSelected(activity: FileManagerActivity) :
 }
 
 @Suppress("DEPRECATION")
-class AsyncMoveSelected(activity: FileManagerActivity) :
+class AsyncMoveSelected(private val activity: FileManagerActivity) :
     AsyncTask<FileManagerActivity, Int, FileManagerActivity>() {
 
     private val progressDialog = ProgressDialog(activity)
@@ -269,14 +270,14 @@ class AsyncMoveSelected(activity: FileManagerActivity) :
     private var selectedListSize = 0.0
 
     override fun onPreExecute() {
-        progressDialog.setTitle("Moving...")
+        progressDialog.setTitle(activity.getString(R.string.moving))
         progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL)
         progressDialog.max = 100
         progressDialog.progress = 0
         progressDialog.setCancelable(false)
         progressDialog.setButton(
             DialogInterface.BUTTON_NEGATIVE,
-            "Cancel"
+            activity.getString(R.string.cancel)
         ) { dialog, which ->
             this.cancel(true)
         }
