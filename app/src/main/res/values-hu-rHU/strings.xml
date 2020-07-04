@@ -11,7 +11,7 @@
     <string name="delete">Törlés</string>
     <string name="type_a_name_here">Ide írd a fájlnevet</string>
     <string name="no_items_selected">NINCS SEMMI KIVÁLASZTVA</string>
-    <string name="to_select_items">Fájlok kiválasztásához kattints az ikonjukra.</string>
+    <string name="to_select_items">Fájlok/mappák kiválasztásához kattints az ikonjukra.</string>
     <string name="ok">OK</string>
     <string name="already_exist">Már létezik!</string>
     <string name="empty_name">ÜRES NÉV</string>
@@ -23,7 +23,6 @@
     <string name="proceed">Folytatás</string>
     <string name="exit">Kilépés</string>
     <string name="no_sdcard">SD-kártya nem található</string>
-    <string name="permission_denied">Engedély megtagadva!</string>
     <string name="cancel">Mégse</string>
     <string name="yes">Igen</string>
     <string name="no">Nem</string>

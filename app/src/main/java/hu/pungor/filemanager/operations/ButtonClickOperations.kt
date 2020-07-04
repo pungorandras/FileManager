@@ -319,14 +319,24 @@ class ButtonClickOperations(activity: FileManagerActivity) {
         request: PermissionRequest,
         activity: FileManagerActivity
     ) {
-        val alertDialog = AlertDialog.Builder(activity)
-            .setTitle(activity.getString(R.string.attention))
-            .setMessage(activity.getString(R.string.rationale))
+        val customTitle =
+            LayoutInflater.from(activity.applicationContext).inflate(R.layout.custom_title, null)
+        customTitle.findViewById<TextView>(R.id.title_text).text =
+            activity.getString(R.string.attention)
+        val customText =
+            LayoutInflater.from(activity.applicationContext)
+                .inflate(R.layout.custom_text_alertdialog, null)
+        customText.findViewById<TextView>(R.id.custom_text).text =
+            activity.getString(R.string.rationale)
+
+        val builder = AlertDialog.Builder(activity)
+            .setView(customText)
+            .setCustomTitle(customTitle)
             .setCancelable(false)
             .setPositiveButton(activity.getString(R.string.proceed)) { dialog, id -> request.proceed() }
             .setNegativeButton(activity.getString(R.string.exit)) { dialog, id -> request.cancel() }
             .create()
-        alertDialog.show()
+        builder.show()
     }
 
     fun sdCardPermissionsBuilder(activity: FileManagerActivity) {

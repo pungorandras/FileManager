@@ -22,7 +22,6 @@
     <string name="proceed">Proceed</string>
     <string name="exit">Exit</string>
     <string name="no_sdcard">No SD Card detected</string>
-    <string name="permission_denied">Permission denied!</string>
     <string name="cancel">Cancel</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>

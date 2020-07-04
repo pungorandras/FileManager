@@ -10,15 +10,13 @@ import android.os.storage.StorageManager
 import android.util.Log
 import android.view.ContextThemeWrapper
 import android.view.Gravity
-import android.view.LayoutInflater
 import android.view.View
 import android.webkit.MimeTypeMap
 import android.widget.PopupMenu
-import android.widget.TextView
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import hu.pungor.filemanager.adapter.FileManagerAdapter
+import hu.pungor.filemanager.alertdialog.AlertDialogMessages
 import hu.pungor.filemanager.model.AboutFile
 import hu.pungor.filemanager.operations.AsyncGetAllFiles
 import hu.pungor.filemanager.operations.ButtonClickOperations
@@ -39,6 +37,7 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
 
     val fileManagerAdapter = FileManagerAdapter()
     private val buttonClickOperations = ButtonClickOperations(this)
+    private val alertDialogMessages = AlertDialogMessages()
     private val fileOperations = FileOperations(this)
 
     var rootPath = File(Environment.getExternalStorageDirectory().absolutePath)
@@ -54,15 +53,9 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_filemanager)
 
-        val prefs = getSharedPreferences("prefs", MODE_PRIVATE)
-        val firstStart = prefs.getBoolean("firstStart", true)
-
         loadFilesWithPermissionCheck()
 
         sdCardPathIsNull()
-
-        if (firstStart)
-            showOnFirstStart()
 
         Internal.setOnClickListener {
             currentPath = rootPath
@@ -122,28 +115,6 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
         }
     }
 
-    private fun showOnFirstStart() {
-        val customTitle =
-            LayoutInflater.from(applicationContext).inflate(R.layout.custom_title, null)
-        customTitle.findViewById<TextView>(R.id.title_text).text = getString(R.string.welcome)
-        val customText =
-            LayoutInflater.from(this).inflate(R.layout.custom_text_alertdialog, null)
-        customText.findViewById<TextView>(R.id.custom_text).text =
-            getString(R.string.welcome_message)
-
-        AlertDialog.Builder(this)
-            .setView(customText)
-            .setCustomTitle(customTitle)
-            .setCancelable(false)
-            .setPositiveButton(getString(R.string.ok), null)
-            .show()
-
-        val prefs = getSharedPreferences("prefs", MODE_PRIVATE)
-        val editor = prefs.edit()
-        editor.putBoolean("firstStart", false)
-        editor.apply()
-    }
-
     @NeedsPermission(
         Manifest.permission.READ_EXTERNAL_STORAGE,
         Manifest.permission.WRITE_EXTERNAL_STORAGE
@@ -165,6 +136,12 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         onRequestPermissionsResult(requestCode, grantResults)
+
+        val prefs = getSharedPreferences("prefs", MODE_PRIVATE)
+        val firstStart = prefs.getBoolean("firstStart", true)
+
+        if (firstStart)
+            alertDialogMessages.showOnFirstStart(this)
     }
 
     @OnShowRationale(
