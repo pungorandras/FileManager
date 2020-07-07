@@ -349,7 +349,11 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
                         true
                     }
                     R.id.move -> {
-                        //TODO
+                        fileManagerAdapter.popupMenuPressed = true
+                        fileManagerAdapter.backupSelectedList()
+                        fileManagerAdapter.clearSelectedList()
+                        fileManagerAdapter.addToSelectedList(fileManagerAdapter.getItem(position))
+                        buttonClickOperations.moveSelectedOperation(this)
                         true
                     }
                     R.id.rename -> {

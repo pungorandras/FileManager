@@ -160,6 +160,13 @@ class FileManagerAdapter : RecyclerView.Adapter<FileManagerAdapter.FileManagerVi
                         target: Target<Drawable>?,
                         isFirstResource: Boolean
                     ): Boolean {
+                        if (file.selected && !popupMenuPressed) {
+                            val r = holder.file_icon.resources
+                            val layerDrawable =
+                                tickOverlay(holder, r.getDrawable(R.drawable.file_icon_default))
+                            holder.file_icon.setImageDrawable(layerDrawable)
+                            return true
+                        }
                         return false
                     }
                 }).into(holder.file_icon)
