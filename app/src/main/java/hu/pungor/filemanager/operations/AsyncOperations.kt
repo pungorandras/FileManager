@@ -289,7 +289,7 @@ class AsyncMoveSelected(private val activity: FileManagerActivity) :
         customTitle.findViewById<TextView>(R.id.title_text).text = activity.getString(
             R.string.moving
         )
-        
+
         progressDialog.setCustomTitle(customTitle)
         progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL)
         progressDialog.max = 100

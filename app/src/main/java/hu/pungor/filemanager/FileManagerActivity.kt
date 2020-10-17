@@ -237,12 +237,8 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
     }
 
     private fun sdCardPathIsNull() {
-        if (sdCardPath == null) {
-            SDCard.isEnabled = false
-            SDCard.backgroundTintList =
-                applicationContext.resources.getColorStateList(R.color.disabled)
-            SDCard.text = getString(R.string.no_sdcard)
-        }
+        if (sdCardPath == null)
+            SDCard.visibility = View.GONE
     }
 
     private fun sdCardPermissions(sdCardRootPath: File) {
