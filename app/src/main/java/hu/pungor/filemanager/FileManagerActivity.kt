@@ -41,7 +41,7 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
     private val fileOperations = FileOperations(this)
 
     var rootPath = File(Environment.getExternalStorageDirectory().absolutePath)
-    var sdCardPath: File? = getSDCardPath()
+    var sdCardPath: File? = null
     var currentPath = rootPath
 
     companion object {
@@ -72,13 +72,11 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
         SDCard.setOnClickListener {
             sdCardPath = getSDCardPath()
 
-            if (sdCardPath != null) {
+            if (!sdCardPath.toString().contains("null")) {
                 Internal.backgroundTintList =
                     applicationContext.resources.getColorStateList(R.color.button)
                 SDCard.backgroundTintList =
                     applicationContext.resources.getColorStateList(R.color.button_pressed)
-                if (getUri() == null)
-                    sdCardPermissions(sdCardPath!!)
                 currentPath = sdCardPath!!
             } else
                 sdCardPathIsNull()
@@ -225,24 +223,30 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
         val storage: Array<File>? = File("/storage").listFiles()
         var sdCardPath: File? = null
         val pattern = Pattern.compile("([A-Z]|[0-9]){4}-([A-Z]|[0-9]){4}")
+        val regex = pattern.toRegex()
 
-        if (storage != null) {
-            for (element in storage) {
-                if (pattern.matcher(element.name).matches())
-                    sdCardPath = element
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+            if (storage != null) {
+                for (element in storage) {
+                    if (pattern.matcher(element.name).matches())
+                        sdCardPath = element
+                }
             }
+            return sdCardPath
+        } else {
+            if (getUri() == null)
+                buttonClickOperations.sdCardPermissionsBuilder(this)
+            return File("/storage/" + getUri()?.path?.let { regex.find(it)?.value })
         }
-
-        return sdCardPath
     }
 
     private fun sdCardPathIsNull() {
-        if (sdCardPath == null)
+        if (applicationContext.externalMediaDirs.size < 2)
             SDCard.visibility = View.GONE
     }
 
     private fun sdCardPermissions(sdCardRootPath: File) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && Build.VERSION.SDK_INT < 29) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
             try {
                 val storageManager = getSystemService(STORAGE_SERVICE) as StorageManager
                 val storageVolume = storageManager.getStorageVolume(sdCardRootPath)
