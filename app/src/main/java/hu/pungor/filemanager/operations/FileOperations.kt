@@ -15,7 +15,7 @@ import hu.pungor.filemanager.model.AboutFile
 import java.io.File
 import java.io.FileWriter
 
-class FileOperations(activity: FileManagerActivity) {
+class FileOperations {
 
     private val alertDialogMessages =
         AlertDialogMessages()

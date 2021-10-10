@@ -15,7 +15,7 @@ import java.io.File
 
 @Suppress("DEPRECATION")
 class ButtonClickOperations(activity: FileManagerActivity) {
-    private val fileOperations = FileOperations(activity)
+    private val fileOperations = FileOperations()
     private val alertDialogMessages =
         AlertDialogMessages()
 

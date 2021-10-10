@@ -106,7 +106,7 @@ class AsyncCopySelected(private val activity: FileManagerActivity) :
     }
 
     override fun onPostExecute(result: FileManagerActivity) {
-        progressDialog.hide()
+        progressDialog.dismiss()
         result.loadFiles()
     }
 
@@ -227,7 +227,7 @@ class AsyncDeleteSelected(private val activity: FileManagerActivity) :
     }
 
     override fun onPostExecute(result: FileManagerActivity) {
-        progressDialog.hide()
+        progressDialog.dismiss()
         result.loadFiles()
     }
 
@@ -406,7 +406,7 @@ class AsyncMoveSelected(private val activity: FileManagerActivity) :
     }
 
     override fun onPostExecute(result: FileManagerActivity) {
-        progressDialog.hide()
+        progressDialog.dismiss()
         result.loadFiles()
     }
 

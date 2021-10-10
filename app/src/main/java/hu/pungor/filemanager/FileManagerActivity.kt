@@ -3,10 +3,8 @@ package hu.pungor.filemanager
 import android.Manifest
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.os.Environment
-import android.os.storage.StorageManager
 import android.util.Log
 import android.view.ContextThemeWrapper
 import android.view.Gravity
@@ -38,7 +36,7 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
     val fileManagerAdapter = FileManagerAdapter()
     private val buttonClickOperations = ButtonClickOperations(this)
     private val alertDialogMessages = AlertDialogMessages()
-    private val fileOperations = FileOperations(this)
+    private val fileOperations = FileOperations()
 
     var rootPath = File(Environment.getExternalStorageDirectory().absolutePath)
     var sdCardPath: File? = null
@@ -219,25 +217,12 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
         return folderList + fileList
     }
 
-    private fun getSDCardPath(): File? {
-        val storage: Array<File>? = File("/storage").listFiles()
-        var sdCardPath: File? = null
+    private fun getSDCardPath(): File {
         val pattern = Pattern.compile("([A-Z]|[0-9]){4}-([A-Z]|[0-9]){4}")
         val regex = pattern.toRegex()
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-            if (storage != null) {
-                for (element in storage) {
-                    if (pattern.matcher(element.name).matches())
-                        sdCardPath = element
-                }
-            }
-            return sdCardPath
-        } else {
-            if (getUri() == null)
-                buttonClickOperations.sdCardPermissionsBuilder(this)
-            return File("/storage/" + getUri()?.path?.let { regex.find(it)?.value })
-        }
+        if (getUri() == null)
+            buttonClickOperations.sdCardPermissionsBuilder(this)
+        return File("/storage/" + getUri()?.path?.let { regex.find(it)?.value })
     }
 
     private fun sdCardPathIsNull() {
@@ -245,21 +230,8 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
             SDCard.visibility = View.GONE
     }
 
-    private fun sdCardPermissions(sdCardRootPath: File) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-            try {
-                val storageManager = getSystemService(STORAGE_SERVICE) as StorageManager
-                val storageVolume = storageManager.getStorageVolume(sdCardRootPath)
-                val intent = storageVolume?.createAccessIntent(null)
-                startActivityForResult(intent, 1000)
-            } catch (e: Exception) {
-            }
-        } else {
-            try {
-                buttonClickOperations.sdCardPermissionsBuilder(this)
-            } catch (e: Exception) {
-            }
-        }
+    private fun sdCardPermissions() {
+        buttonClickOperations.sdCardPermissionsBuilder(this)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -288,7 +260,7 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
                 return uriPermission.uri
             }
         } catch (e: Exception) {
-            sdCardPermissions(sdCardPath!!)
+            sdCardPermissions()
         }
         return null
     }
