@@ -4,4 +4,5 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="bottom_button_height">55dp</dimen>
     <dimen name="top_button_height">60dp</dimen>
+    <dimen name="wait">15dp</dimen>
 </resources>

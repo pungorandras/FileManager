@@ -128,23 +128,28 @@ class ButtonClickOperations(activity: FileManagerActivity) {
             activity.fileManagerAdapter.btnCopyPressed = true
             latestPathBeforeAction = activity.currentPath
 
-            setButton(activity.create_textfile, activity)
-            setButton(activity.select_all, activity)
-            setButton(activity.delete_selected, activity)
-            setButton(activity.move_selected, activity)
+            setButton(
+                activity.create_textfile,
+                activity.select_all,
+                activity.delete_selected,
+                activity.move_selected,
+                activity = activity
+            )
             activity.search.setImageResource(R.drawable.cancel)
             activity.copy_selected.setImageResource(R.drawable.ok)
         } else if (activity.fileManagerAdapter.btnCopyPressed) {
             activity.fileManagerAdapter.clearSelectedList = true
             activity.fileManagerAdapter.btnCopyPressed = false
-
             fileOperations.copySelectedFiles(activity)
             activity.fileManagerAdapter.popupMenuPressed = false
 
-            setButton(activity.create_textfile, activity)
-            setButton(activity.select_all, activity)
-            setButton(activity.delete_selected, activity)
-            setButton(activity.move_selected, activity)
+            setButton(
+                activity.create_textfile,
+                activity.select_all,
+                activity.delete_selected,
+                activity.move_selected,
+                activity = activity
+            )
             activity.search.setImageResource(R.drawable.search)
             activity.copy_selected.setImageResource(R.drawable.copy)
         } else
@@ -159,23 +164,28 @@ class ButtonClickOperations(activity: FileManagerActivity) {
             activity.fileManagerAdapter.btnMovePressed = true
             latestPathBeforeAction = activity.currentPath
 
-            setButton(activity.create_textfile, activity)
-            setButton(activity.select_all, activity)
-            setButton(activity.delete_selected, activity)
-            setButton(activity.copy_selected, activity)
+            setButton(
+                activity.create_textfile,
+                activity.select_all,
+                activity.delete_selected,
+                activity.copy_selected,
+                activity = activity
+            )
             activity.search.setImageResource(R.drawable.cancel)
             activity.move_selected.setImageResource(R.drawable.ok)
         } else if (activity.fileManagerAdapter.btnMovePressed) {
             activity.fileManagerAdapter.clearSelectedList = true
             activity.fileManagerAdapter.btnMovePressed = false
-
             fileOperations.moveSelectedFiles(activity)
             activity.fileManagerAdapter.popupMenuPressed = false
 
-            setButton(activity.create_textfile, activity)
-            setButton(activity.select_all, activity)
-            setButton(activity.delete_selected, activity)
-            setButton(activity.copy_selected, activity)
+            setButton(
+                activity.create_textfile,
+                activity.select_all,
+                activity.delete_selected,
+                activity.copy_selected,
+                activity = activity
+            )
             activity.search.setImageResource(R.drawable.search)
             activity.move_selected.setImageResource(R.drawable.move)
         } else
@@ -186,27 +196,31 @@ class ButtonClickOperations(activity: FileManagerActivity) {
         if (activity.fileManagerAdapter.btnCopyPressed) {
             activity.fileManagerAdapter.clearSelectedList = true
             activity.fileManagerAdapter.btnCopyPressed = false
-
             if (latestPathBeforeAction != activity.currentPath)
                 activity.fileManagerAdapter.clearSelectedList()
 
-            setButton(activity.create_textfile, activity)
-            setButton(activity.select_all, activity)
-            setButton(activity.delete_selected, activity)
-            setButton(activity.move_selected, activity)
+            setButton(
+                activity.create_textfile,
+                activity.select_all,
+                activity.delete_selected,
+                activity.move_selected,
+                activity = activity
+            )
             activity.search.setImageResource(R.drawable.search)
             activity.copy_selected.setImageResource(R.drawable.copy)
         } else if (activity.fileManagerAdapter.btnMovePressed) {
             activity.fileManagerAdapter.clearSelectedList = true
             activity.fileManagerAdapter.btnMovePressed = false
-
             if (latestPathBeforeAction != activity.currentPath)
                 activity.fileManagerAdapter.clearSelectedList()
 
-            setButton(activity.create_textfile, activity)
-            setButton(activity.select_all, activity)
-            setButton(activity.delete_selected, activity)
-            setButton(activity.copy_selected, activity)
+            setButton(
+                activity.create_textfile,
+                activity.select_all,
+                activity.delete_selected,
+                activity.copy_selected,
+                activity = activity
+            )
             activity.search.setImageResource(R.drawable.search)
             activity.move_selected.setImageResource(R.drawable.move)
         } else if (!activity.fileManagerAdapter.btnSearchPressed) {
@@ -248,12 +262,15 @@ class ButtonClickOperations(activity: FileManagerActivity) {
                             activity.SDCard.backgroundTintList =
                                 activity.applicationContext.resources.getColorStateList(R.color.disabled)
 
-                            setButton(activity.create_textfile, activity)
-                            setButton(activity.create_folder, activity)
-                            setButton(activity.select_all, activity)
-                            setButton(activity.delete_selected, activity)
-                            setButton(activity.copy_selected, activity)
-                            setButton(activity.move_selected, activity)
+                            setButton(
+                                activity.create_textfile,
+                                activity.create_folder,
+                                activity.select_all,
+                                activity.delete_selected,
+                                activity.copy_selected,
+                                activity.move_selected,
+                                activity = activity
+                            )
                             activity.search.setImageResource(R.drawable.cancel)
                         }
                     } else
@@ -266,31 +283,29 @@ class ButtonClickOperations(activity: FileManagerActivity) {
             activity.fileManagerAdapter.btnSearchPressed = false
             activity.loadFiles()
             activity.Internal.isEnabled = true
+            activity.SDCard.isEnabled = true
 
-            if (activity.currentPath.toString().contains(activity.rootPath.toString()))
+            if (activity.currentPath.toString().contains(activity.rootPath.toString())) {
                 activity.Internal.backgroundTintList =
                     activity.applicationContext.resources.getColorStateList(R.color.button_pressed)
-            else
+                activity.SDCard.backgroundTintList =
+                    activity.applicationContext.resources.getColorStateList(R.color.button)
+            } else {
                 activity.Internal.backgroundTintList =
                     activity.applicationContext.resources.getColorStateList(R.color.button)
-
-            if (activity.sdCardPath != null) {
-                activity.SDCard.isEnabled = true
-
-                if (activity.currentPath.toString().contains(activity.sdCardPath.toString()))
-                    activity.SDCard.backgroundTintList =
-                        activity.applicationContext.resources.getColorStateList(R.color.button_pressed)
-                else
-                    activity.SDCard.backgroundTintList =
-                        activity.applicationContext.resources.getColorStateList(R.color.button)
+                activity.SDCard.backgroundTintList =
+                    activity.applicationContext.resources.getColorStateList(R.color.button_pressed)
             }
 
-            setButton(activity.create_textfile, activity)
-            setButton(activity.create_folder, activity)
-            setButton(activity.select_all, activity)
-            setButton(activity.delete_selected, activity)
-            setButton(activity.copy_selected, activity)
-            setButton(activity.move_selected, activity)
+            setButton(
+                activity.create_textfile,
+                activity.create_folder,
+                activity.select_all,
+                activity.delete_selected,
+                activity.copy_selected,
+                activity.move_selected,
+                activity = activity
+            )
             activity.search.setImageResource(R.drawable.search)
         }
 
@@ -303,15 +318,17 @@ class ButtonClickOperations(activity: FileManagerActivity) {
         }
     }
 
-    private fun setButton(button: ImageButton, activity: FileManagerActivity) {
-        if (button.isEnabled) {
-            button.isEnabled = false
-            button.backgroundTintList =
-                activity.applicationContext.resources.getColorStateList(R.color.disabled)
-        } else {
-            button.isEnabled = true
-            button.backgroundTintList =
-                activity.applicationContext.resources.getColorStateList(R.color.button)
+    private fun setButton(vararg buttons: ImageButton, activity: FileManagerActivity) {
+        for (button in buttons) {
+            if (button.isEnabled) {
+                button.isEnabled = false
+                button.backgroundTintList =
+                    activity.applicationContext.resources.getColorStateList(R.color.disabled)
+            } else {
+                button.isEnabled = true
+                button.backgroundTintList =
+                    activity.applicationContext.resources.getColorStateList(R.color.button)
+            }
         }
     }
 

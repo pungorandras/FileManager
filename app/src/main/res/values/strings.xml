@@ -48,4 +48,6 @@
     <string name="copying">Copying…</string>
     <string name="deleting">Deleting…</string>
     <string name="moving">Moving…</string>
+    <string name="searching">Searching…</string>
+    <string name="wait">Please wait…</string>
 </resources>

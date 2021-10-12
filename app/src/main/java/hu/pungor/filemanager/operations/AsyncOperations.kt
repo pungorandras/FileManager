@@ -3,6 +3,10 @@ package hu.pungor.filemanager.operations
 import android.app.ProgressDialog
 import android.content.DialogInterface
 import android.os.AsyncTask
+import android.text.Spannable
+import android.text.SpannableStringBuilder
+import android.text.style.AbsoluteSizeSpan
+import android.text.style.StyleSpan
 import android.view.LayoutInflater
 import android.widget.TextView
 import androidx.documentfile.provider.DocumentFile
@@ -456,19 +460,57 @@ class AsyncMoveSelected(private val activity: FileManagerActivity) :
     }
 }
 
-class AsyncSearch(private val input: String) :
+@Suppress("DEPRECATION")
+class AsyncSearch(private val input: String, private val activity: FileManagerActivity) :
     AsyncTask<FileManagerActivity, Void, MutableList<File>>() {
+    private val progressDialog = ProgressDialog(activity)
+
+    override fun onPreExecute() {
+        val customTitle =
+            LayoutInflater.from(activity).inflate(R.layout.custom_title, null)
+        customTitle.findViewById<TextView>(R.id.title_text).text = activity.getString(
+            R.string.searching
+        )
+        val sBuilder = SpannableStringBuilder(activity.getString(R.string.wait))
+        sBuilder.setSpan(
+            StyleSpan(android.graphics.Typeface.BOLD),
+            0,
+            sBuilder.length,
+            Spannable.SPAN_INCLUSIVE_INCLUSIVE
+        )
+        sBuilder.setSpan(
+            AbsoluteSizeSpan(activity.resources.getDimensionPixelSize(R.dimen.wait)),
+            0,
+            sBuilder.length,
+            Spannable.SPAN_INCLUSIVE_INCLUSIVE
+        )
+        progressDialog.setCustomTitle(customTitle)
+        progressDialog.setMessage(sBuilder)
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER)
+        progressDialog.setCancelable(false)
+        progressDialog.setButton(
+            DialogInterface.BUTTON_NEGATIVE,
+            activity.getString(R.string.cancel)
+        ) { dialog, which ->
+            this.cancel(true)
+        }
+        progressDialog.show()
+    }
 
     override fun doInBackground(vararg params: FileManagerActivity): MutableList<File> {
         val result = mutableListOf<File>()
 
-        params[0].currentPath.walk().forEach {
-            if (it.name.toLowerCase(Locale.ROOT)
-                    .contains(input.toLowerCase(Locale.ROOT)) && it.path != params[0].currentPath.toString()
+        params[0].currentPath.walk().takeWhile { !this.isCancelled }.forEach {
+            if (it.name.lowercase(Locale.ROOT)
+                    .contains(input.lowercase(Locale.ROOT)) && it.path != params[0].currentPath.toString()
             )
                 result += it
         }
         return result
+    }
+
+    override fun onPostExecute(result: MutableList<File>?) {
+        progressDialog.dismiss()
     }
 }
 

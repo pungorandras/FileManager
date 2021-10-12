@@ -59,7 +59,6 @@ class SDCardOperations {
             return DocumentFile.fromTreeUri(activity, childrenUri)
         } catch (e: Exception) {
         }
-
         return null
     }
 }

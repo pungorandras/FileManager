@@ -49,4 +49,6 @@
     <string name="copying">Másolás…</string>
     <string name="deleting">Törlés…</string>
     <string name="moving">Áthelyezés…</string>
+    <string name="searching">Keresés…</string>
+    <string name="wait">Kérlek várj…</string>
 </resources>

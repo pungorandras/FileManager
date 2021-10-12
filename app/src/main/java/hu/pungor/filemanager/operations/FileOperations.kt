@@ -178,6 +178,6 @@ class FileOperations {
     }
 
     fun search(input: String, activity: FileManagerActivity): List<File> {
-        return AsyncSearch(input).execute(activity).get()
+        return AsyncSearch(input, activity).execute(activity).get()
     }
 }
