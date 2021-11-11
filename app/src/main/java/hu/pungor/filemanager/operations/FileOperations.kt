@@ -10,7 +10,6 @@ import androidx.core.content.FileProvider
 import hu.pungor.filemanager.FileManagerActivity
 import hu.pungor.filemanager.R
 import hu.pungor.filemanager.alertdialog.AlertDialogMessages
-import hu.pungor.filemanager.loadFilesWithPermissionCheck
 import hu.pungor.filemanager.model.AboutFile
 import java.io.File
 import java.io.FileWriter
@@ -73,7 +72,7 @@ class FileOperations {
     fun createTextFile(name: String, notes: String, activity: FileManagerActivity) {
         if (activity.currentPath.toString().contains(activity.sdCardPath.toString())) {
             sdCardOperations.createTextFileOnSDCard(name, notes, activity)
-            activity.loadFilesWithPermissionCheck()
+            activity.checkPermissionsBeforeLoad()
         } else {
             try {
                 val file = File("$activity.currentPath/$name.txt")
@@ -90,7 +89,7 @@ class FileOperations {
                 else
                     alertDialogMessages.alreadyExists(name, activity)
             } catch (e: Exception) {
-                activity.loadFilesWithPermissionCheck()
+                activity.checkPermissionsBeforeLoad()
             }
         }
     }
@@ -98,7 +97,7 @@ class FileOperations {
     fun createFolder(name: String, activity: FileManagerActivity) {
         if (activity.currentPath.toString().contains(activity.sdCardPath.toString())) {
             sdCardOperations.createFolderOnSDCard(activity.currentPath, name, activity)
-            activity.loadFilesWithPermissionCheck()
+            activity.checkPermissionsBeforeLoad()
         } else {
             try {
                 val folder = File(activity.currentPath, name)
@@ -110,7 +109,7 @@ class FileOperations {
                 else
                     alertDialogMessages.alreadyExists(name, activity)
             } catch (e: Exception) {
-                activity.loadFilesWithPermissionCheck()
+                activity.checkPermissionsBeforeLoad()
             }
         }
     }

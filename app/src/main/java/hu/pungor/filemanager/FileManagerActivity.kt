@@ -4,14 +4,18 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Environment
+import android.provider.Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION
+import android.provider.Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION
 import android.util.Log
 import android.view.ContextThemeWrapper
 import android.view.Gravity
 import android.view.View
 import android.webkit.MimeTypeMap
 import android.widget.PopupMenu
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import hu.pungor.filemanager.adapter.FileManagerAdapter
@@ -49,14 +53,15 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
         const val TYPE_UNKNOWN = "unknown"
     }
 
+    @RequiresApi(Build.VERSION_CODES.R)
     @SuppressLint("UseCompatLoadingForColorStateLists")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_filemanager)
 
-        loadFilesWithPermissionCheck()
+        checkPermissionsBeforeLoad()
 
-        sdCardPathIsNull()
+        setSDCardButton()
 
         Internal.setOnClickListener {
             currentPath = rootPath
@@ -67,7 +72,7 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
                     applicationContext.resources.getColorStateList(R.color.button)
             }
 
-            loadFilesWithPermissionCheck()
+            checkPermissionsBeforeLoad()
         }
 
         SDCard.setOnClickListener {
@@ -79,9 +84,9 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
                 SDCard.backgroundTintList =
                     applicationContext.resources.getColorStateList(R.color.button_pressed)
                 currentPath = sdCardPath!!
-                loadFilesWithPermissionCheck()
+                checkPermissionsBeforeLoad()
             } else
-                sdCardPathIsNull()
+                setSDCardButton()
         }
 
         create_textfile.setOnClickListener {
@@ -138,6 +143,25 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
             fileManagerAdapter.itemClickListener = this
         } catch (e: Exception) {
         }
+    }
+
+    fun checkPermissionsBeforeLoad() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            if (!Environment.isExternalStorageManager()) {
+                try {
+                    val intent = Intent(
+                        ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION,
+                        Uri.parse("package:$packageName")
+                    )
+                    startActivity(intent)
+                } catch (e: Exception) {
+                    val intent = Intent(ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
+                    startActivity(intent)
+                }
+            }
+            loadFiles()
+        } else
+            loadFilesWithPermissionCheck()
     }
 
     override fun onRequestPermissionsResult(
@@ -236,36 +260,6 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
         return File("/storage/" + getUri()?.path?.let { regex.find(it)?.value })
     }
 
-    @SuppressLint("UseCompatLoadingForColorStateLists")
-    private fun sdCardPathIsNull() {
-        if (applicationContext.externalMediaDirs.size < 2) {
-            SDCard.isEnabled = false
-            SDCard.backgroundTintList = resources.getColorStateList(R.color.disabled)
-        }
-
-    }
-
-    private fun sdCardPermissions() {
-        buttonClickOperations.sdCardPermissionsBuilder(this)
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        try {
-            super.onActivityResult(requestCode, resultCode, data!!)
-            if (requestCode == 1000 || requestCode == 1001) {
-                val uri = data.data
-                grantUriPermission(
-                    packageName, uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION or
-                            Intent.FLAG_GRANT_READ_URI_PERMISSION
-                )
-                val takeFlags = Intent.FLAG_GRANT_WRITE_URI_PERMISSION or
-                        Intent.FLAG_GRANT_READ_URI_PERMISSION
-                contentResolver.takePersistableUriPermission(uri!!, takeFlags)
-            }
-        } catch (e: Exception) {
-        }
-    }
-
     fun getUri(): Uri? {
         try {
             val persistedUriPermissions =
@@ -278,6 +272,35 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
             sdCardPermissions()
         }
         return null
+    }
+
+    @SuppressLint("UseCompatLoadingForColorStateLists")
+    private fun setSDCardButton() {
+        if (applicationContext.externalMediaDirs.size < 2) {
+            SDCard.isEnabled = false
+            SDCard.backgroundTintList = resources.getColorStateList(R.color.disabled)
+        }
+    }
+
+    private fun sdCardPermissions() {
+        buttonClickOperations.sdCardPermissionsBuilder(this)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        try {
+            super.onActivityResult(requestCode, resultCode, data!!)
+            if (requestCode == 1001) {
+                val uri = data.data
+                grantUriPermission(
+                    packageName, uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION or
+                            Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
+                val takeFlags = Intent.FLAG_GRANT_WRITE_URI_PERMISSION or
+                        Intent.FLAG_GRANT_READ_URI_PERMISSION
+                contentResolver.takePersistableUriPermission(uri!!, takeFlags)
+            }
+        } catch (e: Exception) {
+        }
     }
 
     override fun onBackPressed() {
