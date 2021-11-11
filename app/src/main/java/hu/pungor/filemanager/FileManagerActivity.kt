@@ -60,7 +60,6 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
         setContentView(R.layout.activity_filemanager)
 
         checkPermissionsBeforeLoad()
-
         setSDCardButton()
 
         Internal.setOnClickListener {
