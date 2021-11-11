@@ -79,10 +79,9 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
                 SDCard.backgroundTintList =
                     applicationContext.resources.getColorStateList(R.color.button_pressed)
                 currentPath = sdCardPath!!
+                loadFilesWithPermissionCheck()
             } else
                 sdCardPathIsNull()
-
-            loadFilesWithPermissionCheck()
         }
 
         create_textfile.setOnClickListener {
@@ -250,7 +249,6 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
         buttonClickOperations.sdCardPermissionsBuilder(this)
     }
 
-    @SuppressLint("WrongConstant")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         try {
             super.onActivityResult(requestCode, resultCode, data!!)
@@ -260,8 +258,8 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
                     packageName, uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION or
                             Intent.FLAG_GRANT_READ_URI_PERMISSION
                 )
-                val takeFlags = data.flags and (Intent.FLAG_GRANT_WRITE_URI_PERMISSION or
-                        Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                val takeFlags = Intent.FLAG_GRANT_WRITE_URI_PERMISSION or
+                        Intent.FLAG_GRANT_READ_URI_PERMISSION
                 contentResolver.takePersistableUriPermission(uri!!, takeFlags)
             }
         } catch (e: Exception) {
