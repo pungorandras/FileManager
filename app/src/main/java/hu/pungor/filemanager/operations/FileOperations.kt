@@ -135,7 +135,7 @@ class FileOperations {
         val customTitle =
             LayoutInflater.from(activity).inflate(R.layout.custom_title, null)
         customTitle.findViewById<TextView>(R.id.title_text).text =
-            activity.getString(R.string.rename_upper)
+            activity.getString(R.string.rename)
 
         val builder = AlertDialog.Builder(view.context)
             .setView(dialogView)

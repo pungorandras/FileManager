@@ -15,7 +15,12 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".intro.IntroScreenActivity"
+            android:exported="true"
+            android:screenOrientation="nosensor" />
+        <activity
             android:name=".FileManagerActivity"
+            android:exported="true"
             android:screenOrientation="nosensor">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

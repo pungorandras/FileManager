@@ -1,5 +1,6 @@
 package hu.pungor.filemanager.adapter
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.LayerDrawable
@@ -154,6 +155,7 @@ class FileManagerAdapter : RecyclerView.Adapter<FileManagerAdapter.FileManagerVi
                         return false
                     }
 
+                    @SuppressLint("UseCompatLoadingForDrawables")
                     override fun onLoadFailed(
                         e: GlideException?,
                         model: Any?,
@@ -202,6 +204,7 @@ class FileManagerAdapter : RecyclerView.Adapter<FileManagerAdapter.FileManagerVi
                 }).into(holder.file_icon)
     }
 
+    @SuppressLint("UseCompatLoadingForDrawables")
     private fun tickOverlay(holder: FileManagerViewHolder, drawable: Drawable?): LayerDrawable {
         val r = holder.file_icon.resources
         val layers = arrayOfNulls<Drawable>(2)
@@ -235,6 +238,7 @@ class FileManagerAdapter : RecyclerView.Adapter<FileManagerAdapter.FileManagerVi
         selectedList.clear()
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     fun setFiles(files: List<AboutFile>) {
         fileList.clear()
 

@@ -4,8 +4,12 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Users/Pungor/AndroidStudioProjects/FileManager/app/src/main/res/drawable/edittext_border.xml" value="0.3828125" />
+        <entry key="..\:/Users/Pungor/AndroidStudioProjects/FileManager/app/src/main/res/drawable/item_ripple.xml" value="0.3828125" />
+        <entry key="..\:/Users/Pungor/AndroidStudioProjects/FileManager/app/src/main/res/layout/activity_filemanager.xml" value="0.28940217391304346" />
+        <entry key="..\:/Users/Pungor/AndroidStudioProjects/FileManager/app/src/main/res/layout/activity_intro_screen.xml" value="0.25" />
         <entry key="..\:/Users/Pungor/AndroidStudioProjects/FileManager/app/src/main/res/layout/custom_title.xml" value="0.2694746376811594" />
         <entry key="..\:/Users/Pungor/AndroidStudioProjects/FileManager/app/src/main/res/layout/layout_dialog_textfile.xml" value="0.26268115942028986" />
+        <entry key="..\:/Users/Pungor/AndroidStudioProjects/FileManager/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" value="0.3828125" />
       </map>
     </option>
   </component>

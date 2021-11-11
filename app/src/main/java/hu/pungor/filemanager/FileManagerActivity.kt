@@ -1,6 +1,7 @@
 package hu.pungor.filemanager
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -14,7 +15,8 @@ import android.widget.PopupMenu
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import hu.pungor.filemanager.adapter.FileManagerAdapter
-import hu.pungor.filemanager.alertdialog.AlertDialogMessages
+import hu.pungor.filemanager.intro.IntroScreenActivity
+import hu.pungor.filemanager.intro.TapTargetPromptInstructions
 import hu.pungor.filemanager.model.AboutFile
 import hu.pungor.filemanager.operations.AsyncGetAllFiles
 import hu.pungor.filemanager.operations.ButtonClickOperations
@@ -35,8 +37,8 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
 
     val fileManagerAdapter = FileManagerAdapter()
     private val buttonClickOperations = ButtonClickOperations(this)
-    private val alertDialogMessages = AlertDialogMessages()
     private val fileOperations = FileOperations()
+    private val tapTargetPromptInstructions = TapTargetPromptInstructions()
 
     var rootPath = File(Environment.getExternalStorageDirectory().absolutePath)
     var sdCardPath: File? = null
@@ -47,6 +49,7 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
         const val TYPE_UNKNOWN = "unknown"
     }
 
+    @SuppressLint("UseCompatLoadingForColorStateLists")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_filemanager)
@@ -111,6 +114,19 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        val prefs = getSharedPreferences("prefs", MODE_PRIVATE)
+        val firstStart = prefs.getBoolean("firstStart", true)
+
+        if (firstStart)
+            startActivity(Intent(this, IntroScreenActivity::class.java))
+
+        val editor = prefs.edit()
+        editor.putBoolean("firstStart", false)
+        editor.apply()
+    }
+
     @NeedsPermission(
         Manifest.permission.READ_EXTERNAL_STORAGE,
         Manifest.permission.WRITE_EXTERNAL_STORAGE
@@ -133,11 +149,7 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         onRequestPermissionsResult(requestCode, grantResults)
 
-        val prefs = getSharedPreferences("prefs", MODE_PRIVATE)
-        val firstStart = prefs.getBoolean("firstStart", true)
-
-        if (firstStart)
-            alertDialogMessages.showOnFirstStart(this)
+        tapTargetPromptInstructions.showTutorial(this)
     }
 
     @OnShowRationale(
@@ -225,15 +237,20 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
         return File("/storage/" + getUri()?.path?.let { regex.find(it)?.value })
     }
 
+    @SuppressLint("UseCompatLoadingForColorStateLists")
     private fun sdCardPathIsNull() {
-        if (applicationContext.externalMediaDirs.size < 2)
-            SDCard.visibility = View.GONE
+        if (applicationContext.externalMediaDirs.size < 2) {
+            SDCard.isEnabled = false
+            SDCard.backgroundTintList = resources.getColorStateList(R.color.disabled)
+        }
+
     }
 
     private fun sdCardPermissions() {
         buttonClickOperations.sdCardPermissionsBuilder(this)
     }
 
+    @SuppressLint("WrongConstant")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         try {
             super.onActivityResult(requestCode, resultCode, data!!)
@@ -296,6 +313,7 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
             fileOperations.openFile(file, this)
     }
 
+    @SuppressLint("DiscouragedPrivateApi")
     override fun onItemLongClick(position: Int, view: View): Boolean {
         if (!fileManagerAdapter.btnSearchPressed && !fileManagerAdapter.btnCopyPressed && !fileManagerAdapter.btnMovePressed) {
             val wrapper = ContextThemeWrapper(this, R.style.NoPopupAnimation)

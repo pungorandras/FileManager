@@ -1,9 +1,9 @@
 package hu.pungor.filemanager.alertdialog
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import hu.pungor.filemanager.FileManagerActivity
 import hu.pungor.filemanager.R
 
@@ -29,6 +29,7 @@ class AlertDialogMessages {
         builder.show()
     }
 
+    @SuppressLint("InflateParams")
     fun alreadyExists(name: String, activity: FileManagerActivity) {
         val customTitle =
             LayoutInflater.from(activity).inflate(R.layout.custom_title, null)
@@ -47,6 +48,7 @@ class AlertDialogMessages {
         builder.show()
     }
 
+    @SuppressLint("InflateParams")
     fun nameIsNull(activity: FileManagerActivity) {
         val customTitle =
             LayoutInflater.from(activity).inflate(R.layout.custom_title, null)
@@ -67,6 +69,7 @@ class AlertDialogMessages {
         builder.show()
     }
 
+    @SuppressLint("InflateParams")
     fun copyOrMoveIntoItself(copyOrMove: String, activity: FileManagerActivity) {
         val customTitle =
             LayoutInflater.from(activity).inflate(R.layout.custom_title, null)
@@ -91,6 +94,7 @@ class AlertDialogMessages {
         builder.show()
     }
 
+    @SuppressLint("InflateParams")
     fun noResults(activity: FileManagerActivity) {
         val customTitle =
             LayoutInflater.from(activity).inflate(R.layout.custom_title, null)
@@ -109,28 +113,5 @@ class AlertDialogMessages {
             .setCancelable(false)
             .setPositiveButton(activity.getString(R.string.ok), null)
         builder.show()
-    }
-
-    fun showOnFirstStart(activity: FileManagerActivity) {
-        val customTitle =
-            LayoutInflater.from(activity.applicationContext).inflate(R.layout.custom_title, null)
-        customTitle.findViewById<TextView>(R.id.title_text).text =
-            activity.getString(R.string.welcome)
-        val customText =
-            LayoutInflater.from(activity).inflate(R.layout.custom_text_alertdialog, null)
-        customText.findViewById<TextView>(R.id.custom_text).text =
-            activity.getString(R.string.welcome_message)
-
-        AlertDialog.Builder(activity)
-            .setView(customText)
-            .setCustomTitle(customTitle)
-            .setCancelable(false)
-            .setPositiveButton(activity.getString(R.string.ok), null)
-            .show()
-
-        val prefs = activity.getSharedPreferences("prefs", AppCompatActivity.MODE_PRIVATE)
-        val editor = prefs.edit()
-        editor.putBoolean("firstStart", false)
-        editor.apply()
     }
 }

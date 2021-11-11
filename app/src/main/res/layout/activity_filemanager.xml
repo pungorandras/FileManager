@@ -28,7 +28,7 @@
             android:backgroundTint="@color/button_pressed"
             android:drawableStart="@drawable/phone_storage"
             android:text="@string/phone_storage"
-            android:textColor="@color/text" />
+            android:textColor="@color/white" />
 
         <Button
             android:id="@+id/SDCard"
@@ -38,7 +38,7 @@
             android:backgroundTint="@color/button"
             android:drawableStart="@drawable/sdcard"
             android:text="@string/sd_card"
-            android:textColor="@color/text" />
+            android:textColor="@color/white" />
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView

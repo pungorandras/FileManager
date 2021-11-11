@@ -1,5 +1,6 @@
 package hu.pungor.filemanager.operations
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.view.LayoutInflater
 import android.widget.EditText
@@ -128,7 +129,7 @@ class ButtonClickOperations(activity: FileManagerActivity) {
             activity.fileManagerAdapter.btnCopyPressed = true
             latestPathBeforeAction = activity.currentPath
 
-            setButton(
+            revertButtonState(
                 activity.create_textfile,
                 activity.select_all,
                 activity.delete_selected,
@@ -143,7 +144,7 @@ class ButtonClickOperations(activity: FileManagerActivity) {
             fileOperations.copySelectedFiles(activity)
             activity.fileManagerAdapter.popupMenuPressed = false
 
-            setButton(
+            revertButtonState(
                 activity.create_textfile,
                 activity.select_all,
                 activity.delete_selected,
@@ -164,7 +165,7 @@ class ButtonClickOperations(activity: FileManagerActivity) {
             activity.fileManagerAdapter.btnMovePressed = true
             latestPathBeforeAction = activity.currentPath
 
-            setButton(
+            revertButtonState(
                 activity.create_textfile,
                 activity.select_all,
                 activity.delete_selected,
@@ -179,7 +180,7 @@ class ButtonClickOperations(activity: FileManagerActivity) {
             fileOperations.moveSelectedFiles(activity)
             activity.fileManagerAdapter.popupMenuPressed = false
 
-            setButton(
+            revertButtonState(
                 activity.create_textfile,
                 activity.select_all,
                 activity.delete_selected,
@@ -192,6 +193,7 @@ class ButtonClickOperations(activity: FileManagerActivity) {
             alertDialogMessages.noItemsSelected(activity)
     }
 
+    @SuppressLint("UseCompatLoadingForColorStateLists")
     fun searchButtonOperations(activity: FileManagerActivity) {
         if (activity.fileManagerAdapter.btnCopyPressed) {
             activity.fileManagerAdapter.clearSelectedList = true
@@ -199,7 +201,7 @@ class ButtonClickOperations(activity: FileManagerActivity) {
             if (latestPathBeforeAction != activity.currentPath)
                 activity.fileManagerAdapter.clearSelectedList()
 
-            setButton(
+            revertButtonState(
                 activity.create_textfile,
                 activity.select_all,
                 activity.delete_selected,
@@ -214,7 +216,7 @@ class ButtonClickOperations(activity: FileManagerActivity) {
             if (latestPathBeforeAction != activity.currentPath)
                 activity.fileManagerAdapter.clearSelectedList()
 
-            setButton(
+            revertButtonState(
                 activity.create_textfile,
                 activity.select_all,
                 activity.delete_selected,
@@ -262,7 +264,7 @@ class ButtonClickOperations(activity: FileManagerActivity) {
                             activity.SDCard.backgroundTintList =
                                 activity.applicationContext.resources.getColorStateList(R.color.disabled)
 
-                            setButton(
+                            revertButtonState(
                                 activity.create_textfile,
                                 activity.create_folder,
                                 activity.select_all,
@@ -297,7 +299,7 @@ class ButtonClickOperations(activity: FileManagerActivity) {
                     activity.applicationContext.resources.getColorStateList(R.color.button_pressed)
             }
 
-            setButton(
+            revertButtonState(
                 activity.create_textfile,
                 activity.create_folder,
                 activity.select_all,
@@ -318,7 +320,8 @@ class ButtonClickOperations(activity: FileManagerActivity) {
         }
     }
 
-    private fun setButton(vararg buttons: ImageButton, activity: FileManagerActivity) {
+    @SuppressLint("UseCompatLoadingForColorStateLists")
+    private fun revertButtonState(vararg buttons: ImageButton, activity: FileManagerActivity) {
         for (button in buttons) {
             if (button.isEnabled) {
                 button.isEnabled = false
@@ -332,6 +335,7 @@ class ButtonClickOperations(activity: FileManagerActivity) {
         }
     }
 
+    @SuppressLint("InflateParams")
     fun showRationaleForStoragePermissionsBuilder(
         request: PermissionRequest,
         activity: FileManagerActivity
@@ -356,6 +360,7 @@ class ButtonClickOperations(activity: FileManagerActivity) {
         builder.show()
     }
 
+    @SuppressLint("InflateParams")
     fun sdCardPermissionsBuilder(activity: FileManagerActivity) {
         val customTitle =
             LayoutInflater.from(activity).inflate(R.layout.custom_title, null)
