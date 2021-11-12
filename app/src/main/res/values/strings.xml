@@ -64,5 +64,5 @@
     <string name="search_recursively_msg">You can search for items. It searches at the current location and in the subfolders recursively.</string>
     <string name="switch_source">Switch source</string>
     <string name="switch_source_msg">You can switch between internal storage and SD card, if an SD card is inserted.</string>
-    <string name="version">\"Version: \"</string>
+    <string name="version">Version:</string>
 </resources>
