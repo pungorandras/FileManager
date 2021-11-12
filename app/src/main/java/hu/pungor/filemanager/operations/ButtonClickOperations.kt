@@ -1,7 +1,6 @@
 package hu.pungor.filemanager.operations
 
 import android.annotation.SuppressLint
-import android.content.Intent
 import android.view.LayoutInflater
 import android.widget.EditText
 import android.widget.ImageButton
@@ -10,15 +9,18 @@ import androidx.appcompat.app.AlertDialog
 import hu.pungor.filemanager.FileManagerActivity
 import hu.pungor.filemanager.R
 import hu.pungor.filemanager.alertdialog.AlertDialogMessages
+import hu.pungor.filemanager.permissions.SDCardPermissionsUntilApi29
+import hu.pungor.filemanager.permissions.StoragePermissions
 import kotlinx.android.synthetic.main.activity_filemanager.*
 import permissions.dispatcher.PermissionRequest
 import java.io.File
 
 @Suppress("DEPRECATION")
-class ButtonClickOperations(activity: FileManagerActivity) {
+class ButtonClickOperations {
     private val fileOperations = FileOperations()
-    private val alertDialogMessages =
-        AlertDialogMessages()
+    private val alertDialogMessages = AlertDialogMessages()
+    private val storagePermissions = StoragePermissions()
+    private val sdCardPermissions = SDCardPermissionsUntilApi29()
 
     var fileTreeDepth = 0
     lateinit var result: List<File>
@@ -321,6 +323,43 @@ class ButtonClickOperations(activity: FileManagerActivity) {
     }
 
     @SuppressLint("UseCompatLoadingForColorStateLists")
+    fun internalButtonOperations(activity: FileManagerActivity) {
+        activity.currentPath = activity.rootPath
+        activity.Internal.backgroundTintList =
+            activity.resources.getColorStateList(R.color.button_pressed)
+        if (activity.sdCardPath != null) {
+            activity.SDCard.backgroundTintList =
+                activity.resources.getColorStateList(R.color.button)
+        }
+
+        storagePermissions.checkPermissionsAndLoadFiles(activity)
+    }
+
+    @SuppressLint("UseCompatLoadingForColorStateLists")
+    fun sdCardButtonOperations(activity: FileManagerActivity) {
+        activity.sdCardPath = sdCardPermissions.getSDCardPath(activity)
+
+        if (!activity.sdCardPath.toString().contains("null")) {
+            activity.Internal.backgroundTintList =
+                activity.resources.getColorStateList(R.color.button)
+            activity.SDCard.backgroundTintList =
+                activity.resources.getColorStateList(R.color.button_pressed)
+            activity.currentPath = activity.sdCardPath!!
+            storagePermissions.checkPermissionsAndLoadFiles(activity)
+        } else
+            disableSDCardButtonIfNotAvailable(activity)
+    }
+
+    @SuppressLint("UseCompatLoadingForColorStateLists")
+    fun disableSDCardButtonIfNotAvailable(activity: FileManagerActivity) {
+        if (activity.externalMediaDirs.size < 2) {
+            activity.SDCard.isEnabled = false
+            activity.SDCard.backgroundTintList =
+                activity.resources.getColorStateList(R.color.disabled)
+        }
+    }
+
+    @SuppressLint("UseCompatLoadingForColorStateLists")
     private fun revertButtonState(vararg buttons: ImageButton, activity: FileManagerActivity) {
         for (button in buttons) {
             if (button.isEnabled) {
@@ -357,28 +396,6 @@ class ButtonClickOperations(activity: FileManagerActivity) {
             .setPositiveButton(activity.getString(R.string.proceed)) { dialog, id -> request.proceed() }
             .setNegativeButton(activity.getString(R.string.exit)) { dialog, id -> request.cancel() }
             .create()
-        builder.show()
-    }
-
-    @SuppressLint("InflateParams")
-    fun sdCardPermissionsBuilder(activity: FileManagerActivity) {
-        val customTitle =
-            LayoutInflater.from(activity).inflate(R.layout.custom_title, null)
-        customTitle.findViewById<TextView>(R.id.title_text).text = activity.getString(
-            R.string.info
-        )
-        val customText =
-            LayoutInflater.from(activity).inflate(R.layout.custom_text_alertdialog, null)
-        customText.findViewById<TextView>(R.id.custom_text).text =
-            activity.getString(R.string.sdcard_permission)
-
-        val builder = AlertDialog.Builder(activity)
-            .setCustomTitle(customTitle)
-            .setView(customText)
-            .setCancelable(false)
-            .setPositiveButton(activity.getString(R.string.ok)) { dialog, which ->
-                activity.startActivityForResult(Intent(Intent.ACTION_OPEN_DOCUMENT_TREE), 1001)
-            }
         builder.show()
     }
 }

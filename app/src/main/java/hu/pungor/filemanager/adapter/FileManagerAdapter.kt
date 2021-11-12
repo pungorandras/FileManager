@@ -75,7 +75,7 @@ class FileManagerAdapter : RecyclerView.Adapter<FileManagerAdapter.FileManagerVi
     private fun setDrawableOnLoad(holder: FileManagerViewHolder, position: Int) {
         val file = fileList[position]
         val intent = Intent(Intent.ACTION_VIEW)
-        intent.data = Uri.parse(file.uri)
+        intent.data = Uri.parse(file.path)
         intent.type = file.mimeType
         val matches = holder.file_icon.context.packageManager.queryIntentActivities(intent, 0)
 
@@ -137,7 +137,7 @@ class FileManagerAdapter : RecyclerView.Adapter<FileManagerAdapter.FileManagerVi
                 }).into(holder.file_icon)
         else if (file.mimeType.startsWith("image") || file.mimeType.startsWith("video")) {
             val cropOptions = RequestOptions().centerCrop()
-            Glide.with(holder.itemView).load(file.uri).apply(cropOptions).override(100, 100)
+            Glide.with(holder.itemView).load(file.path).apply(cropOptions).override(100, 100)
                 .diskCacheStrategy(DiskCacheStrategy.ALL).placeholder(R.drawable.file_icon_default)
                 .listener(object : RequestListener<Drawable> {
                     override fun onResourceReady(
@@ -218,7 +218,7 @@ class FileManagerAdapter : RecyclerView.Adapter<FileManagerAdapter.FileManagerVi
     private fun setSelectedOnLoad(files: List<AboutFile>): List<AboutFile> {
         for (element in files) {
             for (selected in selectedList) {
-                if (element.uri == selected.uri)
+                if (element.path == selected.path)
                     element.selected = true
             }
         }
@@ -227,7 +227,7 @@ class FileManagerAdapter : RecyclerView.Adapter<FileManagerAdapter.FileManagerVi
 
     private fun removeFromSelectedList(file: AboutFile) {
         for (position in selectedList.indices) {
-            if (selectedList[position].uri == file.uri) {
+            if (selectedList[position].path == file.path) {
                 selectedList.removeAt(position)
                 break
             }

@@ -4,12 +4,14 @@ import android.provider.DocumentsContract
 import androidx.documentfile.provider.DocumentFile
 import hu.pungor.filemanager.FileManagerActivity
 import hu.pungor.filemanager.model.AboutFile
+import hu.pungor.filemanager.permissions.SDCardPermissionsUntilApi29
 import java.io.BufferedInputStream
 import java.io.BufferedOutputStream
 import java.io.File
 import java.io.FileInputStream
 
-class SDCardOperations {
+class SDCardOperationsUntilApi29 {
+    private val sdCardPermissions = SDCardPermissionsUntilApi29()
 
     fun copyToSDCard(dstPath: File, file: File, activity: FileManagerActivity) {
         val sdCardFile = getChildren(dstPath, activity)?.createFile("", file.name)
@@ -53,9 +55,10 @@ class SDCardOperations {
 
     fun getChildren(dstPath: File, activity: FileManagerActivity): DocumentFile? {
         try {
-            var id = DocumentsContract.getTreeDocumentId(activity.getUri())
+            var id = DocumentsContract.getTreeDocumentId(sdCardPermissions.getUri(activity))
             id += dstPath.toString().removePrefix(activity.sdCardPath.toString())
-            val childrenUri = DocumentsContract.buildDocumentUriUsingTree(activity.getUri(), id)
+            val childrenUri =
+                DocumentsContract.buildDocumentUriUsingTree(sdCardPermissions.getUri(activity), id)
             return DocumentFile.fromTreeUri(activity, childrenUri)
         } catch (e: Exception) {
         }

@@ -3,19 +3,14 @@ package hu.pungor.filemanager
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.os.Environment
-import android.provider.Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION
-import android.provider.Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION
 import android.util.Log
 import android.view.ContextThemeWrapper
 import android.view.Gravity
 import android.view.View
 import android.webkit.MimeTypeMap
 import android.widget.PopupMenu
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import hu.pungor.filemanager.adapter.FileManagerAdapter
@@ -25,6 +20,8 @@ import hu.pungor.filemanager.model.AboutFile
 import hu.pungor.filemanager.operations.AsyncGetAllFiles
 import hu.pungor.filemanager.operations.ButtonClickOperations
 import hu.pungor.filemanager.operations.FileOperations
+import hu.pungor.filemanager.permissions.SDCardPermissionsUntilApi29
+import hu.pungor.filemanager.permissions.StoragePermissions
 import kotlinx.android.synthetic.main.activity_filemanager.*
 import permissions.dispatcher.NeedsPermission
 import permissions.dispatcher.OnShowRationale
@@ -32,7 +29,6 @@ import permissions.dispatcher.PermissionRequest
 import permissions.dispatcher.RuntimePermissions
 import java.io.File
 import java.util.*
-import java.util.regex.Pattern
 
 
 @Suppress("DEPRECATION")
@@ -40,9 +36,11 @@ import java.util.regex.Pattern
 class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClickListener {
 
     val fileManagerAdapter = FileManagerAdapter()
-    private val buttonClickOperations = ButtonClickOperations(this)
+    private val buttonClickOperations = ButtonClickOperations()
     private val fileOperations = FileOperations()
     private val tapTargetPromptInstructions = TapTargetPromptInstructions()
+    private val storagePermissions = StoragePermissions()
+    private val sdCardPermissions = SDCardPermissionsUntilApi29()
 
     var rootPath = File(Environment.getExternalStorageDirectory().absolutePath)
     var sdCardPath: File? = null
@@ -53,39 +51,21 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
         const val TYPE_UNKNOWN = "unknown"
     }
 
-    @RequiresApi(Build.VERSION_CODES.R)
-    @SuppressLint("UseCompatLoadingForColorStateLists")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_filemanager)
 
-        checkPermissionsAndLoadFiles()
-        disableSDCardButtonIfNotAvailable()
+        storagePermissions.checkPermissionsAndLoadFiles(this)
+        buttonClickOperations.disableSDCardButtonIfNotAvailable(this)
+        loadIntroScreen()
+        loadTutorial()
 
         Internal.setOnClickListener {
-            currentPath = rootPath
-            Internal.backgroundTintList =
-                applicationContext.resources.getColorStateList(R.color.button_pressed)
-            if (sdCardPath != null) {
-                SDCard.backgroundTintList =
-                    applicationContext.resources.getColorStateList(R.color.button)
-            }
-
-            checkPermissionsAndLoadFiles()
+            buttonClickOperations.internalButtonOperations(this)
         }
 
         SDCard.setOnClickListener {
-            sdCardPath = getSDCardPath()
-
-            if (!sdCardPath.toString().contains("null")) {
-                Internal.backgroundTintList =
-                    applicationContext.resources.getColorStateList(R.color.button)
-                SDCard.backgroundTintList =
-                    applicationContext.resources.getColorStateList(R.color.button_pressed)
-                currentPath = sdCardPath!!
-                checkPermissionsAndLoadFiles()
-            } else
-                disableSDCardButtonIfNotAvailable()
+            buttonClickOperations.sdCardButtonOperations(this)
         }
 
         create_textfile.setOnClickListener {
@@ -117,8 +97,7 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
         }
     }
 
-    override fun onStart() {
-        super.onStart()
+    private fun loadIntroScreen() {
         val prefs = getSharedPreferences("prefs", MODE_PRIVATE)
         val firstStart = prefs.getBoolean("firstStart", true)
 
@@ -127,6 +106,18 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
 
         val editor = prefs.edit()
         editor.putBoolean("firstStart", false)
+        editor.apply()
+    }
+
+    private fun loadTutorial() {
+        val prefs = getSharedPreferences("prefs", MODE_PRIVATE)
+        val firstStart = prefs.getBoolean("tutorial", true)
+
+        if (firstStart)
+            tapTargetPromptInstructions.showTutorial(this)
+
+        val editor = prefs.edit()
+        editor.putBoolean("tutorial", false)
         editor.apply()
     }
 
@@ -144,25 +135,6 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
         }
     }
 
-    fun checkPermissionsAndLoadFiles() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            if (!Environment.isExternalStorageManager()) {
-                try {
-                    val intent = Intent(
-                        ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION,
-                        Uri.parse("package:$packageName")
-                    )
-                    startActivity(intent)
-                } catch (e: Exception) {
-                    val intent = Intent(ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
-                    startActivity(intent)
-                }
-            }
-            loadFiles()
-        } else
-            loadFilesWithPermissionCheck()
-    }
-
     override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<out String>,
@@ -170,8 +142,6 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         onRequestPermissionsResult(requestCode, grantResults)
-
-        tapTargetPromptInstructions.showTutorial(this)
     }
 
     @OnShowRationale(
@@ -180,6 +150,11 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
     )
     fun showRationaleForStoragePermissions(request: PermissionRequest) {
         buttonClickOperations.showRationaleForStoragePermissionsBuilder(request, this)
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        sdCardPermissions.activityResult(requestCode, data, this)
     }
 
     fun fillList(fileList: List<File>): List<AboutFile> {
@@ -251,61 +226,11 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
         return folderList + fileList
     }
 
-    private fun getSDCardPath(): File {
-        val pattern = Pattern.compile("([A-Z]|[0-9]){4}-([A-Z]|[0-9]){4}")
-        val regex = pattern.toRegex()
-        if (getUri() == null)
-            buttonClickOperations.sdCardPermissionsBuilder(this)
-        return File("/storage/" + getUri()?.path?.let { regex.find(it)?.value })
-    }
-
-    fun getUri(): Uri? {
-        try {
-            val persistedUriPermissions =
-                contentResolver.persistedUriPermissions
-            if (persistedUriPermissions.size > 0) {
-                val uriPermission = persistedUriPermissions[0]
-                return uriPermission.uri
-            }
-        } catch (e: Exception) {
-            sdCardPermissions()
-        }
-        return null
-    }
-
-    @SuppressLint("UseCompatLoadingForColorStateLists")
-    private fun disableSDCardButtonIfNotAvailable() {
-        if (applicationContext.externalMediaDirs.size < 2) {
-            SDCard.isEnabled = false
-            SDCard.backgroundTintList = resources.getColorStateList(R.color.disabled)
-        }
-    }
-
-    private fun sdCardPermissions() {
-        buttonClickOperations.sdCardPermissionsBuilder(this)
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        try {
-            super.onActivityResult(requestCode, resultCode, data!!)
-            if (requestCode == 1001) {
-                val uri = data.data
-                grantUriPermission(
-                    packageName, uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION or
-                            Intent.FLAG_GRANT_READ_URI_PERMISSION
-                )
-                val takeFlags = Intent.FLAG_GRANT_WRITE_URI_PERMISSION or
-                        Intent.FLAG_GRANT_READ_URI_PERMISSION
-                contentResolver.takePersistableUriPermission(uri!!, takeFlags)
-            }
-        } catch (e: Exception) {
-        }
-    }
-
     override fun onBackPressed() {
+        val currentPathString = currentPath.toString()
+
         if (currentPath != rootPath && currentPath != sdCardPath && !fileManagerAdapter.btnSearchPressed) {
-            val location =
-                currentPath.toString().substring(0, currentPath.toString().lastIndexOf("/") + 1)
+            val location = currentPathString.substring(0, currentPathString.lastIndexOf("/") + 1)
             currentPath = File(location)
 
             loadFiles()
@@ -316,7 +241,7 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
                 fileManagerAdapter.setFiles(fillList(buttonClickOperations.result))
             else {
                 val location =
-                    currentPath.toString().substring(0, currentPath.toString().lastIndexOf("/") + 1)
+                    currentPathString.substring(0, currentPathString.lastIndexOf("/") + 1)
                 currentPath = File(location)
 
                 loadFiles()

@@ -3,6 +3,7 @@ package hu.pungor.filemanager.operations
 import android.app.ProgressDialog
 import android.content.DialogInterface
 import android.os.AsyncTask
+import android.os.Build
 import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.style.AbsoluteSizeSpan
@@ -16,6 +17,8 @@ import hu.pungor.filemanager.alertdialog.AlertDialogMessages
 import hu.pungor.filemanager.model.AboutFile
 import java.io.File
 import java.util.*
+
+private val versionCodeIsR = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
 
 class AsyncGetAllFiles() : AsyncTask<FileManagerActivity, Void, List<AboutFile>>() {
     override fun doInBackground(vararg params: FileManagerActivity): List<AboutFile>? {
@@ -32,7 +35,7 @@ class AsyncCopySelected(private val activity: FileManagerActivity) :
     private val progressDialog = ProgressDialog(activity)
     private val alertDialogMessages =
         AlertDialogMessages()
-    private val sdCardOperations = SDCardOperations()
+    private val sdCardOperations = SDCardOperationsUntilApi29()
     private var copyState = 0.0
     private var selectedListSize = 0.0
 
@@ -61,9 +64,9 @@ class AsyncCopySelected(private val activity: FileManagerActivity) :
         val selectedList = params[0].fileManagerAdapter.getSelectedList()
         selectedList.forEach {
             if (it.mimeType == FileManagerActivity.TYPE_FOLDER)
-                selectedListSize += getFolderSize(File(it.uri))
+                selectedListSize += getFolderSize(File(it.path))
             else
-                selectedListSize += File(it.uri).length()
+                selectedListSize += File(it.path).length()
         }
 
         for (element in selectedList) {
@@ -71,24 +74,28 @@ class AsyncCopySelected(private val activity: FileManagerActivity) :
             progressDialog.setProgressNumberFormat(((selectedList.indexOf(element) + 1).toString() + "/" + selectedList.size))
 
             if (element.mimeType == FileManagerActivity.TYPE_FOLDER && !params[0].currentPath.toString()
-                    .contains(element.uri) && !file.exists()
+                    .contains(element.path) && !file.exists()
             ) {
-                if (params[0].currentPath.toString().contains(params[0].sdCardPath.toString()))
-                    copyFolderToSDCard(File(element.uri), params[0])
+                if (params[0].currentPath.toString()
+                        .contains(params[0].rootPath.toString()) || versionCodeIsR
+                )
+                    copyFolder(File(element.path), params[0])
                 else
-                    copyFolder(File(element.uri), params[0])
-            } else if (!file.exists() && !params[0].currentPath.toString().contains(element.uri)) {
-                copyState += File(element.uri).length()
-                publishProgress((copyState * 100 / selectedListSize).toInt())
+                    copyFolderToSDCard(File(element.path), params[0])
 
-                if (params[0].currentPath.toString().contains(params[0].sdCardPath.toString()))
+            } else if (!file.exists() && !params[0].currentPath.toString().contains(element.path)) {
+                copyState += File(element.path).length()
+                publishProgress((copyState * 100 / selectedListSize).toInt())
+                if (params[0].currentPath.toString()
+                        .contains(params[0].rootPath.toString()) || versionCodeIsR
+                )
+                    File(element.path).copyTo(file)
+                else
                     sdCardOperations.copyToSDCard(
                         params[0].currentPath,
-                        File(element.uri),
+                        File(element.path),
                         params[0]
                     )
-                else
-                    File(element.uri).copyTo(file)
             } else if (file.exists()) {
                 params[0].runOnUiThread {
                     alertDialogMessages.alreadyExists(element.name, params[0])
@@ -161,7 +168,7 @@ class AsyncDeleteSelected(private val activity: FileManagerActivity) :
     AsyncTask<FileManagerActivity, Int, FileManagerActivity>() {
 
     private val progressDialog = ProgressDialog(activity)
-    private val sdCardOperations = SDCardOperations()
+    private val sdCardOperations = SDCardOperationsUntilApi29()
     private var deleteState = 0.0
     private var selectedListSize = 0.0
 
@@ -190,34 +197,38 @@ class AsyncDeleteSelected(private val activity: FileManagerActivity) :
         val selectedList = params[0].fileManagerAdapter.getSelectedList().toMutableList()
         selectedList.forEach {
             if (it.mimeType == FileManagerActivity.TYPE_FOLDER)
-                selectedListSize += getFolderSize(File(it.uri))
+                selectedListSize += getFolderSize(File(it.path))
             else
-                selectedListSize += File(it.uri).length()
+                selectedListSize += File(it.path).length()
         }
 
         for (position in selectedList.indices) {
-            val fileUri = selectedList[position].uri
+            val fileUri = selectedList[position].path
             val file = File(fileUri)
             progressDialog.setProgressNumberFormat(((position + 1).toString() + "/" + selectedList.size))
 
             if (selectedList[position].mimeType == FileManagerActivity.TYPE_FOLDER)
-                if (params[0].currentPath.toString().contains(params[0].sdCardPath.toString())) {
+                if (params[0].currentPath.toString()
+                        .contains(params[0].rootPath.toString()) || versionCodeIsR
+                )
+                    deleteFolder(file)
+                else {
                     val sdCardFolder =
                         sdCardOperations.getChildren(params[0].currentPath, params[0])
                             ?.findFile(file.name)
                     if (sdCardFolder != null) {
                         deleteFolderOnSDCard(sdCardFolder, params[0])
                     }
-                } else
-                    deleteFolder(file)
+                }
             else {
-                deleteState += File(selectedList[position].uri).length()
+                deleteState += File(selectedList[position].path).length()
                 publishProgress((deleteState * 100 / selectedListSize).toInt())
-
-                if (params[0].currentPath.toString().contains(params[0].sdCardPath.toString()))
-                    sdCardOperations.deleteOnSDCard(params[0].currentPath, file, params[0])
-                else
+                if (params[0].currentPath.toString()
+                        .contains(params[0].rootPath.toString()) || versionCodeIsR
+                )
                     file.delete()
+                else
+                    sdCardOperations.deleteOnSDCard(params[0].currentPath, file, params[0])
             }
 
             if (this.isCancelled)
@@ -280,7 +291,7 @@ class AsyncMoveSelected(private val activity: FileManagerActivity) :
     AsyncTask<FileManagerActivity, Int, FileManagerActivity>() {
 
     private val progressDialog = ProgressDialog(activity)
-    private val sdCardOperations = SDCardOperations()
+    private val sdCardOperations = SDCardOperationsUntilApi29()
     private val asyncDeleteSelected = AsyncDeleteSelected(activity)
     private val alertDialogMessages =
         AlertDialogMessages()
@@ -312,80 +323,98 @@ class AsyncMoveSelected(private val activity: FileManagerActivity) :
         val selectedList = params[0].fileManagerAdapter.getSelectedList()
         selectedList.forEach {
             if (it.mimeType == FileManagerActivity.TYPE_FOLDER)
-                selectedListSize += getFolderSize(File(it.uri))
+                selectedListSize += getFolderSize(File(it.path))
             else
-                selectedListSize += File(it.uri).length()
+                selectedListSize += File(it.path).length()
         }
 
         for (element in selectedList) {
             val file = File(params[0].currentPath.toString() + "/" + element.name)
             progressDialog.setProgressNumberFormat(((selectedList.indexOf(element) + 1).toString() + "/" + selectedList.size))
 
-            if (params[0].currentPath.toString() != element.uri && !file.exists()) {
+            if (params[0].currentPath.toString() != element.path && !file.exists()) {
                 if (params[0].currentPath.toString().contains(params[0].sdCardPath.toString())) {
                     if (element.mimeType == FileManagerActivity.TYPE_FOLDER) {
-                        moveFolderToSDCard(File(element.uri), params[0])
+                        if (versionCodeIsR)
+                            moveFolder(File(element.path), params[0])
+                        else
+                            moveFolderToSDCard(File(element.path), params[0])
 
-                        if (element.uri.contains(params[0].rootPath.toString()))
-                            asyncDeleteSelected.deleteFolder(File(element.uri))
+                        if (element.path.contains(params[0].rootPath.toString()) || versionCodeIsR)
+                            asyncDeleteSelected.deleteFolder(File(element.path))
                         else {
                             val sdCardFolder =
-                                sdCardOperations.getChildren(File(element.uri), params[0])
+                                sdCardOperations.getChildren(File(element.path), params[0])
                             if (sdCardFolder != null) {
                                 asyncDeleteSelected.deleteFolderOnSDCard(sdCardFolder, params[0])
                             }
                         }
                     } else {
-                        moveState += File(element.uri).length()
+                        moveState += File(element.path).length()
                         publishProgress((moveState * 100 / selectedListSize).toInt())
 
-                        sdCardOperations.copyToSDCard(
-                            params[0].currentPath,
-                            File(element.uri),
-                            params[0]
-                        )
-                        if (element.uri.contains(params[0].rootPath.toString()))
-                            File(element.uri).delete()
+                        if (versionCodeIsR)
+                            File(element.path).copyTo(file)
+                        else
+                            sdCardOperations.copyToSDCard(
+                                params[0].currentPath,
+                                File(element.path),
+                                params[0]
+                            )
+
+                        if (element.path.contains(params[0].rootPath.toString()) || versionCodeIsR)
+                            File(element.path).delete()
                         else
                             sdCardOperations.deleteOnSDCard(
                                 File(
-                                    element.uri.substring(
+                                    element.path.substring(
                                         0,
-                                        element.uri.lastIndexOf("/")
+                                        element.path.lastIndexOf("/")
                                     )
-                                ), File(element.uri), params[0]
+                                ), File(element.path), params[0]
                             )
                     }
                 } else if (params[0].currentPath.toString()
                         .contains(params[0].rootPath.toString())
                 ) {
                     if (element.mimeType == FileManagerActivity.TYPE_FOLDER) {
-                        if (element.uri.contains(params[0].rootPath.toString()))
-                            File(element.uri).renameTo(file)
+                        if (element.path.contains(params[0].rootPath.toString()))
+                            File(element.path).renameTo(file)
                         else {
-                            moveFolder(File(element.uri), params[0])
-                            val sdCardFolder =
-                                sdCardOperations.getChildren(File(element.uri), params[0])
-                            if (sdCardFolder != null) {
-                                asyncDeleteSelected.deleteFolderOnSDCard(sdCardFolder, params[0])
+                            moveFolder(File(element.path), params[0])
+                            if (versionCodeIsR)
+                                asyncDeleteSelected.deleteFolder(File(element.path))
+                            else {
+                                val sdCardFolder =
+                                    sdCardOperations.getChildren(File(element.path), params[0])
+                                if (sdCardFolder != null) {
+                                    asyncDeleteSelected.deleteFolderOnSDCard(
+                                        sdCardFolder,
+                                        params[0]
+                                    )
+                                }
                             }
                         }
                     } else {
-                        moveState += File(element.uri).length()
+                        moveState += File(element.path).length()
                         publishProgress((moveState * 100 / selectedListSize).toInt())
 
-                        if (element.uri.contains(params[0].rootPath.toString()))
-                            File(element.uri).renameTo(file)
+                        if (element.path.contains(params[0].rootPath.toString()))
+                            File(element.path).renameTo(file)
                         else {
-                            File(element.uri).copyTo(file)
-                            sdCardOperations.deleteOnSDCard(
-                                File(
-                                    element.uri.substring(
-                                        0,
-                                        element.uri.lastIndexOf("/")
-                                    )
-                                ), File(element.uri), params[0]
-                            )
+                            File(element.path).copyTo(file)
+                            if (versionCodeIsR)
+                                File(element.path).delete()
+                            else {
+                                sdCardOperations.deleteOnSDCard(
+                                    File(
+                                        element.path.substring(
+                                            0,
+                                            element.path.lastIndexOf("/")
+                                        )
+                                    ), File(element.path), params[0]
+                                )
+                            }
                         }
                     }
                 }

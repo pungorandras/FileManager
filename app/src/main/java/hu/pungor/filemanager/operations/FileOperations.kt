@@ -1,6 +1,7 @@
 package hu.pungor.filemanager.operations
 
 import android.content.Intent
+import android.os.Build
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.EditText
@@ -11,14 +12,16 @@ import hu.pungor.filemanager.FileManagerActivity
 import hu.pungor.filemanager.R
 import hu.pungor.filemanager.alertdialog.AlertDialogMessages
 import hu.pungor.filemanager.model.AboutFile
+import hu.pungor.filemanager.permissions.StoragePermissions
 import java.io.File
 import java.io.FileWriter
 
 class FileOperations {
 
-    private val alertDialogMessages =
-        AlertDialogMessages()
-    private val sdCardOperations = SDCardOperations()
+    private val alertDialogMessages = AlertDialogMessages()
+    private val sdCardOperations = SDCardOperationsUntilApi29()
+    private val storagePermissions = StoragePermissions()
+    private val versionCodeIsR = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
 
     fun openFile(file: AboutFile, activity: FileManagerActivity) {
         val intent = Intent(Intent.ACTION_VIEW)
@@ -32,7 +35,7 @@ class FileOperations {
                 FileProvider.getUriForFile(
                     activity.applicationContext,
                     activity.applicationContext.packageName + ".provider",
-                    File(file.uri)
+                    File(file.path)
                 ), file.mimeType
             )
         }
@@ -50,7 +53,7 @@ class FileOperations {
             if (activity.fileManagerAdapter.btnSearchPressed)
                 operations.fileTreeDepth++
 
-            activity.currentPath = File(file.uri)
+            activity.currentPath = File(file.path)
             activity.loadFiles()
         }
     }
@@ -61,7 +64,7 @@ class FileOperations {
         intent.setDataAndType(
             FileProvider.getUriForFile(
                 activity.applicationContext, activity.applicationContext.packageName + ".provider",
-                File(file.uri)
+                File(file.path)
             ), "*/*"
         )
 
@@ -70,12 +73,11 @@ class FileOperations {
     }
 
     fun createTextFile(name: String, notes: String, activity: FileManagerActivity) {
-        if (activity.currentPath.toString().contains(activity.sdCardPath.toString())) {
-            sdCardOperations.createTextFileOnSDCard(name, notes, activity)
-            activity.checkPermissionsAndLoadFiles()
-        } else {
+        if (activity.currentPath.toString()
+                .contains(activity.rootPath.toString()) || versionCodeIsR
+        ) {
             try {
-                val file = File("$activity.currentPath/$name.txt")
+                val file = File(activity.currentPath.toString() + "/" + name + ".txt")
 
                 if (!file.exists() && name.isNotEmpty()) {
                     val textFile = File(activity.currentPath, "$name.txt")
@@ -89,16 +91,18 @@ class FileOperations {
                 else
                     alertDialogMessages.alreadyExists(name, activity)
             } catch (e: Exception) {
-                activity.checkPermissionsAndLoadFiles()
+                storagePermissions.checkPermissionsAndLoadFiles(activity)
             }
+        } else {
+            sdCardOperations.createTextFileOnSDCard(name, notes, activity)
+            storagePermissions.checkPermissionsAndLoadFiles(activity)
         }
     }
 
     fun createFolder(name: String, activity: FileManagerActivity) {
-        if (activity.currentPath.toString().contains(activity.sdCardPath.toString())) {
-            sdCardOperations.createFolderOnSDCard(activity.currentPath, name, activity)
-            activity.checkPermissionsAndLoadFiles()
-        } else {
+        if (activity.currentPath.toString()
+                .contains(activity.rootPath.toString()) || versionCodeIsR
+        ) {
             try {
                 val folder = File(activity.currentPath, name)
                 if (!folder.exists()) {
@@ -109,8 +113,11 @@ class FileOperations {
                 else
                     alertDialogMessages.alreadyExists(name, activity)
             } catch (e: Exception) {
-                activity.checkPermissionsAndLoadFiles()
+                storagePermissions.checkPermissionsAndLoadFiles(activity)
             }
+        } else {
+            sdCardOperations.createFolderOnSDCard(activity.currentPath, name, activity)
+            storagePermissions.checkPermissionsAndLoadFiles(activity)
         }
     }
 
@@ -119,7 +126,7 @@ class FileOperations {
         intent.putExtra(
             Intent.EXTRA_STREAM, FileProvider.getUriForFile(
                 view.context, view.context.packageName + ".provider",
-                File(activity.fileManagerAdapter.getItem(position).uri)
+                File(activity.fileManagerAdapter.getItem(position).path)
             )
         )
         intent.type = "*/*"
@@ -141,20 +148,22 @@ class FileOperations {
             .setCustomTitle(customTitle)
             .setCancelable(false)
             .setPositiveButton(activity.getString(R.string.ok)) { dialog, which ->
-                val file = File(currentItem.uri)
+                val file = File(currentItem.path)
                 val newName = dialogView.findViewById<EditText>(R.id.name_input).text.toString()
 
                 if (newName.isNotEmpty()) {
-                    if (activity.currentPath.toString().contains(activity.sdCardPath.toString())) {
-                        sdCardOperations.renameOnSDCard(currentItem, newName, activity)
-                        activity.loadFiles()
-                    } else {
+                    if (activity.currentPath.toString()
+                            .contains(activity.sdCardPath.toString()) || versionCodeIsR
+                    ) {
                         file.renameTo(
                             File(
                                 activity.currentPath,
                                 newName
                             )
                         )
+                        activity.loadFiles()
+                    } else {
+                        sdCardOperations.renameOnSDCard(currentItem, newName, activity)
                         activity.loadFiles()
                     }
                 } else

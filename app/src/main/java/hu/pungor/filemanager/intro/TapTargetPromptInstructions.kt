@@ -4,7 +4,6 @@ import hu.pungor.filemanager.FileManagerActivity
 import hu.pungor.filemanager.R
 import kotlinx.android.synthetic.main.activity_filemanager.*
 import uk.co.samuelwall.materialtaptargetprompt.MaterialTapTargetPrompt
-import uk.co.samuelwall.materialtaptargetprompt.extras.backgrounds.RectanglePromptBackground
 import uk.co.samuelwall.materialtaptargetprompt.extras.focals.RectanglePromptFocal
 
 class TapTargetPromptInstructions {
@@ -61,10 +60,8 @@ class TapTargetPromptInstructions {
                 secondaryText = buttons[index][2] as String
                 backgroundColour = activity.resources.getColor(R.color.colorPrimary)
                 captureTouchEventOnFocal = true
-                if (buttons[index][0] == R.id.switch_source) {
-                    promptBackground = RectanglePromptBackground()
+                if (buttons[index][0] == R.id.switch_source)
                     promptFocal = RectanglePromptFocal()
-                }
                 setPromptStateChangeListener { prompt, state ->
                     if (state == MaterialTapTargetPrompt.STATE_FOCAL_PRESSED || state == MaterialTapTargetPrompt.STATE_NON_FOCAL_PRESSED) {
                         index++
