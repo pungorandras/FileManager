@@ -72,7 +72,7 @@ class FileOperations {
     fun createTextFile(name: String, notes: String, activity: FileManagerActivity) {
         if (activity.currentPath.toString().contains(activity.sdCardPath.toString())) {
             sdCardOperations.createTextFileOnSDCard(name, notes, activity)
-            activity.checkPermissionsBeforeLoad()
+            activity.checkPermissionsAndLoadFiles()
         } else {
             try {
                 val file = File("$activity.currentPath/$name.txt")
@@ -89,7 +89,7 @@ class FileOperations {
                 else
                     alertDialogMessages.alreadyExists(name, activity)
             } catch (e: Exception) {
-                activity.checkPermissionsBeforeLoad()
+                activity.checkPermissionsAndLoadFiles()
             }
         }
     }
@@ -97,7 +97,7 @@ class FileOperations {
     fun createFolder(name: String, activity: FileManagerActivity) {
         if (activity.currentPath.toString().contains(activity.sdCardPath.toString())) {
             sdCardOperations.createFolderOnSDCard(activity.currentPath, name, activity)
-            activity.checkPermissionsBeforeLoad()
+            activity.checkPermissionsAndLoadFiles()
         } else {
             try {
                 val folder = File(activity.currentPath, name)
@@ -109,7 +109,7 @@ class FileOperations {
                 else
                     alertDialogMessages.alreadyExists(name, activity)
             } catch (e: Exception) {
-                activity.checkPermissionsBeforeLoad()
+                activity.checkPermissionsAndLoadFiles()
             }
         }
     }

@@ -59,8 +59,8 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_filemanager)
 
-        checkPermissionsBeforeLoad()
-        setSDCardButton()
+        checkPermissionsAndLoadFiles()
+        disableSDCardButtonIfNotAvailable()
 
         Internal.setOnClickListener {
             currentPath = rootPath
@@ -71,7 +71,7 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
                     applicationContext.resources.getColorStateList(R.color.button)
             }
 
-            checkPermissionsBeforeLoad()
+            checkPermissionsAndLoadFiles()
         }
 
         SDCard.setOnClickListener {
@@ -83,9 +83,9 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
                 SDCard.backgroundTintList =
                     applicationContext.resources.getColorStateList(R.color.button_pressed)
                 currentPath = sdCardPath!!
-                checkPermissionsBeforeLoad()
+                checkPermissionsAndLoadFiles()
             } else
-                setSDCardButton()
+                disableSDCardButtonIfNotAvailable()
         }
 
         create_textfile.setOnClickListener {
@@ -144,7 +144,7 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
         }
     }
 
-    fun checkPermissionsBeforeLoad() {
+    fun checkPermissionsAndLoadFiles() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             if (!Environment.isExternalStorageManager()) {
                 try {
@@ -274,7 +274,7 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
     }
 
     @SuppressLint("UseCompatLoadingForColorStateLists")
-    private fun setSDCardButton() {
+    private fun disableSDCardButtonIfNotAvailable() {
         if (applicationContext.externalMediaDirs.size < 2) {
             SDCard.isEnabled = false
             SDCard.backgroundTintList = resources.getColorStateList(R.color.disabled)
