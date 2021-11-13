@@ -210,20 +210,7 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
     }
 
     private fun sortList(list: List<AboutFile>): List<AboutFile> {
-        val folderList = mutableListOf<AboutFile>()
-        val fileList = mutableListOf<AboutFile>()
-
-        for (file in list) {
-            if (file.mimeType == TYPE_FOLDER)
-                folderList.add(file)
-            else
-                fileList.add(file)
-        }
-
-        folderList.sortBy { it.name.toLowerCase(Locale.ROOT) }
-        fileList.sortBy { it.name.toLowerCase(Locale.ROOT) }
-
-        return folderList + fileList
+        return list.sortedWith(compareBy({ it.mimeType }, { it.name.toLowerCase(Locale.ROOT) }))
     }
 
     override fun onBackPressed() {
@@ -318,7 +305,6 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
             } finally {
                 popup.show()
             }
-
             return false
         }
         return false
