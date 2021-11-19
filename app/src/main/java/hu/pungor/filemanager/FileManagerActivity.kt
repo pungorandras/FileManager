@@ -194,19 +194,19 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
     }
 
     private fun getSize(file: File): String {
-        val GB: Long = 1024 * 1024 * 1024
-        val MB: Long = 1024 * 1024
-        val kB: Long = 1024
-        val size_in_bytes = file.length().toDouble()
+        val sizeGB: Long = 1024 * 1024 * 1024
+        val sizeMB: Long = 1024 * 1024
+        val sizeKB: Long = 1024
+        val sizeB = file.length().toDouble()
 
-        if (size_in_bytes > GB)
-            return String.format("%.1f", size_in_bytes / GB) + "\u00A0GB"
-        else if (size_in_bytes > MB)
-            return String.format("%.1f", size_in_bytes / MB) + "\u00A0MB"
-        else if (size_in_bytes > kB)
-            return String.format("%.1f", size_in_bytes / kB) + "\u00A0kB"
+        if (sizeB > sizeGB)
+            return String.format("%.1f", sizeB / sizeGB) + "\u00A0GB"
+        else if (sizeB > sizeMB)
+            return String.format("%.1f", sizeB / sizeMB) + "\u00A0MB"
+        else if (sizeB > sizeKB)
+            return String.format("%.1f", sizeB / sizeKB) + "\u00A0kB"
         else
-            return String.format("%.1f", size_in_bytes) + "\u00A0B"
+            return String.format("%.1f", sizeB) + "\u00A0B"
     }
 
     private fun sortList(list: List<AboutFile>): List<AboutFile> {

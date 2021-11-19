@@ -54,7 +54,7 @@ class AsyncCopySelected(private val activity: FileManagerActivity) :
         progressDialog.setButton(
             DialogInterface.BUTTON_NEGATIVE,
             activity.getString(R.string.cancel)
-        ) { dialog, which ->
+        ) { _, _ ->
             this.cancel(true)
         }
         progressDialog.show()
@@ -187,7 +187,7 @@ class AsyncDeleteSelected(private val activity: FileManagerActivity) :
         progressDialog.setButton(
             DialogInterface.BUTTON_NEGATIVE,
             activity.getString(R.string.cancel)
-        ) { dialog, which ->
+        ) { _, _ ->
             this.cancel(true)
         }
         progressDialog.show()
@@ -313,7 +313,7 @@ class AsyncMoveSelected(private val activity: FileManagerActivity) :
         progressDialog.setButton(
             DialogInterface.BUTTON_NEGATIVE,
             activity.getString(R.string.cancel)
-        ) { dialog, which ->
+        ) { _, _ ->
             this.cancel(true)
         }
         progressDialog.show()
@@ -520,7 +520,7 @@ class AsyncSearch(private val input: String, private val activity: FileManagerAc
         progressDialog.setButton(
             DialogInterface.BUTTON_NEGATIVE,
             activity.getString(R.string.cancel)
-        ) { dialog, which ->
+        ) { _, _ ->
             this.cancel(true)
         }
         progressDialog.show()

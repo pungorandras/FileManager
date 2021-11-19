@@ -62,7 +62,7 @@ class TapTargetPromptInstructions {
                 captureTouchEventOnFocal = true
                 if (buttons[index][0] == R.id.switch_source)
                     promptFocal = RectanglePromptFocal()
-                setPromptStateChangeListener { prompt, state ->
+                setPromptStateChangeListener { _, state ->
                     if (state == MaterialTapTargetPrompt.STATE_FOCAL_PRESSED || state == MaterialTapTargetPrompt.STATE_NON_FOCAL_PRESSED) {
                         index++
                         showTutorial(activity)
