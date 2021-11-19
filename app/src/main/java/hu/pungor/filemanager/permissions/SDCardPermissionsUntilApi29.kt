@@ -67,25 +67,22 @@ class SDCardPermissionsUntilApi29 {
             .setCustomTitle(customTitle)
             .setView(customText)
             .setCancelable(false)
-            .setPositiveButton(activity.getString(R.string.ok)) { dialog, which ->
+            .setPositiveButton(activity.getString(R.string.ok)) { _, _ ->
                 activity.startActivityForResult(Intent(Intent.ACTION_OPEN_DOCUMENT_TREE), 1001)
             }
         builder.show()
     }
 
     fun activityResult(requestCode: Int, data: Intent?, activity: FileManagerActivity) {
-        try {
-            if (requestCode == 1001) {
-                val uri = data?.data
-                activity.grantUriPermission(
-                    activity.packageName, uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION or
-                            Intent.FLAG_GRANT_READ_URI_PERMISSION
-                )
-                val takeFlags = Intent.FLAG_GRANT_WRITE_URI_PERMISSION or
+        if (requestCode == 1001) {
+            val uri = data?.data
+            activity.grantUriPermission(
+                activity.packageName, uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION or
                         Intent.FLAG_GRANT_READ_URI_PERMISSION
-                activity.contentResolver.takePersistableUriPermission(uri!!, takeFlags)
-            }
-        } catch (e: Exception) {
+            )
+            val takeFlags = Intent.FLAG_GRANT_WRITE_URI_PERMISSION or
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION
+            activity.contentResolver.takePersistableUriPermission(uri!!, takeFlags)
         }
     }
 }

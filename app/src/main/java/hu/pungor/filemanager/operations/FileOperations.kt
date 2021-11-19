@@ -18,6 +18,8 @@ import java.io.FileWriter
 
 class FileOperations {
 
+    private val dotProvider = ".provider";
+
     private val alertDialogMessages = AlertDialogMessages()
     private val sdCardOperations = SDCardOperationsUntilApi29()
     private val storagePermissions = StoragePermissions()
@@ -32,7 +34,7 @@ class FileOperations {
             intent.setDataAndType(
                 FileProvider.getUriForFile(
                     activity.applicationContext,
-                    activity.applicationContext.packageName + ".provider",
+                    activity.applicationContext.packageName + dotProvider,
                     File(file.path)
                 ), file.mimeType
             )
@@ -65,7 +67,7 @@ class FileOperations {
 
         intent.setDataAndType(
             FileProvider.getUriForFile(
-                activity.applicationContext, activity.applicationContext.packageName + ".provider",
+                activity.applicationContext, activity.applicationContext.packageName + dotProvider,
                 File(file.path)
             ), "*/*"
         )
@@ -127,7 +129,7 @@ class FileOperations {
         val intent = Intent(Intent.ACTION_SEND)
         intent.putExtra(
             Intent.EXTRA_STREAM, FileProvider.getUriForFile(
-                view.context, view.context.packageName + ".provider",
+                view.context, view.context.packageName + dotProvider,
                 File(activity.fileManagerAdapter.getItem(position).path)
             )
         )
@@ -149,7 +151,7 @@ class FileOperations {
             .setView(dialogView)
             .setCustomTitle(customTitle)
             .setCancelable(false)
-            .setPositiveButton(activity.getString(R.string.ok)) { dialog, which ->
+            .setPositiveButton(activity.getString(R.string.ok)) { _, _ ->
                 val file = File(currentItem.path)
                 val newName = dialogView.findViewById<EditText>(R.id.name_input).text.toString()
 

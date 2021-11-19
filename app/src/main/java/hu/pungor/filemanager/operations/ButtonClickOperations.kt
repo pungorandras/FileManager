@@ -39,7 +39,7 @@ class ButtonClickOperations {
             .setView(dialogView)
             .setCustomTitle(customTitle)
             .setCancelable(false)
-            .setPositiveButton(activity.getString(R.string.ok)) { dialog, which ->
+            .setPositiveButton(activity.getString(R.string.ok)) { _, _ ->
                 fileOperations.createTextFile(
                     dialogView.findViewById<EditText>(R.id.name_input).text.toString(),
                     dialogView.findViewById<EditText>(R.id.text_input).text.toString(),
@@ -62,7 +62,7 @@ class ButtonClickOperations {
             .setView(dialogView)
             .setCustomTitle(customTitle)
             .setCancelable(false)
-            .setPositiveButton(activity.getString(R.string.ok)) { dialog, which ->
+            .setPositiveButton(activity.getString(R.string.ok)) { _, _ ->
                 fileOperations.createFolder(
                     dialogView.findViewById<EditText>(R.id.name_input).text.toString(),
                     activity
@@ -105,11 +105,11 @@ class ButtonClickOperations {
             .setCustomTitle(customTitle)
             .setView(customText)
             .setCancelable(false)
-            .setPositiveButton(activity.getString(R.string.yes)) { dialog, which ->
+            .setPositiveButton(activity.getString(R.string.yes)) { _, _ ->
                 fileOperations.deleteSelectedFiles(activity)
                 activity.fileManagerAdapter.popupMenuPressed = false
             }
-            .setNegativeButton(activity.getString(R.string.no)) { dialog, which ->
+            .setNegativeButton(activity.getString(R.string.no)) { _, _ ->
                 if (activity.fileManagerAdapter.popupMenuPressed) {
                     activity.fileManagerAdapter.popupMenuPressed = false
                     activity.fileManagerAdapter.clearSelectedList()
@@ -240,7 +240,7 @@ class ButtonClickOperations {
                 .setView(dialogView)
                 .setCustomTitle(customTitle)
                 .setCancelable(false)
-                .setPositiveButton(activity.getString(R.string.ok)) { dialog, which ->
+                .setPositiveButton(activity.getString(R.string.ok)) { _, _ ->
 
                     if (dialogView.findViewById<EditText>(R.id.name_input).text.toString()
                             .isNotEmpty()
@@ -393,8 +393,8 @@ class ButtonClickOperations {
             .setView(customText)
             .setCustomTitle(customTitle)
             .setCancelable(false)
-            .setPositiveButton(activity.getString(R.string.proceed)) { dialog, id -> request.proceed() }
-            .setNegativeButton(activity.getString(R.string.exit)) { dialog, id -> request.cancel() }
+            .setPositiveButton(activity.getString(R.string.proceed)) { _, _ -> request.proceed() }
+            .setNegativeButton(activity.getString(R.string.exit)) { _, _ -> request.cancel() }
             .create()
         builder.show()
     }
