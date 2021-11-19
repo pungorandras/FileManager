@@ -23,7 +23,6 @@ import hu.pungor.filemanager.deprecated.operations.ButtonClickOperations
 import hu.pungor.filemanager.deprecated.operations.FileOperations
 import hu.pungor.filemanager.deprecated.permissions.SDCardPermissionsUntilApi29
 import hu.pungor.filemanager.deprecated.permissions.StoragePermissions
-import hu.pungor.filemanager.onRequestPermissionsResult
 import kotlinx.android.synthetic.main.activity_filemanager.*
 import permissions.dispatcher.NeedsPermission
 import permissions.dispatcher.OnShowRationale

@@ -3,6 +3,7 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="../../.gradle/caches/transforms-3/c0fb64c0d30e1284ae26ad1597d61660/transformed/jetified-rainbow-cake-core-1.6.0/res/layout/activity_main.xml" value="0.18385416666666668" />
         <entry key="..\:/Users/Pungor/AndroidStudioProjects/FileManager/app/src/main/res/drawable/edittext_border.xml" value="0.3828125" />
         <entry key="..\:/Users/Pungor/AndroidStudioProjects/FileManager/app/src/main/res/drawable/item_ripple.xml" value="0.3828125" />
         <entry key="..\:/Users/Pungor/AndroidStudioProjects/FileManager/app/src/main/res/layout/activity_filemanager.xml" value="0.28940217391304346" />
@@ -13,6 +14,8 @@
         <entry key="..\:/Users/Pungor/AndroidStudioProjects/FileManager/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" value="0.3828125" />
         <entry key="app/src/main/res/layout/activity_filemanager.xml" value="0.18385416666666668" />
         <entry key="app/src/main/res/layout/activity_intro_screen.xml" value="0.18385416666666668" />
+        <entry key="app/src/main/res/layout/fragment_intro.xml" value="0.18385416666666668" />
+        <entry key="app/src/main/res/layout/fragment_manager.xml" value="0.18385416666666668" />
       </map>
     </option>
   </component>

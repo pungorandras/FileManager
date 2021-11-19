@@ -6,7 +6,7 @@ import android.os.Build
 import android.os.Environment
 import android.provider.Settings
 import hu.pungor.filemanager.deprecated.FileManagerActivity
-import hu.pungor.filemanager.loadFilesWithPermissionCheck
+import hu.pungor.filemanager.deprecated.loadFilesWithPermissionCheck
 
 class StoragePermissions {
 
