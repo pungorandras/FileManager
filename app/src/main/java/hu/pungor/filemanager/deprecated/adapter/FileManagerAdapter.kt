@@ -1,4 +1,4 @@
-package hu.pungor.filemanager.adapter
+package hu.pungor.filemanager.deprecated.adapter
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -19,7 +19,7 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
 import hu.pungor.filemanager.R
-import hu.pungor.filemanager.model.AboutFile
+import hu.pungor.filemanager.deprecated.model.AboutFile
 import kotlinx.android.synthetic.main.item_file.view.*
 
 

@@ -1,4 +1,4 @@
-package hu.pungor.filemanager.permissions
+package hu.pungor.filemanager.deprecated.permissions
 
 import android.annotation.SuppressLint
 import android.content.Intent
@@ -7,7 +7,7 @@ import android.os.Build
 import android.view.LayoutInflater
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
-import hu.pungor.filemanager.FileManagerActivity
+import hu.pungor.filemanager.deprecated.FileManagerActivity
 import hu.pungor.filemanager.R
 import java.io.File
 import java.util.regex.Pattern

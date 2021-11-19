@@ -1,6 +1,6 @@
-package hu.pungor.filemanager.intro
+package hu.pungor.filemanager.deprecated.intro
 
-import hu.pungor.filemanager.FileManagerActivity
+import hu.pungor.filemanager.deprecated.FileManagerActivity
 import hu.pungor.filemanager.R
 import kotlinx.android.synthetic.main.activity_filemanager.*
 import uk.co.samuelwall.materialtaptargetprompt.MaterialTapTargetPrompt

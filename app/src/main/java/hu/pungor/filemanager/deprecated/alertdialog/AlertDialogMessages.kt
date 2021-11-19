@@ -1,10 +1,10 @@
-package hu.pungor.filemanager.alertdialog
+package hu.pungor.filemanager.deprecated.alertdialog
 
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
-import hu.pungor.filemanager.FileManagerActivity
+import hu.pungor.filemanager.deprecated.FileManagerActivity
 import hu.pungor.filemanager.R
 
 class AlertDialogMessages {

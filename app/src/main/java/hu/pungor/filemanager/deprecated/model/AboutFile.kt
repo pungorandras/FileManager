@@ -1,4 +1,4 @@
-package hu.pungor.filemanager.model
+package hu.pungor.filemanager.deprecated.model
 
 class AboutFile(
     var name: String,

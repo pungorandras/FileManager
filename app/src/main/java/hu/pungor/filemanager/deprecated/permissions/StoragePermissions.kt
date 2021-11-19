@@ -1,11 +1,11 @@
-package hu.pungor.filemanager.permissions
+package hu.pungor.filemanager.deprecated.permissions
 
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.provider.Settings
-import hu.pungor.filemanager.FileManagerActivity
+import hu.pungor.filemanager.deprecated.FileManagerActivity
 import hu.pungor.filemanager.loadFilesWithPermissionCheck
 
 class StoragePermissions {

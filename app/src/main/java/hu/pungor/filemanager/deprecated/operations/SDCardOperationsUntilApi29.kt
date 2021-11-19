@@ -1,10 +1,10 @@
-package hu.pungor.filemanager.operations
+package hu.pungor.filemanager.deprecated.operations
 
 import android.provider.DocumentsContract
 import androidx.documentfile.provider.DocumentFile
-import hu.pungor.filemanager.FileManagerActivity
-import hu.pungor.filemanager.model.AboutFile
-import hu.pungor.filemanager.permissions.SDCardPermissionsUntilApi29
+import hu.pungor.filemanager.deprecated.FileManagerActivity
+import hu.pungor.filemanager.deprecated.model.AboutFile
+import hu.pungor.filemanager.deprecated.permissions.SDCardPermissionsUntilApi29
 import java.io.BufferedInputStream
 import java.io.BufferedOutputStream
 import java.io.File

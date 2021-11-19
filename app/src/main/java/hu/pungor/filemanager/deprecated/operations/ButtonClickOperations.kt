@@ -1,4 +1,4 @@
-package hu.pungor.filemanager.operations
+package hu.pungor.filemanager.deprecated.operations
 
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
@@ -6,11 +6,11 @@ import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
-import hu.pungor.filemanager.FileManagerActivity
+import hu.pungor.filemanager.deprecated.FileManagerActivity
 import hu.pungor.filemanager.R
-import hu.pungor.filemanager.alertdialog.AlertDialogMessages
-import hu.pungor.filemanager.permissions.SDCardPermissionsUntilApi29
-import hu.pungor.filemanager.permissions.StoragePermissions
+import hu.pungor.filemanager.deprecated.alertdialog.AlertDialogMessages
+import hu.pungor.filemanager.deprecated.permissions.SDCardPermissionsUntilApi29
+import hu.pungor.filemanager.deprecated.permissions.StoragePermissions
 import kotlinx.android.synthetic.main.activity_filemanager.*
 import permissions.dispatcher.PermissionRequest
 import java.io.File

@@ -1,4 +1,4 @@
-package hu.pungor.filemanager.intro
+package hu.pungor.filemanager.deprecated.intro
 
 import android.annotation.SuppressLint
 import android.os.Bundle

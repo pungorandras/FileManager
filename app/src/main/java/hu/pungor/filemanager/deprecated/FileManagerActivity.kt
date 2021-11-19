@@ -1,4 +1,4 @@
-package hu.pungor.filemanager
+package hu.pungor.filemanager.deprecated
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -13,15 +13,17 @@ import android.webkit.MimeTypeMap
 import android.widget.PopupMenu
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import hu.pungor.filemanager.adapter.FileManagerAdapter
-import hu.pungor.filemanager.intro.IntroScreenActivity
-import hu.pungor.filemanager.intro.TapTargetPromptInstructions
-import hu.pungor.filemanager.model.AboutFile
-import hu.pungor.filemanager.operations.AsyncGetAllFiles
-import hu.pungor.filemanager.operations.ButtonClickOperations
-import hu.pungor.filemanager.operations.FileOperations
-import hu.pungor.filemanager.permissions.SDCardPermissionsUntilApi29
-import hu.pungor.filemanager.permissions.StoragePermissions
+import hu.pungor.filemanager.R
+import hu.pungor.filemanager.deprecated.adapter.FileManagerAdapter
+import hu.pungor.filemanager.deprecated.intro.IntroScreenActivity
+import hu.pungor.filemanager.deprecated.intro.TapTargetPromptInstructions
+import hu.pungor.filemanager.deprecated.model.AboutFile
+import hu.pungor.filemanager.deprecated.operations.AsyncGetAllFiles
+import hu.pungor.filemanager.deprecated.operations.ButtonClickOperations
+import hu.pungor.filemanager.deprecated.operations.FileOperations
+import hu.pungor.filemanager.deprecated.permissions.SDCardPermissionsUntilApi29
+import hu.pungor.filemanager.deprecated.permissions.StoragePermissions
+import hu.pungor.filemanager.onRequestPermissionsResult
 import kotlinx.android.synthetic.main.activity_filemanager.*
 import permissions.dispatcher.NeedsPermission
 import permissions.dispatcher.OnShowRationale

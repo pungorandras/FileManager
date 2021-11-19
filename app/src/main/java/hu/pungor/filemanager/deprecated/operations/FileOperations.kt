@@ -1,4 +1,4 @@
-package hu.pungor.filemanager.operations
+package hu.pungor.filemanager.deprecated.operations
 
 import android.content.Intent
 import android.os.Build
@@ -8,11 +8,11 @@ import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.FileProvider
-import hu.pungor.filemanager.FileManagerActivity
+import hu.pungor.filemanager.deprecated.FileManagerActivity
 import hu.pungor.filemanager.R
-import hu.pungor.filemanager.alertdialog.AlertDialogMessages
-import hu.pungor.filemanager.model.AboutFile
-import hu.pungor.filemanager.permissions.StoragePermissions
+import hu.pungor.filemanager.deprecated.alertdialog.AlertDialogMessages
+import hu.pungor.filemanager.deprecated.model.AboutFile
+import hu.pungor.filemanager.deprecated.permissions.StoragePermissions
 import java.io.File
 import java.io.FileWriter
 

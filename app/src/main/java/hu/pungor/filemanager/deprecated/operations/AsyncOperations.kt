@@ -1,4 +1,4 @@
-package hu.pungor.filemanager.operations
+package hu.pungor.filemanager.deprecated.operations
 
 import android.app.ProgressDialog
 import android.content.DialogInterface
@@ -11,10 +11,10 @@ import android.text.style.StyleSpan
 import android.view.LayoutInflater
 import android.widget.TextView
 import androidx.documentfile.provider.DocumentFile
-import hu.pungor.filemanager.FileManagerActivity
+import hu.pungor.filemanager.deprecated.FileManagerActivity
 import hu.pungor.filemanager.R
-import hu.pungor.filemanager.alertdialog.AlertDialogMessages
-import hu.pungor.filemanager.model.AboutFile
+import hu.pungor.filemanager.deprecated.alertdialog.AlertDialogMessages
+import hu.pungor.filemanager.deprecated.model.AboutFile
 import java.io.File
 import java.util.*
 
