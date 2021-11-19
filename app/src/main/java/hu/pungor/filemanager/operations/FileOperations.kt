@@ -26,11 +26,9 @@ class FileOperations {
     fun openFile(file: AboutFile, activity: FileManagerActivity) {
         val intent = Intent(Intent.ACTION_VIEW)
 
-        if (activity.currentPath.toString().contains(activity.sdCardPath.toString())) {
-            val uri = sdCardOperations.getChildren(activity.currentPath, activity)
-                ?.findFile(file.name)?.uri
-            intent.setDataAndType(uri, file.mimeType)
-        } else {
+        if (activity.currentPath.toString()
+                .contains(activity.rootPath.toString()) || versionCodeIsR
+        ) {
             intent.setDataAndType(
                 FileProvider.getUriForFile(
                     activity.applicationContext,
@@ -38,6 +36,10 @@ class FileOperations {
                     File(file.path)
                 ), file.mimeType
             )
+        } else {
+            val uri = sdCardOperations.getChildren(activity.currentPath, activity)
+                ?.findFile(file.name)?.uri
+            intent.setDataAndType(uri, file.mimeType)
         }
 
         intent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
