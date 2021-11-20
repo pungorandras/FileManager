@@ -4,6 +4,7 @@ import co.zsmb.rainbowcake.config.Loggers
 import co.zsmb.rainbowcake.config.rainbowCake
 import co.zsmb.rainbowcake.dagger.RainbowCakeApplication
 import co.zsmb.rainbowcake.timber.TIMBER
+import com.orhanobut.hawk.Hawk
 import hu.pungor.filemanager.di.AppComponent
 import hu.pungor.filemanager.di.ApplicationModule
 import hu.pungor.filemanager.di.DaggerAppComponent
@@ -28,6 +29,8 @@ class FileManagerApplication : RainbowCakeApplication() {
         }
 
         Timber.plant(Timber.DebugTree())
+
+        Hawk.init(applicationContext).build()
     }
 
 }

@@ -8,7 +8,13 @@ class IntroViewModel @Inject constructor(
 ) : RainbowCakeViewModel<IntroViewState>(Loading) {
 
     fun load() = execute {
-        viewState = IntroReady(introPresenter.getData())
+        viewState = Loading
+        if (introPresenter.isFirstTime()) {
+            viewState = FirstTime
+            introPresenter.setFirstTimeFalse()
+        } else {
+            viewState = AlreadyShown
+        }
     }
 
 }

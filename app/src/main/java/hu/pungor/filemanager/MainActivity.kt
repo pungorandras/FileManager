@@ -2,7 +2,7 @@ package hu.pungor.filemanager
 
 import android.os.Bundle
 import co.zsmb.rainbowcake.navigation.SimpleNavActivity
-import hu.pungor.filemanager.ui.Intro.IntroFragment
+import hu.pungor.filemanager.ui.intro.IntroFragment
 
 
 class MainActivity : SimpleNavActivity() {

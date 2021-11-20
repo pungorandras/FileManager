@@ -4,4 +4,7 @@ sealed class IntroViewState
 
 object Loading : IntroViewState()
 
-data class IntroReady(val data: String = "") : IntroViewState()
+object FirstTime : IntroViewState()
+
+object AlreadyShown : IntroViewState()
+
