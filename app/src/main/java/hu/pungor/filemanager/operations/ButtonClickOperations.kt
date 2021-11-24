@@ -301,6 +301,8 @@ class ButtonClickOperations {
                     activity.applicationContext.resources.getColorStateList(R.color.button_pressed)
             }
 
+            disableSDCardButtonIfNotAvailable(activity)
+
             revertButtonState(
                 activity.create_textfile,
                 activity.create_folder,

@@ -29,9 +29,8 @@ class SDCardPermissionsUntilApi29 {
                     return File("/storage/" + path.value)
                 }
             }
-        } else {
-            if (getUri(activity) == null)
-                sdCardPermissionsBuilder(activity)
+        } else if ((getUri(activity) == null)) {
+            sdCardPermissionsBuilder(activity)
             return File("/storage/" + getUri(activity)?.path?.let { regex.find(it)?.value })
         }
         return null
