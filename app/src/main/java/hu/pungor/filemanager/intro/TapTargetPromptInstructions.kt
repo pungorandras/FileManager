@@ -2,7 +2,6 @@ package hu.pungor.filemanager.intro
 
 import hu.pungor.filemanager.FileManagerActivity
 import hu.pungor.filemanager.R
-import kotlinx.android.synthetic.main.activity_filemanager.*
 import uk.co.samuelwall.materialtaptargetprompt.MaterialTapTargetPrompt
 import uk.co.samuelwall.materialtaptargetprompt.extras.focals.RectanglePromptFocal
 

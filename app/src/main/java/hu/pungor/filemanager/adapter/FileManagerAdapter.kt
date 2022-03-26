@@ -55,6 +55,7 @@ class FileManagerAdapter : RecyclerView.Adapter<FileManagerAdapter.FileManagerVi
         holder.file_info.text = file.info
         holder.file = file
 
+        Glide.with(holder.file_icon.context).clear(holder.file_icon)
         setDrawableOnLoad(holder, position)
 
         holder.file_icon.setOnClickListener {
