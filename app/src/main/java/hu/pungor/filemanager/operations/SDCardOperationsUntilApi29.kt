@@ -1,67 +1,65 @@
 package hu.pungor.filemanager.operations
 
 import android.provider.DocumentsContract
+import android.util.Log
 import androidx.documentfile.provider.DocumentFile
 import hu.pungor.filemanager.FileManagerActivity
 import hu.pungor.filemanager.model.AboutFile
-import hu.pungor.filemanager.permissions.SDCardPermissionsUntilApi29
+import hu.pungor.filemanager.permissions.getUri
 import java.io.BufferedInputStream
 import java.io.BufferedOutputStream
 import java.io.File
 import java.io.FileInputStream
 
-class SDCardOperationsUntilApi29 {
-    private val sdCardPermissions = SDCardPermissionsUntilApi29()
+fun FileManagerActivity.copyToSDCard(dstPath: File, file: File) {
+    val sdCardFile = getChildren(dstPath)?.createFile("", file.name)
+    val bufferSize = 8 * 1024
+    val bufferedInput = BufferedInputStream(FileInputStream(file))
+    val bufferedOutput =
+        sdCardFile?.uri?.let { BufferedOutputStream(contentResolver.openOutputStream(it)) }
 
-    fun copyToSDCard(dstPath: File, file: File, activity: FileManagerActivity) {
-        val sdCardFile = getChildren(dstPath, activity)?.createFile("", file.name)
-        val bufferSize = 8 * 1024
-        val bufferedInput = BufferedInputStream(FileInputStream(file))
-        val bufferedOutput =
-            sdCardFile?.uri?.let { BufferedOutputStream(activity.contentResolver.openOutputStream(it)) }
-
-        bufferedInput.use { input ->
-            bufferedOutput.use { output ->
-                if (output != null) {
-                    input.copyTo(output, bufferSize)
-                }
+    bufferedInput.use { input ->
+        bufferedOutput.use { output ->
+            if (output != null) {
+                input.copyTo(output, bufferSize)
             }
         }
-
-        bufferedInput.close()
-        bufferedOutput?.flush()
-        bufferedOutput?.close()
     }
 
-    fun createTextFileOnSDCard(name: String, notes: String, activity: FileManagerActivity) {
-        val sdCardFile = getChildren(activity.currentPath, activity)?.createFile("", "$name.txt")
-        val output = sdCardFile?.uri?.let { activity.contentResolver.openOutputStream(it) }
-        output?.write(notes.toByteArray())
-        output?.flush()
-        output?.close()
-    }
+    bufferedInput.close()
+    bufferedOutput?.flush()
+    bufferedOutput?.close()
+}
 
-    fun createFolderOnSDCard(dstPath: File, name: String, activity: FileManagerActivity) {
-        getChildren(dstPath, activity)?.createDirectory(name)
-    }
+fun FileManagerActivity.createTextFileOnSDCard(name: String, notes: String) {
+    val sdCardFile = getChildren(currentPath)?.createFile("", "$name.txt")
+    val output = sdCardFile?.uri?.let { contentResolver.openOutputStream(it) }
+    output?.write(notes.toByteArray())
+    output?.flush()
+    output?.close()
+}
 
-    fun renameOnSDCard(input: AboutFile, newName: String, activity: FileManagerActivity) {
-        getChildren(activity.currentPath, activity)?.findFile(input.name)?.renameTo(newName)
-    }
+fun FileManagerActivity.createFolderOnSDCard(dstPath: File, name: String) {
+    getChildren(dstPath)?.createDirectory(name)
+}
 
-    fun deleteOnSDCard(path: File, file: File, activity: FileManagerActivity) {
-        getChildren(path, activity)?.findFile(file.name)?.delete()
-    }
+fun FileManagerActivity.renameOnSDCard(input: AboutFile, newName: String) {
+    getChildren(currentPath)?.findFile(input.name)?.renameTo(newName)
+}
 
-    fun getChildren(dstPath: File, activity: FileManagerActivity): DocumentFile? {
-        try {
-            var id = DocumentsContract.getTreeDocumentId(sdCardPermissions.getUri(activity))
-            id += dstPath.toString().removePrefix(activity.sdCardPath.toString())
-            val childrenUri =
-                DocumentsContract.buildDocumentUriUsingTree(sdCardPermissions.getUri(activity), id)
-            return DocumentFile.fromTreeUri(activity, childrenUri)
-        } catch (e: Exception) {
-        }
-        return null
+fun FileManagerActivity.deleteOnSDCard(path: File, file: File) {
+    getChildren(path)?.findFile(file.name)?.delete()
+}
+
+fun FileManagerActivity.getChildren(dstPath: File): DocumentFile? {
+    try {
+        var id = DocumentsContract.getTreeDocumentId(getUri())
+        id += dstPath.toString().removePrefix(sdCardPath.toString())
+        val childrenUri =
+            DocumentsContract.buildDocumentUriUsingTree(getUri(), id)
+        return DocumentFile.fromTreeUri(this, childrenUri)
+    } catch (e: Exception) {
+        Log.e("Main", "Unable to get child object.", e)
     }
+    return null
 }

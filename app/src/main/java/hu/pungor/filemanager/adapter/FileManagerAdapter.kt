@@ -44,6 +44,7 @@ class FileManagerAdapter : RecyclerView.Adapter<FileManagerAdapter.FileManagerVi
         private const val TYPE_UNKNOWN = "unknown"
     }
 
+    @SuppressLint("InflateParams")
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FileManagerViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_file, null)
         return FileManagerViewHolder(view)
@@ -73,136 +74,68 @@ class FileManagerAdapter : RecyclerView.Adapter<FileManagerAdapter.FileManagerVi
         }
     }
 
+    @SuppressLint("IntentReset")
     private fun setDrawableOnLoad(holder: FileManagerViewHolder, position: Int) {
         val file = fileList[position]
         val intent = Intent(Intent.ACTION_VIEW)
         intent.data = Uri.parse(file.path)
         intent.type = file.mimeType
         val matches = holder.file_icon.context.packageManager.queryIntentActivities(intent, 0)
+        val cropOptions = RequestOptions().centerCrop()
 
-        if (file.mimeType == TYPE_FOLDER)
-            Glide.with(holder.itemView).load(R.drawable.folder).override(100, 100)
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .listener(object : RequestListener<Drawable> {
-                    override fun onResourceReady(
-                        resource: Drawable?,
-                        model: Any?,
-                        target: Target<Drawable>?,
-                        dataSource: DataSource?,
-                        isFirstResource: Boolean
-                    ): Boolean {
-                        if (file.selected && !popupMenuPressed) {
-                            val layerDrawable = tickOverlay(holder, resource)
-                            holder.file_icon.setImageDrawable(layerDrawable)
-                            return true
-                        }
-                        return false
-                    }
-
-                    override fun onLoadFailed(
-                        e: GlideException?,
-                        model: Any?,
-                        target: Target<Drawable>?,
-                        isFirstResource: Boolean
-                    ): Boolean {
-                        return false
-                    }
-                }).into(holder.file_icon)
+        val resource: Any = if (file.mimeType == TYPE_FOLDER)
+            R.drawable.folder
         else if (file.mimeType == TYPE_UNKNOWN || matches.isNullOrEmpty())
-            Glide.with(holder.itemView).load(R.drawable.file_icon_default).override(100, 100)
-                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .listener(object : RequestListener<Drawable> {
-                    override fun onResourceReady(
-                        resource: Drawable?,
-                        model: Any?,
-                        target: Target<Drawable>?,
-                        dataSource: DataSource?,
-                        isFirstResource: Boolean
-                    ): Boolean {
-                        if (file.selected && !popupMenuPressed) {
-                            val layerDrawable = tickOverlay(holder, resource)
-                            holder.file_icon.setImageDrawable(layerDrawable)
-                            return true
-                        }
-                        return false
-                    }
+            R.drawable.file_icon_default
+        else if (mediaFile(file))
+            file.path
+        else
+            matches[0].loadIcon(holder.file_icon.context.packageManager)
 
-                    override fun onLoadFailed(
-                        e: GlideException?,
-                        model: Any?,
-                        target: Target<Drawable>?,
-                        isFirstResource: Boolean
-                    ): Boolean {
-                        return false
+        var obj = Glide.with(holder.itemView).load(resource).override(100, 100)
+            .diskCacheStrategy(DiskCacheStrategy.ALL).listener(object : RequestListener<Drawable> {
+                override fun onResourceReady(
+                    resource: Drawable?,
+                    model: Any?,
+                    target: Target<Drawable>?,
+                    dataSource: DataSource?,
+                    isFirstResource: Boolean
+                ): Boolean {
+                    if (file.selected && !popupMenuPressed) {
+                        val layerDrawable = tickOverlay(holder, resource)
+                        holder.file_icon.setImageDrawable(layerDrawable)
+                        return true
                     }
-                }).into(holder.file_icon)
-        else if (file.mimeType.startsWith("image") || file.mimeType.startsWith("video")) {
-            val cropOptions = RequestOptions().centerCrop()
-            Glide.with(holder.itemView).load(file.path).apply(cropOptions).override(100, 100)
-                .diskCacheStrategy(DiskCacheStrategy.ALL).placeholder(R.drawable.file_icon_default)
-                .listener(object : RequestListener<Drawable> {
-                    override fun onResourceReady(
-                        resource: Drawable?,
-                        model: Any?,
-                        target: Target<Drawable>?,
-                        dataSource: DataSource?,
-                        isFirstResource: Boolean
-                    ): Boolean {
-                        if (file.selected && !popupMenuPressed) {
-                            val layerDrawable = tickOverlay(holder, resource)
-                            holder.file_icon.setImageDrawable(layerDrawable)
-                            return true
-                        }
-                        return false
-                    }
+                    return false
+                }
 
-                    @SuppressLint("UseCompatLoadingForDrawables")
-                    override fun onLoadFailed(
-                        e: GlideException?,
-                        model: Any?,
-                        target: Target<Drawable>?,
-                        isFirstResource: Boolean
-                    ): Boolean {
-                        if (file.selected && !popupMenuPressed) {
-                            val r = holder.file_icon.resources
-                            val layerDrawable =
-                                tickOverlay(holder, r.getDrawable(R.drawable.file_icon_default))
-                            holder.file_icon.setImageDrawable(layerDrawable)
-                            return true
-                        }
-                        return false
+                override fun onLoadFailed(
+                    e: GlideException?,
+                    model: Any?,
+                    target: Target<Drawable>?,
+                    isFirstResource: Boolean
+                ): Boolean {
+                    if (file.selected && !popupMenuPressed && mediaFile(file)) {
+                        val r = holder.file_icon.resources
+                        val layerDrawable =
+                            tickOverlay(holder, r.getDrawable(R.drawable.file_icon_default))
+                        holder.file_icon.setImageDrawable(layerDrawable)
+                        return true
                     }
-                }).into(holder.file_icon)
+                    return false
+                }
+            })
 
-        } else
-            Glide.with(holder.itemView)
-                .load(matches[0].loadIcon(holder.file_icon.context.packageManager))
-                .override(100, 100).diskCacheStrategy(DiskCacheStrategy.ALL)
-                .listener(object : RequestListener<Drawable> {
-                    override fun onResourceReady(
-                        resource: Drawable?,
-                        model: Any?,
-                        target: Target<Drawable>?,
-                        dataSource: DataSource?,
-                        isFirstResource: Boolean
-                    ): Boolean {
-                        if (file.selected && !popupMenuPressed) {
-                            val layerDrawable = tickOverlay(holder, resource)
-                            holder.file_icon.setImageDrawable(layerDrawable)
-                            return true
-                        }
-                        return false
-                    }
+        if (mediaFile(file))
+            obj = obj.apply(cropOptions).placeholder(R.drawable.file_icon_default)
 
-                    override fun onLoadFailed(
-                        e: GlideException?,
-                        model: Any?,
-                        target: Target<Drawable>?,
-                        isFirstResource: Boolean
-                    ): Boolean {
-                        return false
-                    }
-                }).into(holder.file_icon)
+        obj.into(holder.file_icon)
+    }
+
+    private fun mediaFile(file: AboutFile): Boolean {
+        if (file.mimeType.startsWith("image") || file.mimeType.startsWith("video"))
+            return true
+        return false
     }
 
     @SuppressLint("UseCompatLoadingForDrawables")
@@ -247,9 +180,7 @@ class FileManagerAdapter : RecyclerView.Adapter<FileManagerAdapter.FileManagerVi
             clearSelectedList()
             btnSelectAllPressed = false
         }
-
         fileList += setSelectedOnLoad(files)
-
         notifyDataSetChanged()
     }
 
@@ -265,7 +196,7 @@ class FileManagerAdapter : RecyclerView.Adapter<FileManagerAdapter.FileManagerVi
         return selectedList
     }
 
-    fun backupSelectedList() {
+    private fun backupSelectedList() {
         selectedListBackup = selectedList.toMutableList()
     }
 
@@ -273,7 +204,7 @@ class FileManagerAdapter : RecyclerView.Adapter<FileManagerAdapter.FileManagerVi
         selectedList = selectedListBackup.toMutableList()
     }
 
-    fun addToSelectedList(file: AboutFile) {
+    private fun addToSelectedList(file: AboutFile) {
         selectedList.add(file)
     }
 
@@ -281,6 +212,13 @@ class FileManagerAdapter : RecyclerView.Adapter<FileManagerAdapter.FileManagerVi
         for (element in fileList)
             if (!selectedList.contains(element))
                 selectedList.add(element)
+    }
+
+    fun popupMenuPressActions(position: Int) {
+        popupMenuPressed = true
+        backupSelectedList()
+        clearSelectedList()
+        addToSelectedList(getItem(position))
     }
 
     inner class FileManagerViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {

@@ -1,5 +1,7 @@
 package hu.pungor.filemanager.operations
 
+import android.annotation.SuppressLint
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.os.Build
 import android.view.LayoutInflater
@@ -10,184 +12,175 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.FileProvider
 import hu.pungor.filemanager.FileManagerActivity
 import hu.pungor.filemanager.R
-import hu.pungor.filemanager.alertdialog.AlertDialogMessages
+import hu.pungor.filemanager.alertdialog.alreadyExistsDialog
+import hu.pungor.filemanager.alertdialog.nameIsNullDialog
 import hu.pungor.filemanager.model.AboutFile
-import hu.pungor.filemanager.permissions.StoragePermissions
+import hu.pungor.filemanager.permissions.checkPermissionsAndLoadFiles
 import java.io.File
 import java.io.FileWriter
 
-class FileOperations {
+private val vcIsR = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
 
-    private val alertDialogMessages = AlertDialogMessages()
-    private val sdCardOperations = SDCardOperationsUntilApi29()
-    private val storagePermissions = StoragePermissions()
-    private val versionCodeIsR = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
+fun FileManagerActivity.openFile(file: AboutFile) {
+    val intent = Intent(Intent.ACTION_VIEW)
 
-    fun openFile(file: AboutFile, activity: FileManagerActivity) {
-        val intent = Intent(Intent.ACTION_VIEW)
-
-        if (activity.currentPath.toString()
-                .contains(activity.rootPath.toString()) || versionCodeIsR
-        ) {
-            intent.setDataAndType(
-                FileProvider.getUriForFile(
-                    activity.applicationContext,
-                    activity.applicationContext.packageName + ".provider",
-                    File(file.path)
-                ), file.mimeType
-            )
-        } else {
-            val uri = sdCardOperations.getChildren(activity.currentPath, activity)
-                ?.findFile(file.name)?.uri
-            intent.setDataAndType(uri, file.mimeType)
-        }
-
-        intent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
-        activity.startActivity(intent)
-    }
-
-    fun openFolder(
-        file: AboutFile,
-        activity: FileManagerActivity,
-        operations: ButtonClickOperations
-    ) {
-        if (file.mimeType == FileManagerActivity.TYPE_FOLDER) {
-            if (activity.fileManagerAdapter.btnSearchPressed)
-                operations.fileTreeDepth++
-
-            activity.currentPath = File(file.path)
-            activity.loadFiles()
-        }
-    }
-
-    fun openUnknown(file: AboutFile, activity: FileManagerActivity) {
-        val intent = Intent(Intent.ACTION_VIEW)
-
+    if (currentPath.toString().contains(rootPath.toString()) || vcIsR) {
         intent.setDataAndType(
             FileProvider.getUriForFile(
-                activity.applicationContext, activity.applicationContext.packageName + ".provider",
+                this,
+                "$packageName.provider",
                 File(file.path)
-            ), "*/*"
+            ), file.mimeType
         )
-
-        intent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
-        activity.startActivity(intent)
+    } else {
+        val uri = getChildren(currentPath)
+            ?.findFile(file.name)?.uri
+        intent.setDataAndType(uri, file.mimeType)
     }
 
-    fun createTextFile(name: String, notes: String, activity: FileManagerActivity) {
-        if (activity.currentPath.toString()
-                .contains(activity.rootPath.toString()) || versionCodeIsR
-        ) {
-            try {
-                val file = File(activity.currentPath.toString() + "/" + name + ".txt")
+    intent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+    try {
+        startActivity(intent)
+    } catch (e: ActivityNotFoundException) {
+        openUnknown(file)
+    }
 
-                if (!file.exists() && name.isNotEmpty()) {
-                    val textFile = File(activity.currentPath, "$name.txt")
-                    val fileWriter = FileWriter(textFile)
-                    fileWriter.append(notes)
-                    fileWriter.flush()
-                    fileWriter.close()
-                    activity.loadFiles()
-                } else if (name.isEmpty())
-                    alertDialogMessages.nameIsNull(activity)
-                else
-                    alertDialogMessages.alreadyExists(name, activity)
-            } catch (e: Exception) {
-                storagePermissions.checkPermissionsAndLoadFiles(activity)
-            }
-        } else {
-            sdCardOperations.createTextFileOnSDCard(name, notes, activity)
-            storagePermissions.checkPermissionsAndLoadFiles(activity)
+}
+
+fun FileManagerActivity.openFolder(file: AboutFile) {
+    if (file.mimeType == FileManagerActivity.TYPE_FOLDER) {
+        if (fmAdapter.btnSearchPressed)
+            fileTreeDepth++
+
+        currentPath = File(file.path)
+        loadFiles()
+    }
+}
+
+fun FileManagerActivity.openUnknown(file: AboutFile) {
+    val intent = Intent(Intent.ACTION_VIEW)
+
+    intent.setDataAndType(
+        FileProvider.getUriForFile(
+            applicationContext, "$packageName.provider",
+            File(file.path)
+        ), "*/*"
+    )
+
+    intent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+    startActivity(intent)
+}
+
+fun FileManagerActivity.createTextFile(name: String, notes: String) {
+    if (currentPath.toString().contains(rootPath.toString()) || vcIsR) {
+        try {
+            val file = File("$currentPath/$name.txt")
+
+            if (!file.exists() && name.isNotEmpty()) {
+                val textFile = File(currentPath, "$name.txt")
+                val fileWriter = FileWriter(textFile)
+                fileWriter.append(notes)
+                fileWriter.flush()
+                fileWriter.close()
+                loadFiles()
+            } else if (name.isEmpty())
+                nameIsNullDialog()
+            else
+                alreadyExistsDialog(name)
+        } catch (e: Exception) {
+            checkPermissionsAndLoadFiles()
         }
+    } else {
+        createTextFileOnSDCard(name, notes)
+        checkPermissionsAndLoadFiles()
     }
+}
 
-    fun createFolder(name: String, activity: FileManagerActivity) {
-        if (activity.currentPath.toString()
-                .contains(activity.rootPath.toString()) || versionCodeIsR
-        ) {
-            try {
-                val folder = File(activity.currentPath, name)
-                if (!folder.exists()) {
-                    folder.mkdir()
-                    activity.loadFiles()
-                } else if (name.isEmpty())
-                    alertDialogMessages.nameIsNull(activity)
-                else
-                    alertDialogMessages.alreadyExists(name, activity)
-            } catch (e: Exception) {
-                storagePermissions.checkPermissionsAndLoadFiles(activity)
-            }
-        } else {
-            sdCardOperations.createFolderOnSDCard(activity.currentPath, name, activity)
-            storagePermissions.checkPermissionsAndLoadFiles(activity)
+fun FileManagerActivity.createFolder(name: String) {
+    if (currentPath.toString().contains(rootPath.toString()) || vcIsR
+    ) {
+        try {
+            val folder = File(currentPath, name)
+            if (!folder.exists()) {
+                folder.mkdir()
+                loadFiles()
+            } else if (name.isEmpty())
+                nameIsNullDialog()
+            else
+                alreadyExistsDialog(name)
+        } catch (e: Exception) {
+            checkPermissionsAndLoadFiles()
         }
+    } else {
+        createFolderOnSDCard(currentPath, name)
+        checkPermissionsAndLoadFiles()
     }
+}
 
-    fun shareFile(view: View, position: Int, activity: FileManagerActivity) {
-        val intent = Intent(Intent.ACTION_SEND)
-        intent.putExtra(
-            Intent.EXTRA_STREAM, FileProvider.getUriForFile(
-                view.context, view.context.packageName + ".provider",
-                File(activity.fileManagerAdapter.getItem(position).path)
-            )
+fun FileManagerActivity.shareFile(view: View, position: Int) {
+    val intent = Intent(Intent.ACTION_SEND)
+    intent.putExtra(
+        Intent.EXTRA_STREAM, FileProvider.getUriForFile(
+            view.context, view.context.packageName + ".provider",
+            File(fmAdapter.getItem(position).path)
         )
-        intent.type = "*/*"
-        view.context.startActivity(intent)
-    }
+    )
+    intent.type = "*/*"
+    view.context.startActivity(intent)
+}
 
-    fun renameFile(view: View, position: Int, activity: FileManagerActivity) {
-        val currentItem = activity.fileManagerAdapter.getItem(position)
-        val dialogView = LayoutInflater.from(view.context).inflate(R.layout.layout_dialog, null)
-        dialogView.findViewById<EditText>(R.id.name_input).setText(currentItem.name)
+@SuppressLint("InflateParams")
+fun FileManagerActivity.renameFile(view: View, position: Int) {
+    val currentItem = fmAdapter.getItem(position)
 
-        val customTitle =
-            LayoutInflater.from(activity).inflate(R.layout.custom_title, null)
-        customTitle.findViewById<TextView>(R.id.title_text).text =
-            activity.getString(R.string.rename)
+    val dialogView = LayoutInflater.from(view.context).inflate(R.layout.layout_dialog, null)
+    dialogView.findViewById<EditText>(R.id.name_input).setText(currentItem.name)
 
-        val builder = AlertDialog.Builder(view.context)
-            .setView(dialogView)
-            .setCustomTitle(customTitle)
-            .setCancelable(false)
-            .setPositiveButton(activity.getString(R.string.ok)) { dialog, which ->
-                val file = File(currentItem.path)
-                val newName = dialogView.findViewById<EditText>(R.id.name_input).text.toString()
+    val customTitle = LayoutInflater.from(this).inflate(R.layout.custom_title, null)
+    customTitle.findViewById<TextView>(R.id.title_text).text = getString(R.string.rename)
 
-                if (newName.isNotEmpty()) {
-                    if (activity.currentPath.toString()
-                            .contains(activity.sdCardPath.toString()) || versionCodeIsR
-                    ) {
-                        file.renameTo(
-                            File(
-                                activity.currentPath,
-                                newName
-                            )
+    val builder = AlertDialog.Builder(view.context)
+        .setView(dialogView)
+        .setCustomTitle(customTitle)
+        .setCancelable(false)
+        .setPositiveButton(getString(R.string.ok)) { dialog, which ->
+            val file = File(currentItem.path)
+            val newName = dialogView.findViewById<EditText>(R.id.name_input).text.toString()
+
+            if (newName.isNotEmpty()) {
+                if (currentPath.toString()
+                        .contains(sdCardPath.toString()) || vcIsR
+                ) {
+                    file.renameTo(
+                        File(
+                            currentPath,
+                            newName
                         )
-                        activity.loadFiles()
-                    } else {
-                        sdCardOperations.renameOnSDCard(currentItem, newName, activity)
-                        activity.loadFiles()
-                    }
-                } else
-                    alertDialogMessages.nameIsNull(activity)
-            }
-            .setNegativeButton(activity.getString(R.string.cancel), null)
-        builder.show()
-    }
+                    )
+                    loadFiles()
+                } else {
+                    renameOnSDCard(currentItem, newName)
+                    loadFiles()
+                }
+            } else
+                nameIsNullDialog()
+        }
+        .setNegativeButton(getString(R.string.cancel), null)
+    builder.show()
+}
 
-    fun deleteSelectedFiles(activity: FileManagerActivity) {
-        AsyncDeleteSelected(activity).execute(activity)
-    }
+fun FileManagerActivity.deleteSelectedFiles() {
+    AsyncDeleteSelected(this).execute(this)
+}
 
-    fun copySelectedFiles(activity: FileManagerActivity) {
-        AsyncCopySelected(activity).execute(activity)
-    }
+fun FileManagerActivity.copySelectedFiles() {
+    AsyncCopySelected(this).execute(this)
+}
 
-    fun moveSelectedFiles(activity: FileManagerActivity) {
-        AsyncMoveSelected(activity).execute(activity)
-    }
+fun FileManagerActivity.moveSelectedFiles() {
+    AsyncMoveSelected(this).execute(this)
+}
 
-    fun search(input: String, activity: FileManagerActivity): List<File> {
-        return AsyncSearch(input, activity).execute(activity).get()
-    }
+fun FileManagerActivity.search(input: String): List<File> {
+    return AsyncSearch(input, this).execute(this).get()
 }

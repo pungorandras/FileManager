@@ -9,38 +9,29 @@ import android.util.Log
 import android.view.ContextThemeWrapper
 import android.view.Gravity
 import android.view.View
-import android.webkit.MimeTypeMap
 import android.widget.PopupMenu
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import hu.pungor.filemanager.adapter.FileManagerAdapter
-import hu.pungor.filemanager.intro.IntroScreenActivity
-import hu.pungor.filemanager.intro.TapTargetPromptInstructions
+import hu.pungor.filemanager.intro.loadIntroScreen
+import hu.pungor.filemanager.intro.loadTutorial
 import hu.pungor.filemanager.model.AboutFile
-import hu.pungor.filemanager.operations.AsyncGetAllFiles
-import hu.pungor.filemanager.operations.ButtonClickOperations
-import hu.pungor.filemanager.operations.FileOperations
-import hu.pungor.filemanager.permissions.SDCardPermissionsUntilApi29
-import hu.pungor.filemanager.permissions.StoragePermissions
+import hu.pungor.filemanager.operations.*
+import hu.pungor.filemanager.permissions.activityResult
+import hu.pungor.filemanager.permissions.checkPermissionsAndLoadFiles
 import kotlinx.android.synthetic.main.activity_filemanager.*
 import permissions.dispatcher.NeedsPermission
 import permissions.dispatcher.OnShowRationale
 import permissions.dispatcher.PermissionRequest
 import permissions.dispatcher.RuntimePermissions
 import java.io.File
-import java.util.*
 
 
 @Suppress("DEPRECATION")
 @RuntimePermissions
 class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClickListener {
 
-    val fileManagerAdapter = FileManagerAdapter()
-    private val buttonClickOperations = ButtonClickOperations()
-    private val fileOperations = FileOperations()
-    private val tapTargetPromptInstructions = TapTargetPromptInstructions()
-    private val storagePermissions = StoragePermissions()
-    private val sdCardPermissions = SDCardPermissionsUntilApi29()
+    val fmAdapter = FileManagerAdapter()
 
     var rootPath = File(Environment.getExternalStorageDirectory().absolutePath)
     var sdCardPath: File? = null
@@ -55,70 +46,46 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_filemanager)
 
-        storagePermissions.checkPermissionsAndLoadFiles(this)
-        buttonClickOperations.disableSDCardButtonIfNotAvailable(this)
+        checkPermissionsAndLoadFiles()
+        disableSDCardButtonIfNotAvailable()
         loadIntroScreen()
         loadTutorial()
 
         Internal.setOnClickListener {
-            buttonClickOperations.internalButtonOperations(this)
+            internalButtonOperations()
         }
 
         SDCard.setOnClickListener {
-            buttonClickOperations.sdCardButtonOperations(this)
+            sdCardButtonOperations()
         }
 
         create_textfile.setOnClickListener {
-            buttonClickOperations.createTextFileBuilder(this)
+            createTextFileBuilder()
         }
 
         create_folder.setOnClickListener {
-            buttonClickOperations.createFolderBuilder(this)
+            createFolderBuilder()
         }
 
         select_all.setOnClickListener {
-            buttonClickOperations.selectAllOperation(this)
+            selectAllOperation()
         }
 
         delete_selected.setOnClickListener {
-            buttonClickOperations.deleteSelectedBuilder(this)
+            deleteSelectedBuilder()
         }
 
         copy_selected.setOnClickListener {
-            buttonClickOperations.copySelectedOperation(this)
+            copySelectedOperation()
         }
 
         move_selected.setOnClickListener {
-            buttonClickOperations.moveSelectedOperation(this)
+            moveSelectedOperation()
         }
 
         search.setOnClickListener {
-            buttonClickOperations.searchButtonOperations(this)
+            searchButtonOperations()
         }
-    }
-
-    private fun loadIntroScreen() {
-        val prefs = getSharedPreferences("prefs", MODE_PRIVATE)
-        val firstStart = prefs.getBoolean("firstStart", true)
-
-        if (firstStart)
-            startActivity(Intent(this, IntroScreenActivity::class.java))
-
-        val editor = prefs.edit()
-        editor.putBoolean("firstStart", false)
-        editor.apply()
-    }
-
-    private fun loadTutorial() {
-        val prefs = getSharedPreferences("prefs", MODE_PRIVATE)
-        val firstStart = prefs.getBoolean("tutorial", true)
-
-        if (firstStart)
-            tapTargetPromptInstructions.showTutorial(this)
-
-        val editor = prefs.edit()
-        editor.putBoolean("tutorial", false)
-        editor.apply()
     }
 
     @NeedsPermission(
@@ -128,10 +95,11 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
     fun loadFiles() {
         try {
             rvFiles.layoutManager = LinearLayoutManager(this)
-            rvFiles.adapter = fileManagerAdapter
-            fileManagerAdapter.setFiles(AsyncGetAllFiles().execute(this).get())
-            fileManagerAdapter.itemClickListener = this
+            rvFiles.adapter = fmAdapter
+            fmAdapter.setFiles(AsyncGetAllFiles().execute(this).get())
+            fmAdapter.itemClickListener = this
         } catch (e: Exception) {
+            Log.e("Main", "Error loading files.", e)
         }
     }
 
@@ -149,107 +117,51 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
         Manifest.permission.WRITE_EXTERNAL_STORAGE
     )
     fun showRationaleForStoragePermissions(request: PermissionRequest) {
-        buttonClickOperations.showRationaleForStoragePermissionsBuilder(request, this)
+        showRationaleForStoragePermissionsBuilder(request)
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        sdCardPermissions.activityResult(requestCode, data, this)
+        if (requestCode == 1000)
+            loadFiles()
+        if (requestCode == 1001)
+            activityResult(requestCode, data)
     }
 
-    fun fillList(fileList: List<File>): List<AboutFile> {
-        val mutableFileList = mutableListOf<AboutFile>()
-
-        if (fileList.isNotEmpty()) {
-            for (currentFile in fileList) {
-                val uri = currentFile.path
-                val uriWithoutPrefix = uri.removePrefix("/storage/emulated/0/")
-                val extension = uri.substring(uri.lastIndexOf(".") + 1).toLowerCase(Locale.ROOT)
-                val mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension)
-
-                val name =
-                    if (fileManagerAdapter.btnSearchPressed) uriWithoutPrefix else currentFile.name
-
-                if (currentFile.isDirectory)
-                    mutableFileList += AboutFile(name, "", uri, TYPE_FOLDER, false)
-                else if (mimeType.isNullOrEmpty())
-                    mutableFileList += AboutFile(
-                        name,
-                        getSize(currentFile),
-                        uri,
-                        TYPE_UNKNOWN,
-                        false
-                    )
-                else
-                    mutableFileList += AboutFile(
-                        name,
-                        getSize(currentFile),
-                        uri,
-                        mimeType.toString(),
-                        false
-                    )
-            }
-        }
-        return sortList(mutableFileList)
-    }
-
-    private fun getSize(file: File): String {
-        val GB: Long = 1024 * 1024 * 1024
-        val MB: Long = 1024 * 1024
-        val kB: Long = 1024
-        val size_in_bytes = file.length().toDouble()
-
-        if (size_in_bytes > GB)
-            return String.format("%.1f", size_in_bytes / GB) + "\u00A0GB"
-        else if (size_in_bytes > MB)
-            return String.format("%.1f", size_in_bytes / MB) + "\u00A0MB"
-        else if (size_in_bytes > kB)
-            return String.format("%.1f", size_in_bytes / kB) + "\u00A0kB"
-        else
-            return String.format("%.1f", size_in_bytes) + "\u00A0B"
-    }
-
-    private fun sortList(list: List<AboutFile>): List<AboutFile> {
-        val folders = list.filter { it.mimeType == TYPE_FOLDER }
-        val files = list.subtract(folders.toSet())
-        return folders.sortedWith(compareBy { it.name }) + files.sortedWith(compareBy { it.name })
-    }
-
+    @Deprecated("Deprecated in Java")
     override fun onBackPressed() {
         val currentPathString = currentPath.toString()
 
-        if (currentPath != rootPath && currentPath != sdCardPath && !fileManagerAdapter.btnSearchPressed) {
+        if (currentPath != rootPath && currentPath != sdCardPath && !fmAdapter.btnSearchPressed) {
             val location = currentPathString.substring(0, currentPathString.lastIndexOf("/") + 1)
             currentPath = File(location)
-
             loadFiles()
-        } else if (fileManagerAdapter.btnSearchPressed && buttonClickOperations.fileTreeDepth > 0) {
-            buttonClickOperations.fileTreeDepth--
+        } else if (fmAdapter.btnSearchPressed && fileTreeDepth > 0) {
+            fileTreeDepth--
 
-            if (buttonClickOperations.fileTreeDepth == 0)
-                fileManagerAdapter.setFiles(fillList(buttonClickOperations.result))
+            if (fileTreeDepth == 0)
+                fmAdapter.setFiles(fillList(result))
             else {
                 val location =
                     currentPathString.substring(0, currentPathString.lastIndexOf("/") + 1)
                 currentPath = File(location)
-
                 loadFiles()
             }
         }
     }
 
     override fun onItemClick(file: AboutFile) {
-        if (file.mimeType == TYPE_FOLDER)
-            fileOperations.openFolder(file, this, buttonClickOperations)
-        else if (file.mimeType == TYPE_UNKNOWN)
-            fileOperations.openUnknown(file, this)
-        else
-            fileOperations.openFile(file, this)
+        when (file.mimeType) {
+            TYPE_FOLDER -> openFolder(file)
+            TYPE_UNKNOWN -> openUnknown(file)
+            else -> openFile(file)
+        }
     }
 
     @SuppressLint("DiscouragedPrivateApi")
     override fun onItemLongClick(position: Int, view: View): Boolean {
-        if (!fileManagerAdapter.btnSearchPressed && !fileManagerAdapter.btnCopyPressed && !fileManagerAdapter.btnMovePressed) {
+        if (!fmAdapter.btnSearchPressed && !fmAdapter.btnCopyPressed && !fmAdapter.btnMovePressed) {
             val wrapper = ContextThemeWrapper(this, R.style.NoPopupAnimation)
             val popup = PopupMenu(wrapper, view, Gravity.END)
             popup.inflate(R.menu.menu_options)
@@ -257,39 +169,30 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
             popup.setOnMenuItemClickListener { item ->
                 when (item.itemId) {
                     R.id.open_with -> {
-                        fileOperations.openUnknown(fileManagerAdapter.getItem(position), this)
+                        openUnknown(fmAdapter.getItem(position))
                         true
                     }
                     R.id.share -> {
-                        fileOperations.shareFile(view, position, this)
+                        shareFile(view, position)
                         true
                     }
                     R.id.copy -> {
-                        fileManagerAdapter.popupMenuPressed = true
-                        fileManagerAdapter.backupSelectedList()
-                        fileManagerAdapter.clearSelectedList()
-                        fileManagerAdapter.addToSelectedList(fileManagerAdapter.getItem(position))
-                        buttonClickOperations.copySelectedOperation(this)
+                        fmAdapter.popupMenuPressActions(position)
+                        copySelectedOperation()
                         true
                     }
                     R.id.move -> {
-                        fileManagerAdapter.popupMenuPressed = true
-                        fileManagerAdapter.backupSelectedList()
-                        fileManagerAdapter.clearSelectedList()
-                        fileManagerAdapter.addToSelectedList(fileManagerAdapter.getItem(position))
-                        buttonClickOperations.moveSelectedOperation(this)
+                        fmAdapter.popupMenuPressActions(position)
+                        moveSelectedOperation()
                         true
                     }
                     R.id.rename -> {
-                        fileOperations.renameFile(view, position, this)
+                        renameFile(view, position)
                         true
                     }
                     R.id.delete -> {
-                        fileManagerAdapter.popupMenuPressed = true
-                        fileManagerAdapter.backupSelectedList()
-                        fileManagerAdapter.clearSelectedList()
-                        fileManagerAdapter.addToSelectedList(fileManagerAdapter.getItem(position))
-                        buttonClickOperations.deleteSelectedBuilder(this)
+                        fmAdapter.popupMenuPressActions(position)
+                        deleteSelectedBuilder()
                         true
                     }
                     else -> false

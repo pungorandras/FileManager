@@ -8,19 +8,22 @@ import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.style.AbsoluteSizeSpan
 import android.text.style.StyleSpan
+import android.util.Log
 import android.view.LayoutInflater
 import android.widget.TextView
 import androidx.documentfile.provider.DocumentFile
 import hu.pungor.filemanager.FileManagerActivity
 import hu.pungor.filemanager.R
-import hu.pungor.filemanager.alertdialog.AlertDialogMessages
+import hu.pungor.filemanager.alertdialog.alreadyExistsDialog
+import hu.pungor.filemanager.alertdialog.copyOrMoveIntoItselfDialog
 import hu.pungor.filemanager.model.AboutFile
 import java.io.File
 import java.util.*
 
-private val versionCodeIsR = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
+private val vcIsR = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
 
 class AsyncGetAllFiles() : AsyncTask<FileManagerActivity, Void, List<AboutFile>>() {
+    @Deprecated("Deprecated in Java")
     override fun doInBackground(vararg params: FileManagerActivity): List<AboutFile>? {
         val fileList = params[0].currentPath.listFiles()?.asList()
 
@@ -33,12 +36,10 @@ class AsyncCopySelected(private val activity: FileManagerActivity) :
     AsyncTask<FileManagerActivity, Int, FileManagerActivity>() {
 
     private val progressDialog = ProgressDialog(activity)
-    private val alertDialogMessages =
-        AlertDialogMessages()
-    private val sdCardOperations = SDCardOperationsUntilApi29()
     private var copyState = 0.0
     private var selectedListSize = 0.0
 
+    @Deprecated("Deprecated in Java")
     override fun onPreExecute() {
         val customTitle =
             LayoutInflater.from(activity).inflate(R.layout.custom_title, null)
@@ -60,8 +61,9 @@ class AsyncCopySelected(private val activity: FileManagerActivity) :
         progressDialog.show()
     }
 
+    @Deprecated("Deprecated in Java")
     override fun doInBackground(vararg params: FileManagerActivity): FileManagerActivity? {
-        val selectedList = params[0].fileManagerAdapter.getSelectedList()
+        val selectedList = params[0].fmAdapter.getSelectedList()
         selectedList.forEach {
             if (it.mimeType == FileManagerActivity.TYPE_FOLDER)
                 selectedListSize += getFolderSize(File(it.path))
@@ -77,32 +79,31 @@ class AsyncCopySelected(private val activity: FileManagerActivity) :
                     .contains(element.path) && !file.exists()
             ) {
                 if (params[0].currentPath.toString()
-                        .contains(params[0].rootPath.toString()) || versionCodeIsR
+                        .contains(params[0].rootPath.toString()) || vcIsR
                 )
                     copyFolder(File(element.path), params[0])
                 else
-                    copyFolderToSDCard(File(element.path), params[0])
+                    params[0].copyFolderToSDCard(File(element.path))
 
             } else if (!file.exists() && !params[0].currentPath.toString().contains(element.path)) {
                 copyState += File(element.path).length()
                 publishProgress((copyState * 100 / selectedListSize).toInt())
                 if (params[0].currentPath.toString()
-                        .contains(params[0].rootPath.toString()) || versionCodeIsR
+                        .contains(params[0].rootPath.toString()) || vcIsR
                 )
                     File(element.path).copyTo(file)
                 else
-                    sdCardOperations.copyToSDCard(
+                    params[0].copyToSDCard(
                         params[0].currentPath,
-                        File(element.path),
-                        params[0]
+                        File(element.path)
                     )
             } else if (file.exists()) {
                 params[0].runOnUiThread {
-                    alertDialogMessages.alreadyExists(element.name, params[0])
+                    params[0].alreadyExistsDialog(element.name)
                 }
             } else {
                 params[0].runOnUiThread {
-                    alertDialogMessages.copyOrMoveIntoItself("copy", params[0])
+                    params[0].copyOrMoveIntoItselfDialog("copy")
                 }
             }
 
@@ -112,15 +113,18 @@ class AsyncCopySelected(private val activity: FileManagerActivity) :
         return params[0]
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onProgressUpdate(vararg values: Int?) {
         progressDialog.progress = values[0]!!
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onPostExecute(result: FileManagerActivity) {
         progressDialog.dismiss()
         result.loadFiles()
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onCancelled(result: FileManagerActivity) {
         progressDialog.dismiss()
         result.loadFiles()
@@ -144,7 +148,7 @@ class AsyncCopySelected(private val activity: FileManagerActivity) :
         }
     }
 
-    private fun copyFolderToSDCard(folder: File, activity: FileManagerActivity) {
+    private fun FileManagerActivity.copyFolderToSDCard(folder: File) {
         for (src in folder.walkTopDown()) {
             val relPath = src.toRelativeString(folder.parentFile)
             val dstFile = File(activity.currentPath, relPath)
@@ -153,11 +157,11 @@ class AsyncCopySelected(private val activity: FileManagerActivity) :
             publishProgress((copyState * 100 / selectedListSize).toInt())
 
             if (src.isDirectory)
-                sdCardOperations.createFolderOnSDCard(dstFile.parentFile, src.name, activity)
+                createFolderOnSDCard(dstFile.parentFile, src.name)
             else
-                sdCardOperations.copyToSDCard(dstFile.parentFile, src, activity)
+                copyToSDCard(dstFile.parentFile, src)
 
-            if (this.isCancelled)
+            if (isCancelled)
                 break
         }
     }
@@ -168,10 +172,10 @@ class AsyncDeleteSelected(private val activity: FileManagerActivity) :
     AsyncTask<FileManagerActivity, Int, FileManagerActivity>() {
 
     private val progressDialog = ProgressDialog(activity)
-    private val sdCardOperations = SDCardOperationsUntilApi29()
     private var deleteState = 0.0
     private var selectedListSize = 0.0
 
+    @Deprecated("Deprecated in Java")
     override fun onPreExecute() {
         val customTitle =
             LayoutInflater.from(activity).inflate(R.layout.custom_title, null)
@@ -193,8 +197,11 @@ class AsyncDeleteSelected(private val activity: FileManagerActivity) :
         progressDialog.show()
     }
 
+    @Deprecated("Deprecated in Java")
     override fun doInBackground(vararg params: FileManagerActivity): FileManagerActivity {
-        val selectedList = params[0].fileManagerAdapter.getSelectedList().toMutableList()
+        val selectedList = params[0].fmAdapter.getSelectedList().toMutableList()
+        for (i in selectedList)
+            Log.e("asd", i.name)
         selectedList.forEach {
             if (it.mimeType == FileManagerActivity.TYPE_FOLDER)
                 selectedListSize += getFolderSize(File(it.path))
@@ -209,13 +216,12 @@ class AsyncDeleteSelected(private val activity: FileManagerActivity) :
 
             if (selectedList[position].mimeType == FileManagerActivity.TYPE_FOLDER)
                 if (params[0].currentPath.toString()
-                        .contains(params[0].rootPath.toString()) || versionCodeIsR
+                        .contains(params[0].rootPath.toString()) || vcIsR
                 )
                     deleteFolder(file)
                 else {
                     val sdCardFolder =
-                        sdCardOperations.getChildren(params[0].currentPath, params[0])
-                            ?.findFile(file.name)
+                        params[0].getChildren(params[0].currentPath)?.findFile(file.name)
                     if (sdCardFolder != null) {
                         deleteFolderOnSDCard(sdCardFolder, params[0])
                     }
@@ -224,11 +230,11 @@ class AsyncDeleteSelected(private val activity: FileManagerActivity) :
                 deleteState += File(selectedList[position].path).length()
                 publishProgress((deleteState * 100 / selectedListSize).toInt())
                 if (params[0].currentPath.toString()
-                        .contains(params[0].rootPath.toString()) || versionCodeIsR
+                        .contains(params[0].rootPath.toString()) || vcIsR
                 )
                     file.delete()
                 else
-                    sdCardOperations.deleteOnSDCard(params[0].currentPath, file, params[0])
+                    params[0].deleteOnSDCard(params[0].currentPath, file)
             }
 
             if (this.isCancelled)
@@ -237,15 +243,18 @@ class AsyncDeleteSelected(private val activity: FileManagerActivity) :
         return params[0]
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onProgressUpdate(vararg values: Int?) {
         progressDialog.progress = values[0]!!
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onPostExecute(result: FileManagerActivity) {
         progressDialog.dismiss()
         result.loadFiles()
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onCancelled(result: FileManagerActivity?) {
         progressDialog.dismiss()
         result?.loadFiles()
@@ -291,13 +300,11 @@ class AsyncMoveSelected(private val activity: FileManagerActivity) :
     AsyncTask<FileManagerActivity, Int, FileManagerActivity>() {
 
     private val progressDialog = ProgressDialog(activity)
-    private val sdCardOperations = SDCardOperationsUntilApi29()
     private val asyncDeleteSelected = AsyncDeleteSelected(activity)
-    private val alertDialogMessages =
-        AlertDialogMessages()
     private var moveState = 0.0
     private var selectedListSize = 0.0
 
+    @Deprecated("Deprecated in Java")
     override fun onPreExecute() {
         val customTitle =
             LayoutInflater.from(activity).inflate(R.layout.custom_title, null)
@@ -319,8 +326,9 @@ class AsyncMoveSelected(private val activity: FileManagerActivity) :
         progressDialog.show()
     }
 
+    @Deprecated("Deprecated in Java")
     override fun doInBackground(vararg params: FileManagerActivity): FileManagerActivity {
-        val selectedList = params[0].fileManagerAdapter.getSelectedList()
+        val selectedList = params[0].fmAdapter.getSelectedList()
         selectedList.forEach {
             if (it.mimeType == FileManagerActivity.TYPE_FOLDER)
                 selectedListSize += getFolderSize(File(it.path))
@@ -335,16 +343,15 @@ class AsyncMoveSelected(private val activity: FileManagerActivity) :
             if (params[0].currentPath.toString() != element.path && !file.exists()) {
                 if (params[0].currentPath.toString().contains(params[0].sdCardPath.toString())) {
                     if (element.mimeType == FileManagerActivity.TYPE_FOLDER) {
-                        if (versionCodeIsR)
+                        if (vcIsR)
                             moveFolder(File(element.path), params[0])
                         else
-                            moveFolderToSDCard(File(element.path), params[0])
+                            params[0].moveFolderToSDCard(File(element.path))
 
-                        if (element.path.contains(params[0].rootPath.toString()) || versionCodeIsR)
+                        if (element.path.contains(params[0].rootPath.toString()) || vcIsR)
                             asyncDeleteSelected.deleteFolder(File(element.path))
                         else {
-                            val sdCardFolder =
-                                sdCardOperations.getChildren(File(element.path), params[0])
+                            val sdCardFolder = params[0].getChildren(File(element.path))
                             if (sdCardFolder != null) {
                                 asyncDeleteSelected.deleteFolderOnSDCard(sdCardFolder, params[0])
                             }
@@ -353,25 +360,21 @@ class AsyncMoveSelected(private val activity: FileManagerActivity) :
                         moveState += File(element.path).length()
                         publishProgress((moveState * 100 / selectedListSize).toInt())
 
-                        if (versionCodeIsR)
+                        if (vcIsR)
                             File(element.path).copyTo(file)
                         else
-                            sdCardOperations.copyToSDCard(
-                                params[0].currentPath,
-                                File(element.path),
-                                params[0]
-                            )
+                            params[0].copyToSDCard(params[0].currentPath, File(element.path))
 
-                        if (element.path.contains(params[0].rootPath.toString()) || versionCodeIsR)
+                        if (element.path.contains(params[0].rootPath.toString()) || vcIsR)
                             File(element.path).delete()
                         else
-                            sdCardOperations.deleteOnSDCard(
+                            params[0].deleteOnSDCard(
                                 File(
                                     element.path.substring(
                                         0,
                                         element.path.lastIndexOf("/")
                                     )
-                                ), File(element.path), params[0]
+                                ), File(element.path)
                             )
                     }
                 } else if (params[0].currentPath.toString()
@@ -382,11 +385,10 @@ class AsyncMoveSelected(private val activity: FileManagerActivity) :
                             File(element.path).renameTo(file)
                         else {
                             moveFolder(File(element.path), params[0])
-                            if (versionCodeIsR)
+                            if (vcIsR)
                                 asyncDeleteSelected.deleteFolder(File(element.path))
                             else {
-                                val sdCardFolder =
-                                    sdCardOperations.getChildren(File(element.path), params[0])
+                                val sdCardFolder = params[0].getChildren(File(element.path))
                                 if (sdCardFolder != null) {
                                     asyncDeleteSelected.deleteFolderOnSDCard(
                                         sdCardFolder,
@@ -403,16 +405,16 @@ class AsyncMoveSelected(private val activity: FileManagerActivity) :
                             File(element.path).renameTo(file)
                         else {
                             File(element.path).copyTo(file)
-                            if (versionCodeIsR)
+                            if (vcIsR)
                                 File(element.path).delete()
                             else {
-                                sdCardOperations.deleteOnSDCard(
+                                params[0].deleteOnSDCard(
                                     File(
                                         element.path.substring(
                                             0,
                                             element.path.lastIndexOf("/")
                                         )
-                                    ), File(element.path), params[0]
+                                    ), File(element.path)
                                 )
                             }
                         }
@@ -420,11 +422,11 @@ class AsyncMoveSelected(private val activity: FileManagerActivity) :
                 }
             } else if (file.exists()) {
                 params[0].runOnUiThread {
-                    alertDialogMessages.alreadyExists(file.name, params[0])
+                    params[0].alreadyExistsDialog(file.name)
                 }
             } else {
                 params[0].runOnUiThread {
-                    alertDialogMessages.copyOrMoveIntoItself("move", params[0])
+                    params[0].copyOrMoveIntoItselfDialog("move")
                 }
             }
 
@@ -434,15 +436,18 @@ class AsyncMoveSelected(private val activity: FileManagerActivity) :
         return params[0]
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onProgressUpdate(vararg values: Int?) {
         progressDialog.progress = values[0]!!
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onPostExecute(result: FileManagerActivity) {
         progressDialog.dismiss()
         result.loadFiles()
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onCancelled(result: FileManagerActivity) {
         progressDialog.dismiss()
         result.loadFiles()
@@ -468,7 +473,7 @@ class AsyncMoveSelected(private val activity: FileManagerActivity) :
         }
     }
 
-    private fun moveFolderToSDCard(folder: File, activity: FileManagerActivity) {
+    private fun FileManagerActivity.moveFolderToSDCard(folder: File) {
         for (src in folder.walkTopDown()) {
             val relPath = src.toRelativeString(folder.parentFile)
             val dstFile = File(activity.currentPath, relPath)
@@ -477,11 +482,11 @@ class AsyncMoveSelected(private val activity: FileManagerActivity) :
             publishProgress((moveState * 100 / selectedListSize).toInt())
 
             if (src.isDirectory)
-                sdCardOperations.createFolderOnSDCard(dstFile.parentFile, src.name, activity)
+                createFolderOnSDCard(dstFile.parentFile, src.name)
             else
-                sdCardOperations.copyToSDCard(dstFile.parentFile, src, activity)
+                copyToSDCard(dstFile.parentFile, src)
 
-            if (this.isCancelled) {
+            if (isCancelled) {
                 asyncDeleteSelected.cancel(true)
                 break
             }
@@ -494,6 +499,7 @@ class AsyncSearch(private val input: String, private val activity: FileManagerAc
     AsyncTask<FileManagerActivity, Void, MutableList<File>>() {
     private val progressDialog = ProgressDialog(activity)
 
+    @Deprecated("Deprecated in Java")
     override fun onPreExecute() {
         val customTitle =
             LayoutInflater.from(activity).inflate(R.layout.custom_title, null)
@@ -526,6 +532,7 @@ class AsyncSearch(private val input: String, private val activity: FileManagerAc
         progressDialog.show()
     }
 
+    @Deprecated("Deprecated in Java")
     override fun doInBackground(vararg params: FileManagerActivity): MutableList<File> {
         val result = mutableListOf<File>()
 
@@ -538,6 +545,7 @@ class AsyncSearch(private val input: String, private val activity: FileManagerAc
         return result
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onPostExecute(result: MutableList<File>?) {
         progressDialog.dismiss()
     }
