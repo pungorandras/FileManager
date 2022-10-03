@@ -22,6 +22,7 @@ fun FileManagerActivity.checkPermissionsAndLoadFiles() {
                 startActivityForResult(intent, 1000)
             }
         }
+        loadFiles()
     } else
         loadFilesWithPermissionCheck()
 }
