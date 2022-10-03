@@ -21,8 +21,8 @@ fun FileManagerActivity.checkPermissionsAndLoadFiles() {
                 val intent = Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
                 startActivityForResult(intent, 1000)
             }
-        }
-        loadFiles()
+        } else
+            loadFiles()
     } else
         loadFilesWithPermissionCheck()
 }
