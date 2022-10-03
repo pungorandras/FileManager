@@ -81,7 +81,6 @@ class FileManagerAdapter : RecyclerView.Adapter<FileManagerAdapter.FileManagerVi
         intent.data = Uri.parse(file.path)
         intent.type = file.mimeType
         val matches = holder.file_icon.context.packageManager.queryIntentActivities(intent, 0)
-        val cropOptions = RequestOptions().centerCrop()
 
         val resource: Any = if (file.mimeType == TYPE_FOLDER)
             R.drawable.folder
@@ -92,6 +91,10 @@ class FileManagerAdapter : RecyclerView.Adapter<FileManagerAdapter.FileManagerVi
         else
             matches[0].loadIcon(holder.file_icon.context.packageManager)
 
+        configureGlide(holder, resource, file)
+    }
+
+    private fun configureGlide(holder: FileManagerViewHolder, resource: Any, file: AboutFile) {
         var obj = Glide.with(holder.itemView).load(resource).override(100, 100)
             .diskCacheStrategy(DiskCacheStrategy.ALL).listener(object : RequestListener<Drawable> {
                 override fun onResourceReady(
@@ -127,7 +130,7 @@ class FileManagerAdapter : RecyclerView.Adapter<FileManagerAdapter.FileManagerVi
             })
 
         if (mediaFile(file))
-            obj = obj.apply(cropOptions).placeholder(R.drawable.file_icon_default)
+            obj = obj.apply(RequestOptions().centerCrop()).placeholder(R.drawable.file_icon_default)
 
         obj.into(holder.file_icon)
     }
