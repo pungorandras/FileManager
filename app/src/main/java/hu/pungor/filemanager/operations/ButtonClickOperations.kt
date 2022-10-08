@@ -4,10 +4,9 @@ import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.widget.EditText
 import android.widget.ImageButton
-import android.widget.TextView
-import androidx.appcompat.app.AlertDialog
 import hu.pungor.filemanager.FileManagerActivity
 import hu.pungor.filemanager.R
+import hu.pungor.filemanager.alertdialog.alertDialogBuilder
 import hu.pungor.filemanager.alertdialog.nameIsNullDialog
 import hu.pungor.filemanager.alertdialog.noItemsSelectedDialog
 import hu.pungor.filemanager.alertdialog.noResultsDialog
@@ -23,41 +22,34 @@ lateinit var result: List<File>
 private lateinit var latestPathBeforeAction: File
 
 @SuppressLint("InflateParams")
-fun FileManagerActivity.createTextFileBuilder() {
+fun FileManagerActivity.createTextFileDialog() {
     val dialogView = LayoutInflater.from(this).inflate(R.layout.layout_dialog_textfile, null)
-    val customTitle = LayoutInflater.from(this).inflate(R.layout.custom_title, null)
-    customTitle.findViewById<TextView>(R.id.title_text).text =
-        getString(R.string.create_new_textfile)
 
-    val builder = AlertDialog.Builder(this)
-        .setView(dialogView)
-        .setCustomTitle(customTitle)
-        .setCancelable(false)
-        .setPositiveButton(getString(R.string.ok)) { dialog, which ->
+    alertDialogBuilder(
+        titleText = R.string.create_new_textfile,
+        dialogLayout = R.layout.layout_dialog_textfile,
+        positiveButtonFunctionality = {
             createTextFile(
                 dialogView.findViewById<EditText>(R.id.name_input).text.toString(),
                 dialogView.findViewById<EditText>(R.id.text_input).text.toString()
             )
-        }
-        .setNegativeButton(getString(R.string.cancel), null)
-    builder.show()
+        },
+        negativeButtonLabel = R.string.cancel
+    )?.show()
 }
 
 @SuppressLint("InflateParams")
-fun FileManagerActivity.createFolderBuilder() {
+fun FileManagerActivity.createFolderDialog() {
     val dialogView = LayoutInflater.from(this).inflate(R.layout.layout_dialog, null)
-    val customTitle = LayoutInflater.from(this).inflate(R.layout.custom_title, null)
-    customTitle.findViewById<TextView>(R.id.title_text).text = getString(R.string.create_new_folder)
 
-    val builder = AlertDialog.Builder(this)
-        .setView(dialogView)
-        .setCustomTitle(customTitle)
-        .setCancelable(false)
-        .setPositiveButton(getString(R.string.ok)) { dialog, which ->
+    alertDialogBuilder(
+        titleText = R.string.create_new_folder,
+        dialogLayout = dialogView,
+        positiveButtonFunctionality = {
             createFolder(dialogView.findViewById<EditText>(R.id.name_input).text.toString())
-        }
-        .setNegativeButton(getString(R.string.cancel), null)
-    builder.show()
+        },
+        negativeButtonLabel = R.string.cancel
+    )?.show()
 }
 
 fun FileManagerActivity.selectAllOperation() {
@@ -75,37 +67,33 @@ fun FileManagerActivity.selectAllOperation() {
 }
 
 @SuppressLint("InflateParams")
-fun FileManagerActivity.deleteSelectedBuilder() {
+fun FileManagerActivity.deleteSelectedDialog() {
     val selectedList = fmAdapter.getSelectedList()
     val message =
         if (selectedList.size == 1) getString(R.string.delete_item) + selectedList[0].name else getString(
             R.string.delete_selected_items
         )
 
-    val customTitle =
-        LayoutInflater.from(this).inflate(R.layout.custom_title, null)
-    customTitle.findViewById<TextView>(R.id.title_text).text = getString(R.string.are_you_sure)
-    val customText = LayoutInflater.from(this).inflate(R.layout.custom_text_alertdialog, null)
-    customText.findViewById<TextView>(R.id.custom_text).text = message
-
-    val builder = AlertDialog.Builder(this)
-        .setCustomTitle(customTitle)
-        .setView(customText)
-        .setCancelable(false)
-        .setPositiveButton(getString(R.string.yes)) { dialog, which ->
+    val builder = alertDialogBuilder(
+        titleText = R.string.are_you_sure,
+        dialogText = message,
+        positiveButtonLabel = R.string.yes,
+        positiveButtonFunctionality = {
             deleteSelectedFiles()
             fmAdapter.popupMenuPressed = false
-        }
-        .setNegativeButton(getString(R.string.no)) { dialog, which ->
+        },
+        negativeButtonLabel = R.string.no,
+        negativeButtonFunctionality = {
             if (fmAdapter.popupMenuPressed) {
                 fmAdapter.popupMenuPressed = false
                 fmAdapter.clearSelectedList()
                 fmAdapter.restoreSelectedList()
             }
         }
+    )
 
     if (!selectedList.isNullOrEmpty())
-        builder.show()
+        builder?.show()
     else
         noItemsSelectedDialog()
 }
@@ -210,15 +198,11 @@ fun FileManagerActivity.searchButtonOperations() {
         move_selected.setImageResource(R.drawable.move)
     } else if (!fmAdapter.btnSearchPressed) {
         val dialogView = LayoutInflater.from(this).inflate(R.layout.layout_dialog, null)
-        val customTitle = LayoutInflater.from(this).inflate(R.layout.custom_title, null)
-        customTitle.findViewById<TextView>(R.id.title_text).text = getString(R.string.search)
 
-        val builder = AlertDialog.Builder(this)
-            .setView(dialogView)
-            .setCustomTitle(customTitle)
-            .setCancelable(false)
-            .setPositiveButton(getString(R.string.ok)) { dialog, which ->
-
+        alertDialogBuilder(
+            titleText = R.string.search,
+            dialogLayout = dialogView,
+            positiveButtonFunctionality = {
                 if (dialogView.findViewById<EditText>(R.id.name_input).text.toString()
                         .isNotEmpty()
                 ) {
@@ -250,9 +234,9 @@ fun FileManagerActivity.searchButtonOperations() {
                     }
                 } else
                     nameIsNullDialog()
-            }
-            .setNegativeButton(getString(R.string.cancel), null)
-        builder.show()
+            },
+            negativeButtonLabel = R.string.cancel
+        )?.show()
     } else if (fmAdapter.btnSearchPressed) {
         currentPath = latestPathBeforeAction
         fmAdapter.btnSearchPressed = false
@@ -336,18 +320,13 @@ private fun FileManagerActivity.revertButtonState(vararg buttons: ImageButton) {
 }
 
 @SuppressLint("InflateParams")
-fun FileManagerActivity.showRationaleForStoragePermissionsBuilder(request: PermissionRequest) {
-    val customTitle = LayoutInflater.from(this).inflate(R.layout.custom_title, null)
-    customTitle.findViewById<TextView>(R.id.title_text).text = getString(R.string.attention)
-    val customText = LayoutInflater.from(this).inflate(R.layout.custom_text_alertdialog, null)
-    customText.findViewById<TextView>(R.id.custom_text).text = getString(R.string.rationale)
-
-    val builder = AlertDialog.Builder(this)
-        .setView(customText)
-        .setCustomTitle(customTitle)
-        .setCancelable(false)
-        .setPositiveButton(getString(R.string.proceed)) { dialog, id -> request.proceed() }
-        .setNegativeButton(getString(R.string.exit)) { dialog, id -> request.cancel() }
-        .create()
-    builder.show()
+fun FileManagerActivity.showRationaleForStoragePermissionsDialog(request: PermissionRequest) {
+    alertDialogBuilder(
+        titleText = R.string.attention,
+        dialogText = R.string.rationale,
+        positiveButtonLabel = R.string.proceed,
+        positiveButtonFunctionality = { request.proceed() },
+        negativeButtonLabel = R.string.exit,
+        negativeButtonFunctionality = { request.cancel() }
+    )?.show()
 }

@@ -8,7 +8,6 @@ import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.style.AbsoluteSizeSpan
 import android.text.style.StyleSpan
-import android.util.Log
 import android.view.LayoutInflater
 import android.widget.TextView
 import androidx.documentfile.provider.DocumentFile
@@ -201,13 +200,12 @@ class AsyncDeleteSelected(private val activity: FileManagerActivity) :
     override fun doInBackground(vararg params: FileManagerActivity): FileManagerActivity {
         val selectedList = params[0].fmAdapter.getSelectedList().toMutableList()
         for (i in selectedList)
-            Log.e("asd", i.name)
-        selectedList.forEach {
-            if (it.mimeType == FileManagerActivity.TYPE_FOLDER)
-                selectedListSize += getFolderSize(File(it.path))
-            else
-                selectedListSize += File(it.path).length()
-        }
+            selectedList.forEach {
+                if (it.mimeType == FileManagerActivity.TYPE_FOLDER)
+                    selectedListSize += getFolderSize(File(it.path))
+                else
+                    selectedListSize += File(it.path).length()
+            }
 
         for (position in selectedList.indices) {
             val fileUri = selectedList[position].path

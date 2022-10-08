@@ -60,11 +60,11 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
         }
 
         create_textfile.setOnClickListener {
-            createTextFileBuilder()
+            createTextFileDialog()
         }
 
         create_folder.setOnClickListener {
-            createFolderBuilder()
+            createFolderDialog()
         }
 
         select_all.setOnClickListener {
@@ -72,7 +72,7 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
         }
 
         delete_selected.setOnClickListener {
-            deleteSelectedBuilder()
+            deleteSelectedDialog()
         }
 
         copy_selected.setOnClickListener {
@@ -117,7 +117,7 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
         Manifest.permission.WRITE_EXTERNAL_STORAGE
     )
     fun showRationaleForStoragePermissions(request: PermissionRequest) {
-        showRationaleForStoragePermissionsBuilder(request)
+        showRationaleForStoragePermissionsDialog(request)
     }
 
     @Deprecated("Deprecated in Java")
@@ -192,7 +192,7 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
                     }
                     R.id.delete -> {
                         fmAdapter.popupMenuPressActions(position)
-                        deleteSelectedBuilder()
+                        deleteSelectedDialog()
                         true
                     }
                     else -> false
