@@ -63,7 +63,7 @@ fun FileManagerActivity.copyOrMoveIntoItselfDialog(copyOrMove: String) {
     val text = when (copyOrMove) {
         "copy" -> R.string.cannot_copy_into_itself
         "move" -> R.string.cannot_move_into_itself
-        else -> ""
+        else -> copyOrMove
     }
 
     alertDialogBuilder(
