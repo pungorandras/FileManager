@@ -58,7 +58,6 @@ fun FileManagerActivity.nameIsNullDialog() {
     )?.show()
 }
 
-@SuppressLint("InflateParams")
 fun FileManagerActivity.copyOrMoveIntoItselfDialog(copyOrMove: String) {
     val text = when (copyOrMove) {
         "copy" -> R.string.cannot_copy_into_itself
@@ -72,7 +71,6 @@ fun FileManagerActivity.copyOrMoveIntoItselfDialog(copyOrMove: String) {
     )?.show()
 }
 
-@SuppressLint("InflateParams")
 fun FileManagerActivity.noResultsDialog() {
     alertDialogBuilder(
         titleText = R.string.info,

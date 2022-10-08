@@ -66,7 +66,6 @@ fun FileManagerActivity.selectAllOperation() {
     }
 }
 
-@SuppressLint("InflateParams")
 fun FileManagerActivity.deleteSelectedDialog() {
     val selectedList = fmAdapter.getSelectedList()
     val message =
@@ -166,7 +165,7 @@ fun FileManagerActivity.moveSelectedOperation() {
         noItemsSelectedDialog()
 }
 
-@SuppressLint("UseCompatLoadingForColorStateLists", "InflateParams")
+@SuppressLint("InflateParams", "UseCompatLoadingForColorStateLists")
 fun FileManagerActivity.searchButtonOperations() {
     if (fmAdapter.btnCopyPressed) {
         fmAdapter.clearSelectedList = true
@@ -237,7 +236,7 @@ fun FileManagerActivity.searchButtonOperations() {
             },
             negativeButtonLabel = R.string.cancel
         )?.show()
-    } else if (fmAdapter.btnSearchPressed) {
+    } else {
         currentPath = latestPathBeforeAction
         fmAdapter.btnSearchPressed = false
         loadFiles()
@@ -319,7 +318,6 @@ private fun FileManagerActivity.revertButtonState(vararg buttons: ImageButton) {
     }
 }
 
-@SuppressLint("InflateParams")
 fun FileManagerActivity.showRationaleForStoragePermissionsDialog(request: PermissionRequest) {
     alertDialogBuilder(
         titleText = R.string.attention,
