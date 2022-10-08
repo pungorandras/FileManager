@@ -214,7 +214,7 @@ class FileManagerAdapter : RecyclerView.Adapter<FileManagerAdapter.FileManagerVi
     fun addAllToSelectedList() {
         for (element in fileList)
             if (!selectedList.contains(element))
-                selectedList.add(element)
+                addToSelectedList(element)
     }
 
     fun popupMenuPressActions(position: Int) {
