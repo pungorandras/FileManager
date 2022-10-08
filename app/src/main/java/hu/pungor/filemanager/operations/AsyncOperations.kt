@@ -21,6 +21,7 @@ import java.util.*
 
 private val vcIsR = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
 
+@Suppress("DEPRECATION")
 class AsyncGetAllFiles() : AsyncTask<FileManagerActivity, Void, List<AboutFile>>() {
     @Deprecated("Deprecated in Java")
     override fun doInBackground(vararg params: FileManagerActivity): List<AboutFile>? {
