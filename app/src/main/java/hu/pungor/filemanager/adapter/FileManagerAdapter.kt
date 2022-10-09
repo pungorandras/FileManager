@@ -66,7 +66,7 @@ class FileManagerAdapter : RecyclerView.Adapter<FileManagerAdapter.FileManagerVi
                 setDrawableOnLoad(holder, position)
             } else if (holder.file_icon.drawable != null && !btnCopyPressed && !btnMovePressed && !btnSearchPressed) {
                 file.selected = true
-                selectedList.add(file)
+                addToSelectedList(file)
                 val layerDrawable = tickOverlay(holder, holder.file_icon.drawable)
                 Glide.with(holder.itemView).load(layerDrawable)
                     .diskCacheStrategy(DiskCacheStrategy.ALL).into(holder.file_icon)

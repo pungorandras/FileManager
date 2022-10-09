@@ -17,7 +17,7 @@ class IntroScreenActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.version).text = version
 
         next.setOnClickListener {
-            this.finish()
+            finish()
         }
     }
 }

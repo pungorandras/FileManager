@@ -15,20 +15,29 @@ import hu.pungor.filemanager.FileManagerActivity
 import hu.pungor.filemanager.R
 import hu.pungor.filemanager.alertdialog.alreadyExistsDialog
 import hu.pungor.filemanager.alertdialog.copyOrMoveIntoItselfDialog
-import hu.pungor.filemanager.model.AboutFile
+import kotlinx.coroutines.*
 import java.io.File
 import java.util.*
 
 private val vcIsR = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
 
-@Suppress("DEPRECATION")
-class AsyncGetAllFiles() : AsyncTask<FileManagerActivity, Void, List<AboutFile>>() {
-    @Deprecated("Deprecated in Java")
-    override fun doInBackground(vararg params: FileManagerActivity): List<AboutFile>? {
-        val fileList = params[0].currentPath.listFiles()?.asList()
-
-        return fileList?.let { params[0].fillList(it) }
+suspend fun FileManagerActivity.asyncGetAllFiles() {
+    val fileList = CoroutineScope(Dispatchers.IO).async {
+        return@async currentPath.listFiles()?.asList()?.let { fillList(it) }
     }
+    fileList.await()?.let { fmAdapter.setFiles(it) }
+}
+
+@OptIn(DelicateCoroutinesApi::class)
+fun FileManagerActivity.setFiles(fileList: List<File>? = null) {
+    if (fileList == null)
+        GlobalScope.launch(Dispatchers.Main) { asyncGetAllFiles() }
+    else
+        GlobalScope.launch(Dispatchers.Main) { fmAdapter.setFiles(fillList(fileList)) }
+}
+
+fun FileManagerActivity.setFilesRunBlocking() {
+    runBlocking { asyncGetAllFiles() }
 }
 
 @Suppress("DEPRECATION")

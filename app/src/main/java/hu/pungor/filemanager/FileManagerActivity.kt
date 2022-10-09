@@ -20,6 +20,7 @@ import hu.pungor.filemanager.operations.*
 import hu.pungor.filemanager.permissions.activityResult
 import hu.pungor.filemanager.permissions.checkPermissionsAndLoadFiles
 import kotlinx.android.synthetic.main.activity_filemanager.*
+import kotlinx.coroutines.DelicateCoroutinesApi
 import permissions.dispatcher.NeedsPermission
 import permissions.dispatcher.OnShowRationale
 import permissions.dispatcher.PermissionRequest
@@ -88,6 +89,7 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
         }
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     @NeedsPermission(
         Manifest.permission.READ_EXTERNAL_STORAGE,
         Manifest.permission.WRITE_EXTERNAL_STORAGE
@@ -96,7 +98,7 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
         try {
             rvFiles.layoutManager = LinearLayoutManager(this)
             rvFiles.adapter = fmAdapter
-            fmAdapter.setFiles(AsyncGetAllFiles().execute(this).get())
+            setFiles()
             fmAdapter.itemClickListener = this
         } catch (e: Exception) {
             Log.e("Main", "Error loading files.", e)

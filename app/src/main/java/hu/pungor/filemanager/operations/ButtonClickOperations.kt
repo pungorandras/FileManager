@@ -57,12 +57,12 @@ fun FileManagerActivity.selectAllOperation() {
         fmAdapter.btnSelectAllPressed = true
         fmAdapter.addAllToSelectedList()
         fmAdapter.clearSelectedList = false
-        loadFiles()
+        setFilesRunBlocking()
         fmAdapter.clearSelectedList = true
     } else {
         fmAdapter.btnSelectAllPressed = false
         fmAdapter.clearSelectedList()
-        loadFiles()
+        setFiles()
     }
 }
 
@@ -213,8 +213,7 @@ fun FileManagerActivity.searchButtonOperations() {
                         noResultsDialog()
                     else {
                         fmAdapter.btnSearchPressed = true
-                        rvFiles.adapter = fmAdapter
-                        fmAdapter.setFiles(fillList(result))
+                        setFiles(result)
 
                         Internal.isEnabled = false
                         Internal.backgroundTintList = resources.getColorStateList(R.color.disabled)
@@ -269,7 +268,7 @@ fun FileManagerActivity.searchButtonOperations() {
         fmAdapter.clearSelectedList()
 
         if (currentPath == latestPathBeforeAction)
-            fmAdapter.setFiles(AsyncGetAllFiles().execute().get())
+            setFiles()
     }
 }
 
