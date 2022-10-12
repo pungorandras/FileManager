@@ -41,32 +41,40 @@ fun FileManagerActivity.setFilesRunBlocking() {
 }
 
 @Suppress("DEPRECATION")
+fun FileManagerActivity.progressDialogBuilder(
+    titleText: Int,
+    buttonFunctionality: (() -> Unit)
+): ProgressDialog {
+    val customTitle =
+        LayoutInflater.from(this).inflate(R.layout.custom_title, null)
+    customTitle.findViewById<TextView>(R.id.title_text).text = getString(titleText)
+
+    val progressDialog = ProgressDialog(this)
+    progressDialog.setCustomTitle(customTitle)
+    progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL)
+    progressDialog.max = 100
+    progressDialog.progress = 0
+    progressDialog.setCancelable(false)
+    progressDialog.setButton(DialogInterface.BUTTON_NEGATIVE, getString(R.string.cancel)) { _, _ ->
+        buttonFunctionality.invoke()
+    }
+
+    return progressDialog
+}
+
+@Suppress("DEPRECATION")
 class AsyncCopySelected(private val activity: FileManagerActivity) :
     AsyncTask<FileManagerActivity, Int, FileManagerActivity>() {
 
-    private val progressDialog = ProgressDialog(activity)
     private var copyState = 0.0
     private var selectedListSize = 0.0
+    private val progressDialog = activity.progressDialogBuilder(
+        titleText = R.string.copying,
+        buttonFunctionality = { cancel(true) }
+    )
 
     @Deprecated("Deprecated in Java")
     override fun onPreExecute() {
-        val customTitle =
-            LayoutInflater.from(activity).inflate(R.layout.custom_title, null)
-        customTitle.findViewById<TextView>(R.id.title_text).text = activity.getString(
-            R.string.copying
-        )
-
-        progressDialog.setCustomTitle(customTitle)
-        progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL)
-        progressDialog.max = 100
-        progressDialog.progress = 0
-        progressDialog.setCancelable(false)
-        progressDialog.setButton(
-            DialogInterface.BUTTON_NEGATIVE,
-            activity.getString(R.string.cancel)
-        ) { dialog, which ->
-            this.cancel(true)
-        }
         progressDialog.show()
     }
 
