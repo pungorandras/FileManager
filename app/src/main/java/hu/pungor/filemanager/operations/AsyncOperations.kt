@@ -188,29 +188,15 @@ class AsyncCopySelected(private val activity: FileManagerActivity) :
 class AsyncDeleteSelected(private val activity: FileManagerActivity) :
     AsyncTask<FileManagerActivity, Int, FileManagerActivity>() {
 
-    private val progressDialog = ProgressDialog(activity)
     private var deleteState = 0.0
     private var selectedListSize = 0.0
+    private val progressDialog = activity.progressDialogBuilder(
+        titleText = R.string.deleting,
+        buttonFunctionality = { cancel(true) }
+    )
 
     @Deprecated("Deprecated in Java")
     override fun onPreExecute() {
-        val customTitle =
-            LayoutInflater.from(activity).inflate(R.layout.custom_title, null)
-        customTitle.findViewById<TextView>(R.id.title_text).text = activity.getString(
-            R.string.deleting
-        )
-
-        progressDialog.setCustomTitle(customTitle)
-        progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL)
-        progressDialog.max = 100
-        progressDialog.progress = 0
-        progressDialog.setCancelable(false)
-        progressDialog.setButton(
-            DialogInterface.BUTTON_NEGATIVE,
-            activity.getString(R.string.cancel)
-        ) { dialog, which ->
-            this.cancel(true)
-        }
         progressDialog.show()
     }
 
@@ -315,30 +301,16 @@ class AsyncDeleteSelected(private val activity: FileManagerActivity) :
 class AsyncMoveSelected(private val activity: FileManagerActivity) :
     AsyncTask<FileManagerActivity, Int, FileManagerActivity>() {
 
-    private val progressDialog = ProgressDialog(activity)
     private val asyncDeleteSelected = AsyncDeleteSelected(activity)
     private var moveState = 0.0
     private var selectedListSize = 0.0
+    private val progressDialog = activity.progressDialogBuilder(
+        titleText = R.string.moving,
+        buttonFunctionality = { cancel(true) }
+    )
 
     @Deprecated("Deprecated in Java")
     override fun onPreExecute() {
-        val customTitle =
-            LayoutInflater.from(activity).inflate(R.layout.custom_title, null)
-        customTitle.findViewById<TextView>(R.id.title_text).text = activity.getString(
-            R.string.moving
-        )
-
-        progressDialog.setCustomTitle(customTitle)
-        progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL)
-        progressDialog.max = 100
-        progressDialog.progress = 0
-        progressDialog.setCancelable(false)
-        progressDialog.setButton(
-            DialogInterface.BUTTON_NEGATIVE,
-            activity.getString(R.string.cancel)
-        ) { dialog, which ->
-            this.cancel(true)
-        }
         progressDialog.show()
     }
 
