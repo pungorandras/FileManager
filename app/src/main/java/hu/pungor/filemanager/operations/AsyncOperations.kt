@@ -50,14 +50,14 @@ fun FileManagerActivity.progressDialogBuilder(
     val customTitle = LayoutInflater.from(this).inflate(R.layout.custom_title, null)
     customTitle.findViewById<TextView>(R.id.title_text).text = getString(titleText)
 
-    return ProgressDialog(this).also {
-        it.setCustomTitle(customTitle)
-        it.setProgressStyle(progressStyle)
-        it.setMessage(message)
-        it.max = 100
-        it.progress = 0
-        it.setCancelable(false)
-        it.setButton(
+    return ProgressDialog(this).apply {
+        setCustomTitle(customTitle)
+        setProgressStyle(progressStyle)
+        setMessage(message)
+        max = 100
+        progress = 0
+        setCancelable(false)
+        setButton(
             DialogInterface.BUTTON_NEGATIVE,
             getString(R.string.cancel)
         ) { _, _ -> buttonFunctionality.invoke() }
@@ -488,17 +488,17 @@ class AsyncMoveSelected(private val activity: FileManagerActivity) :
 class AsyncSearch(private val input: String, private val activity: FileManagerActivity) :
     AsyncTask<FileManagerActivity, Void, MutableList<File>>() {
 
-    private val sBuilder = SpannableStringBuilder(activity.getString(R.string.wait)).also {
-        it.setSpan(
+    private val sBuilder = SpannableStringBuilder(activity.getString(R.string.wait)).apply {
+        setSpan(
             StyleSpan(android.graphics.Typeface.BOLD),
             0,
-            it.length,
+            length,
             Spannable.SPAN_INCLUSIVE_INCLUSIVE
         )
-        it.setSpan(
+        setSpan(
             AbsoluteSizeSpan(activity.resources.getDimensionPixelSize(R.dimen.wait)),
             0,
-            it.length,
+            length,
             Spannable.SPAN_INCLUSIVE_INCLUSIVE
         )
     }
