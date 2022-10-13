@@ -43,23 +43,25 @@ fun FileManagerActivity.setFilesRunBlocking() {
 @Suppress("DEPRECATION")
 fun FileManagerActivity.progressDialogBuilder(
     titleText: Int,
+    message: SpannableStringBuilder? = null,
+    progressStyle: Int = ProgressDialog.STYLE_HORIZONTAL,
     buttonFunctionality: (() -> Unit)
 ): ProgressDialog {
-    val customTitle =
-        LayoutInflater.from(this).inflate(R.layout.custom_title, null)
+    val customTitle = LayoutInflater.from(this).inflate(R.layout.custom_title, null)
     customTitle.findViewById<TextView>(R.id.title_text).text = getString(titleText)
 
-    val progressDialog = ProgressDialog(this)
-    progressDialog.setCustomTitle(customTitle)
-    progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL)
-    progressDialog.max = 100
-    progressDialog.progress = 0
-    progressDialog.setCancelable(false)
-    progressDialog.setButton(DialogInterface.BUTTON_NEGATIVE, getString(R.string.cancel)) { _, _ ->
-        buttonFunctionality.invoke()
+    return ProgressDialog(this).also {
+        it.setCustomTitle(customTitle)
+        it.setProgressStyle(progressStyle)
+        it.setMessage(message)
+        it.max = 100
+        it.progress = 0
+        it.setCancelable(false)
+        it.setButton(
+            DialogInterface.BUTTON_NEGATIVE,
+            getString(R.string.cancel)
+        ) { _, _ -> buttonFunctionality.invoke() }
     }
-
-    return progressDialog
 }
 
 @Suppress("DEPRECATION")
@@ -485,38 +487,31 @@ class AsyncMoveSelected(private val activity: FileManagerActivity) :
 @Suppress("DEPRECATION")
 class AsyncSearch(private val input: String, private val activity: FileManagerActivity) :
     AsyncTask<FileManagerActivity, Void, MutableList<File>>() {
-    private val progressDialog = ProgressDialog(activity)
+
+    private val sBuilder = SpannableStringBuilder(activity.getString(R.string.wait)).also {
+        it.setSpan(
+            StyleSpan(android.graphics.Typeface.BOLD),
+            0,
+            it.length,
+            Spannable.SPAN_INCLUSIVE_INCLUSIVE
+        )
+        it.setSpan(
+            AbsoluteSizeSpan(activity.resources.getDimensionPixelSize(R.dimen.wait)),
+            0,
+            it.length,
+            Spannable.SPAN_INCLUSIVE_INCLUSIVE
+        )
+    }
+
+    private val progressDialog = activity.progressDialogBuilder(
+        titleText = R.string.searching,
+        message = sBuilder,
+        progressStyle = ProgressDialog.STYLE_SPINNER,
+        buttonFunctionality = { cancel(true) }
+    )
 
     @Deprecated("Deprecated in Java")
     override fun onPreExecute() {
-        val customTitle =
-            LayoutInflater.from(activity).inflate(R.layout.custom_title, null)
-        customTitle.findViewById<TextView>(R.id.title_text).text = activity.getString(
-            R.string.searching
-        )
-        val sBuilder = SpannableStringBuilder(activity.getString(R.string.wait))
-        sBuilder.setSpan(
-            StyleSpan(android.graphics.Typeface.BOLD),
-            0,
-            sBuilder.length,
-            Spannable.SPAN_INCLUSIVE_INCLUSIVE
-        )
-        sBuilder.setSpan(
-            AbsoluteSizeSpan(activity.resources.getDimensionPixelSize(R.dimen.wait)),
-            0,
-            sBuilder.length,
-            Spannable.SPAN_INCLUSIVE_INCLUSIVE
-        )
-        progressDialog.setCustomTitle(customTitle)
-        progressDialog.setMessage(sBuilder)
-        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER)
-        progressDialog.setCancelable(false)
-        progressDialog.setButton(
-            DialogInterface.BUTTON_NEGATIVE,
-            activity.getString(R.string.cancel)
-        ) { dialog, which ->
-            this.cancel(true)
-        }
         progressDialog.show()
     }
 
