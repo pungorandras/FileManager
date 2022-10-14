@@ -2,10 +2,11 @@ package hu.pungor.filemanager.operations
 
 import android.app.ProgressDialog
 import android.content.DialogInterface
+import android.graphics.Typeface.BOLD
 import android.os.AsyncTask
 import android.os.Build
-import android.text.Spannable
 import android.text.SpannableStringBuilder
+import android.text.Spanned.SPAN_INCLUSIVE_INCLUSIVE
 import android.text.style.AbsoluteSizeSpan
 import android.text.style.StyleSpan
 import android.view.LayoutInflater
@@ -17,7 +18,6 @@ import hu.pungor.filemanager.alertdialog.alreadyExistsDialog
 import hu.pungor.filemanager.alertdialog.copyOrMoveIntoItselfDialog
 import kotlinx.coroutines.*
 import java.io.File
-import java.util.*
 
 private val vcIsR = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
 
@@ -28,12 +28,11 @@ suspend fun FileManagerActivity.asyncGetAllFiles() {
     fileList.await()?.let { fmAdapter.setFiles(it) }
 }
 
-@OptIn(DelicateCoroutinesApi::class)
 fun FileManagerActivity.setFiles(fileList: List<File>? = null) {
     if (fileList == null)
-        GlobalScope.launch(Dispatchers.Main) { asyncGetAllFiles() }
+        CoroutineScope(Dispatchers.Main).launch { asyncGetAllFiles() }
     else
-        GlobalScope.launch(Dispatchers.Main) { fmAdapter.setFiles(fillList(fileList)) }
+        CoroutineScope(Dispatchers.Main).launch { fmAdapter.setFiles(fillList(fileList)) }
 }
 
 fun FileManagerActivity.setFilesRunBlocking() {
@@ -485,53 +484,36 @@ class AsyncMoveSelected(private val activity: FileManagerActivity) :
 }
 
 @Suppress("DEPRECATION")
-class AsyncSearch(private val input: String, private val activity: FileManagerActivity) :
-    AsyncTask<FileManagerActivity, Void, MutableList<File>>() {
+suspend fun FileManagerActivity.asyncSearch(input: String): MutableList<File> {
 
-    private val sBuilder = SpannableStringBuilder(activity.getString(R.string.wait)).apply {
-        setSpan(
-            StyleSpan(android.graphics.Typeface.BOLD),
-            0,
-            length,
-            Spannable.SPAN_INCLUSIVE_INCLUSIVE
-        )
-        setSpan(
-            AbsoluteSizeSpan(activity.resources.getDimensionPixelSize(R.dimen.wait)),
-            0,
-            length,
-            Spannable.SPAN_INCLUSIVE_INCLUSIVE
-        )
+    val sBuilder = SpannableStringBuilder(getString(R.string.wait)).apply {
+        val spanResource = resources.getDimensionPixelSize(R.dimen.wait)
+        setSpan(StyleSpan(BOLD), 0, length, SPAN_INCLUSIVE_INCLUSIVE)
+        setSpan(AbsoluteSizeSpan(spanResource), 0, length, SPAN_INCLUSIVE_INCLUSIVE)
     }
 
-    private val progressDialog = activity.progressDialogBuilder(
-        titleText = R.string.searching,
-        message = sBuilder,
-        progressStyle = ProgressDialog.STYLE_SPINNER,
-        buttonFunctionality = { cancel(true) }
-    )
-
-    @Deprecated("Deprecated in Java")
-    override fun onPreExecute() {
-        progressDialog.show()
-    }
-
-    @Deprecated("Deprecated in Java")
-    override fun doInBackground(vararg params: FileManagerActivity): MutableList<File> {
-        val result = mutableListOf<File>()
-
-        params[0].currentPath.walk().takeWhile { !this.isCancelled }.forEach {
-            if (it.name.lowercase(Locale.ROOT)
-                    .contains(input.lowercase(Locale.ROOT)) && it.path != params[0].currentPath.toString()
-            )
-                result += it
+    val searchResult = CoroutineScope(Dispatchers.IO).async {
+        val progressDialog = withContext(Dispatchers.Main) {
+            progressDialogBuilder(
+                titleText = R.string.searching,
+                message = sBuilder,
+                progressStyle = ProgressDialog.STYLE_SPINNER,
+                buttonFunctionality = { cancel() }
+            ).apply { show() }
         }
-        return result
-    }
 
-    @Deprecated("Deprecated in Java")
-    override fun onPostExecute(result: MutableList<File>?) {
+        val result = mutableListOf<File>()
+        currentPath.walk().takeWhile { isActive }.forEach {
+            if (it.name.lowercase().contains(input.lowercase()))
+                result += it
+            if (!isActive)
+                progressDialog.dismiss()
+        }
         progressDialog.dismiss()
+
+        return@async result
     }
+    return searchResult.await()
 }
 
 private fun getFolderSize(folder: File): Double {

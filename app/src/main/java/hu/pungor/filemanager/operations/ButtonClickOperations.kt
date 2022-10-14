@@ -13,6 +13,9 @@ import hu.pungor.filemanager.alertdialog.noResultsDialog
 import hu.pungor.filemanager.permissions.checkPermissionsAndLoadFiles
 import hu.pungor.filemanager.permissions.getSDCardPath
 import kotlinx.android.synthetic.main.activity_filemanager.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import permissions.dispatcher.PermissionRequest
 import java.io.File
 
@@ -202,33 +205,35 @@ fun FileManagerActivity.searchButtonOperations() {
             titleText = R.string.search,
             dialogLayout = dialogView,
             positiveButtonFunctionality = {
-                if (dialogView.findViewById<EditText>(R.id.name_input).text.toString()
-                        .isNotEmpty()
-                ) {
-                    latestPathBeforeAction = currentPath
-                    result =
-                        search(dialogView.findViewById<EditText>(R.id.name_input).text.toString())
+                val inputText = dialogView.findViewById<EditText>(R.id.name_input).text.toString()
+                if (inputText.isNotEmpty()) {
+                    CoroutineScope(Dispatchers.Main).launch {
+                        latestPathBeforeAction = currentPath
+                        result = search(inputText)
 
-                    if (result.isNullOrEmpty())
-                        noResultsDialog()
-                    else {
-                        fmAdapter.btnSearchPressed = true
-                        setFiles(result)
+                        if (result.isNullOrEmpty())
+                            noResultsDialog()
+                        else {
+                            fmAdapter.btnSearchPressed = true
+                            setFiles(result)
 
-                        Internal.isEnabled = false
-                        Internal.backgroundTintList = resources.getColorStateList(R.color.disabled)
-                        SDCard.isEnabled = false
-                        SDCard.backgroundTintList = resources.getColorStateList(R.color.disabled)
+                            Internal.isEnabled = false
+                            Internal.backgroundTintList =
+                                resources.getColorStateList(R.color.disabled)
+                            SDCard.isEnabled = false
+                            SDCard.backgroundTintList =
+                                resources.getColorStateList(R.color.disabled)
 
-                        revertButtonState(
-                            create_textfile,
-                            create_folder,
-                            select_all,
-                            delete_selected,
-                            copy_selected,
-                            move_selected
-                        )
-                        search.setImageResource(R.drawable.cancel)
+                            revertButtonState(
+                                create_textfile,
+                                create_folder,
+                                select_all,
+                                delete_selected,
+                                copy_selected,
+                                move_selected
+                            )
+                            search.setImageResource(R.drawable.cancel)
+                        }
                     }
                 } else
                     nameIsNullDialog()

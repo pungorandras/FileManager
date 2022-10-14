@@ -181,6 +181,6 @@ fun FileManagerActivity.moveSelectedFiles() {
     AsyncMoveSelected(this).execute(this)
 }
 
-fun FileManagerActivity.search(input: String): List<File> {
-    return AsyncSearch(input, this).execute(this).get()
+suspend fun FileManagerActivity.search(input: String): MutableList<File> {
+    return asyncSearch(input)
 }
