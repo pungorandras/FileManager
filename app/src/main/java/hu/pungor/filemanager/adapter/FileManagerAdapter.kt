@@ -245,6 +245,6 @@ class FileManagerAdapter : RecyclerView.Adapter<FileManagerAdapter.FileManagerVi
 
     interface FileItemClickListener {
         fun onItemClick(file: AboutFile)
-        fun onItemLongClick(position: Int, view: View): Boolean
+        fun onItemLongClick(position: Int, view: View)
     }
 }

@@ -20,7 +20,6 @@ import hu.pungor.filemanager.operations.*
 import hu.pungor.filemanager.permissions.activityResult
 import hu.pungor.filemanager.permissions.checkPermissionsAndLoadFiles
 import kotlinx.android.synthetic.main.activity_filemanager.*
-import kotlinx.coroutines.DelicateCoroutinesApi
 import permissions.dispatcher.NeedsPermission
 import permissions.dispatcher.OnShowRationale
 import permissions.dispatcher.PermissionRequest
@@ -89,7 +88,6 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
         }
     }
 
-    @OptIn(DelicateCoroutinesApi::class)
     @NeedsPermission(
         Manifest.permission.READ_EXTERNAL_STORAGE,
         Manifest.permission.WRITE_EXTERNAL_STORAGE
@@ -143,7 +141,7 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
             fileTreeDepth--
 
             if (fileTreeDepth == 0)
-                fmAdapter.setFiles(fillList(result))
+                setFiles(result)
             else {
                 val location =
                     currentPathString.substring(0, currentPathString.lastIndexOf("/") + 1)
@@ -162,7 +160,7 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
     }
 
     @SuppressLint("DiscouragedPrivateApi")
-    override fun onItemLongClick(position: Int, view: View): Boolean {
+    override fun onItemLongClick(position: Int, view: View) {
         if (!fmAdapter.btnSearchPressed && !fmAdapter.btnCopyPressed && !fmAdapter.btnMovePressed) {
             val wrapper = ContextThemeWrapper(this, R.style.NoPopupAnimation)
             val popup = PopupMenu(wrapper, view, Gravity.END)
@@ -202,18 +200,17 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
             }
 
             try {
-                val fieldMPopup = PopupMenu::class.java.getDeclaredField("mPopup")
-                fieldMPopup.isAccessible = true
-                val mPopup = fieldMPopup.get(popup)
-                mPopup.javaClass.getDeclaredMethod("setForceShowIcon", Boolean::class.java)
-                    .invoke(mPopup, true)
+                PopupMenu::class.java.getDeclaredField("mPopup").apply {
+                    isAccessible = true
+                }.get(popup).apply {
+                    javaClass.getDeclaredMethod("setForceShowIcon", Boolean::class.java)
+                        .invoke(this, true)
+                }
             } catch (e: Exception) {
                 Log.e("Main", "Error showing menu icons.", e)
             } finally {
                 popup.show()
             }
-            return false
         }
-        return false
     }
 }
