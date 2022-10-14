@@ -30,7 +30,7 @@ fun FileManagerActivity.createTextFileDialog() {
 
     alertDialogBuilder(
         titleText = R.string.create_new_textfile,
-        dialogLayout = R.layout.layout_dialog_textfile,
+        dialogLayout = dialogView,
         positiveButtonFunctionality = {
             createTextFile(
                 dialogView.findViewById<EditText>(R.id.name_input).text.toString(),

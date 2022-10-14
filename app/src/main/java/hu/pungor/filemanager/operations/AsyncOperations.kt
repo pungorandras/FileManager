@@ -504,7 +504,7 @@ suspend fun FileManagerActivity.asyncSearch(input: String): MutableList<File> {
 
         val result = mutableListOf<File>()
         currentPath.walk().takeWhile { isActive }.forEach {
-            if (it.name.lowercase().contains(input.lowercase()))
+            if (it.name.lowercase().contains(input.lowercase()) && it.path != currentPath.path)
                 result += it
             if (!isActive)
                 progressDialog.dismiss()
