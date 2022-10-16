@@ -1,7 +1,6 @@
-package hu.pungor.filemanager.operations
+package hu.pungor.filemanager.operations.async
 
 import android.app.ProgressDialog
-import android.content.DialogInterface
 import android.graphics.Typeface.BOLD
 import android.os.AsyncTask
 import android.os.Build
@@ -9,13 +8,12 @@ import android.text.SpannableStringBuilder
 import android.text.Spanned.SPAN_INCLUSIVE_INCLUSIVE
 import android.text.style.AbsoluteSizeSpan
 import android.text.style.StyleSpan
-import android.view.LayoutInflater
-import android.widget.TextView
 import androidx.documentfile.provider.DocumentFile
 import hu.pungor.filemanager.FileManagerActivity
 import hu.pungor.filemanager.R
 import hu.pungor.filemanager.alertdialog.alreadyExistsDialog
 import hu.pungor.filemanager.alertdialog.copyOrMoveIntoItselfDialog
+import hu.pungor.filemanager.operations.*
 import kotlinx.coroutines.*
 import java.io.File
 
@@ -26,41 +24,6 @@ suspend fun FileManagerActivity.asyncGetAllFiles() {
         return@async currentPath.listFiles()?.asList()?.let { fillList(it) }
     }
     fileList.await()?.let { fmAdapter.setFiles(it) }
-}
-
-fun FileManagerActivity.setFiles(fileList: List<File>? = null) {
-    if (fileList == null)
-        CoroutineScope(Dispatchers.Main).launch { asyncGetAllFiles() }
-    else
-        CoroutineScope(Dispatchers.Main).launch { fmAdapter.setFiles(fillList(fileList)) }
-}
-
-fun FileManagerActivity.setFilesRunBlocking() {
-    runBlocking { asyncGetAllFiles() }
-}
-
-@Suppress("DEPRECATION")
-fun FileManagerActivity.progressDialogBuilder(
-    titleText: Int,
-    message: SpannableStringBuilder? = null,
-    progressStyle: Int = ProgressDialog.STYLE_HORIZONTAL,
-    buttonFunctionality: (() -> Unit)
-): ProgressDialog {
-    val customTitle = LayoutInflater.from(this).inflate(R.layout.custom_title, null)
-    customTitle.findViewById<TextView>(R.id.title_text).text = getString(titleText)
-
-    return ProgressDialog(this).apply {
-        setCustomTitle(customTitle)
-        setProgressStyle(progressStyle)
-        setMessage(message)
-        max = 100
-        progress = 0
-        setCancelable(false)
-        setButton(
-            DialogInterface.BUTTON_NEGATIVE,
-            getString(R.string.cancel)
-        ) { _, _ -> buttonFunctionality.invoke() }
-    }
 }
 
 @Suppress("DEPRECATION")
@@ -80,14 +43,9 @@ class AsyncCopySelected(private val activity: FileManagerActivity) :
     }
 
     @Deprecated("Deprecated in Java")
-    override fun doInBackground(vararg params: FileManagerActivity): FileManagerActivity? {
+    override fun doInBackground(vararg params: FileManagerActivity): FileManagerActivity {
         val selectedList = params[0].fmAdapter.getSelectedList()
-        selectedList.forEach {
-            if (it.mimeType == FileManagerActivity.TYPE_FOLDER)
-                selectedListSize += getFolderSize(File(it.path))
-            else
-                selectedListSize += File(it.path).length()
-        }
+        selectedListSize = getSelectedListSize(selectedList)
 
         for (element in selectedList) {
             val file = File(params[0].currentPath.toString() + "/" + element.name)
@@ -139,13 +97,13 @@ class AsyncCopySelected(private val activity: FileManagerActivity) :
     @Deprecated("Deprecated in Java")
     override fun onPostExecute(result: FileManagerActivity) {
         progressDialog.dismiss()
-        result.loadFiles()
+        result.listFiles()
     }
 
     @Deprecated("Deprecated in Java")
     override fun onCancelled(result: FileManagerActivity) {
         progressDialog.dismiss()
-        result.loadFiles()
+        result.listFiles()
     }
 
     private fun copyFolder(folder: File, activity: FileManagerActivity) {
@@ -203,14 +161,8 @@ class AsyncDeleteSelected(private val activity: FileManagerActivity) :
 
     @Deprecated("Deprecated in Java")
     override fun doInBackground(vararg params: FileManagerActivity): FileManagerActivity {
-        val selectedList = params[0].fmAdapter.getSelectedList().toMutableList()
-        for (i in selectedList)
-            selectedList.forEach {
-                if (it.mimeType == FileManagerActivity.TYPE_FOLDER)
-                    selectedListSize += getFolderSize(File(it.path))
-                else
-                    selectedListSize += File(it.path).length()
-            }
+        val selectedList = params[0].fmAdapter.getSelectedList()
+        selectedListSize = getSelectedListSize(selectedList)
 
         for (position in selectedList.indices) {
             val fileUri = selectedList[position].path
@@ -254,13 +206,13 @@ class AsyncDeleteSelected(private val activity: FileManagerActivity) :
     @Deprecated("Deprecated in Java")
     override fun onPostExecute(result: FileManagerActivity) {
         progressDialog.dismiss()
-        result.loadFiles()
+        result.listFiles()
     }
 
     @Deprecated("Deprecated in Java")
     override fun onCancelled(result: FileManagerActivity?) {
         progressDialog.dismiss()
-        result?.loadFiles()
+        result?.listFiles()
     }
 
     fun deleteFolder(folderOrFile: File) {
@@ -318,12 +270,7 @@ class AsyncMoveSelected(private val activity: FileManagerActivity) :
     @Deprecated("Deprecated in Java")
     override fun doInBackground(vararg params: FileManagerActivity): FileManagerActivity {
         val selectedList = params[0].fmAdapter.getSelectedList()
-        selectedList.forEach {
-            if (it.mimeType == FileManagerActivity.TYPE_FOLDER)
-                selectedListSize += getFolderSize(File(it.path))
-            else
-                selectedListSize += File(it.path).length()
-        }
+        selectedListSize = getSelectedListSize(selectedList)
 
         for (element in selectedList) {
             val file = File(params[0].currentPath.toString() + "/" + element.name)
@@ -433,13 +380,13 @@ class AsyncMoveSelected(private val activity: FileManagerActivity) :
     @Deprecated("Deprecated in Java")
     override fun onPostExecute(result: FileManagerActivity) {
         progressDialog.dismiss()
-        result.loadFiles()
+        result.listFiles()
     }
 
     @Deprecated("Deprecated in Java")
     override fun onCancelled(result: FileManagerActivity) {
         progressDialog.dismiss()
-        result.loadFiles()
+        result.listFiles()
     }
 
     private fun moveFolder(folder: File, activity: FileManagerActivity) {
@@ -514,15 +461,4 @@ suspend fun FileManagerActivity.asyncSearch(input: String): MutableList<File> {
         return@async result
     }
     return searchResult.await()
-}
-
-private fun getFolderSize(folder: File): Double {
-    var length = 0.0
-    for (element in folder.listFiles()) {
-        if (element.isFile)
-            length += element.length()
-        else
-            length += getFolderSize(element)
-    }
-    return length
 }

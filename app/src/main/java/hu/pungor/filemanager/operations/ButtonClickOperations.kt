@@ -10,6 +10,8 @@ import hu.pungor.filemanager.alertdialog.alertDialogBuilder
 import hu.pungor.filemanager.alertdialog.nameIsNullDialog
 import hu.pungor.filemanager.alertdialog.noItemsSelectedDialog
 import hu.pungor.filemanager.alertdialog.noResultsDialog
+import hu.pungor.filemanager.operations.async.listFiles
+import hu.pungor.filemanager.operations.async.listFilesRunBlocking
 import hu.pungor.filemanager.permissions.checkPermissionsAndLoadFiles
 import hu.pungor.filemanager.permissions.getSDCardPath
 import kotlinx.android.synthetic.main.activity_filemanager.*
@@ -60,12 +62,12 @@ fun FileManagerActivity.selectAllOperation() {
         fmAdapter.btnSelectAllPressed = true
         fmAdapter.addAllToSelectedList()
         fmAdapter.clearSelectedList = false
-        setFilesRunBlocking()
+        listFilesRunBlocking()
         fmAdapter.clearSelectedList = true
     } else {
         fmAdapter.btnSelectAllPressed = false
         fmAdapter.clearSelectedList()
-        setFiles()
+        listFiles()
     }
 }
 
@@ -215,7 +217,7 @@ fun FileManagerActivity.searchButtonOperations() {
                             noResultsDialog()
                         else {
                             fmAdapter.btnSearchPressed = true
-                            setFiles(result)
+                            listFiles(result)
 
                             Internal.isEnabled = false
                             Internal.backgroundTintList =
@@ -273,7 +275,7 @@ fun FileManagerActivity.searchButtonOperations() {
         fmAdapter.clearSelectedList()
 
         if (currentPath == latestPathBeforeAction)
-            setFiles()
+            listFiles()
     }
 }
 

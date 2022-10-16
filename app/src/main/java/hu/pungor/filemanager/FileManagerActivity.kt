@@ -17,6 +17,7 @@ import hu.pungor.filemanager.intro.loadIntroScreen
 import hu.pungor.filemanager.intro.loadTutorial
 import hu.pungor.filemanager.model.AboutFile
 import hu.pungor.filemanager.operations.*
+import hu.pungor.filemanager.operations.async.listFiles
 import hu.pungor.filemanager.permissions.activityResult
 import hu.pungor.filemanager.permissions.checkPermissionsAndLoadFiles
 import kotlinx.android.synthetic.main.activity_filemanager.*
@@ -96,7 +97,7 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
         try {
             rvFiles.layoutManager = LinearLayoutManager(this)
             rvFiles.adapter = fmAdapter
-            setFiles()
+            listFiles()
             fmAdapter.itemClickListener = this
         } catch (e: Exception) {
             Log.e("Main", "Error loading files.", e)
@@ -141,7 +142,7 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
             fileTreeDepth--
 
             if (fileTreeDepth == 0)
-                setFiles(result)
+                listFiles(result)
             else {
                 val location =
                     currentPathString.substring(0, currentPathString.lastIndexOf("/") + 1)
