@@ -92,13 +92,8 @@ fun FileManagerActivity.createTextFile(name: String, notes: String) {
             checkPermissionsAndLoadFiles()
         }
     } else {
-        try {
-            createTextFileOnSDCard(name, notes)
-            listFiles()
-        } catch (e: Exception) {
-            checkPermissionsAndLoadFiles()
-        }
-
+        createTextFileOnSDCard(name, notes)
+        listFiles()
     }
 }
 
@@ -118,12 +113,8 @@ fun FileManagerActivity.createFolder(name: String) {
             checkPermissionsAndLoadFiles()
         }
     } else {
-        try {
-            createFolderOnSDCard(currentPath, name)
-            listFiles()
-        } catch (e: Exception) {
-            checkPermissionsAndLoadFiles()
-        }
+        createFolderOnSDCard(currentPath, name)
+        listFiles()
     }
 }
 
