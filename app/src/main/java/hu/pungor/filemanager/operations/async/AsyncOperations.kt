@@ -1,15 +1,10 @@
 package hu.pungor.filemanager.operations.async
 
-import android.app.ProgressDialog
-import android.graphics.Typeface.BOLD
 import android.os.AsyncTask
 import android.os.Build
-import android.text.SpannableStringBuilder
-import android.text.Spanned.SPAN_INCLUSIVE_INCLUSIVE
-import android.text.style.AbsoluteSizeSpan
-import android.text.style.StyleSpan
 import androidx.documentfile.provider.DocumentFile
 import hu.pungor.filemanager.FileManagerActivity
+import hu.pungor.filemanager.FileManagerActivity.Companion.TYPE_FOLDER
 import hu.pungor.filemanager.R
 import hu.pungor.filemanager.alertdialog.alreadyExistsDialog
 import hu.pungor.filemanager.alertdialog.copyOrMoveIntoItselfDialog
@@ -17,131 +12,7 @@ import hu.pungor.filemanager.operations.*
 import kotlinx.coroutines.*
 import java.io.File
 
-private val vcIsR = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
-
-suspend fun FileManagerActivity.asyncGetAllFiles() {
-    val fileList = CoroutineScope(Dispatchers.IO).async {
-        return@async currentPath.listFiles()?.asList()?.let { fillList(it) }
-    }
-    fileList.await()?.let { fmAdapter.setFiles(it) }
-}
-
-@Suppress("DEPRECATION")
-class AsyncCopySelected(private val activity: FileManagerActivity) :
-    AsyncTask<FileManagerActivity, Int, FileManagerActivity>() {
-
-    private var copyState = 0.0
-    private var selectedListSize = 0.0
-    private val progressDialog = activity.progressDialogBuilder(
-        titleText = R.string.copying,
-        buttonFunctionality = { cancel(true) }
-    )
-
-    @Deprecated("Deprecated in Java")
-    override fun onPreExecute() {
-        progressDialog.show()
-    }
-
-    @Deprecated("Deprecated in Java")
-    override fun doInBackground(vararg params: FileManagerActivity): FileManagerActivity {
-        val selectedList = params[0].fmAdapter.getSelectedList()
-        selectedListSize = getSelectedListSize(selectedList)
-
-        for (element in selectedList) {
-            val file = File(params[0].currentPath.toString() + "/" + element.name)
-            progressDialog.setProgressNumberFormat(((selectedList.indexOf(element) + 1).toString() + "/" + selectedList.size))
-
-            if (element.mimeType == FileManagerActivity.TYPE_FOLDER && !params[0].currentPath.toString()
-                    .contains(element.path) && !file.exists()
-            ) {
-                if (params[0].currentPath.toString()
-                        .contains(params[0].rootPath.toString()) || vcIsR
-                )
-                    copyFolder(File(element.path), params[0])
-                else
-                    params[0].copyFolderToSDCard(File(element.path))
-
-            } else if (!file.exists() && !params[0].currentPath.toString().contains(element.path)) {
-                copyState += File(element.path).length()
-                publishProgress((copyState * 100 / selectedListSize).toInt())
-                if (params[0].currentPath.toString()
-                        .contains(params[0].rootPath.toString()) || vcIsR
-                )
-                    File(element.path).copyTo(file)
-                else
-                    params[0].copyToSDCard(
-                        params[0].currentPath,
-                        File(element.path)
-                    )
-            } else if (file.exists()) {
-                params[0].runOnUiThread {
-                    params[0].alreadyExistsDialog(element.name)
-                }
-            } else {
-                params[0].runOnUiThread {
-                    params[0].copyOrMoveIntoItselfDialog("copy")
-                }
-            }
-
-            if (this.isCancelled)
-                break
-        }
-        return params[0]
-    }
-
-    @Deprecated("Deprecated in Java")
-    override fun onProgressUpdate(vararg values: Int?) {
-        progressDialog.progress = values[0]!!
-    }
-
-    @Deprecated("Deprecated in Java")
-    override fun onPostExecute(result: FileManagerActivity) {
-        progressDialog.dismiss()
-        result.listFiles()
-    }
-
-    @Deprecated("Deprecated in Java")
-    override fun onCancelled(result: FileManagerActivity) {
-        progressDialog.dismiss()
-        result.listFiles()
-    }
-
-    private fun copyFolder(folder: File, activity: FileManagerActivity) {
-        for (src in folder.walkTopDown()) {
-            val relPath = src.toRelativeString(folder.parentFile)
-            val dstFile = File(activity.currentPath, relPath)
-
-            copyState += src.length()
-            publishProgress((copyState * 100 / selectedListSize).toInt())
-
-            if (src.isDirectory)
-                dstFile.mkdirs()
-            else
-                src.copyTo(dstFile)
-
-            if (this.isCancelled)
-                break
-        }
-    }
-
-    private fun FileManagerActivity.copyFolderToSDCard(folder: File) {
-        for (src in folder.walkTopDown()) {
-            val relPath = src.toRelativeString(folder.parentFile)
-            val dstFile = File(activity.currentPath, relPath)
-
-            copyState += src.length()
-            publishProgress((copyState * 100 / selectedListSize).toInt())
-
-            if (src.isDirectory)
-                createFolderOnSDCard(dstFile.parentFile, src.name)
-            else
-                copyToSDCard(dstFile.parentFile, src)
-
-            if (isCancelled)
-                break
-        }
-    }
-}
+val vcIsR = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
 
 @Suppress("DEPRECATION")
 class AsyncDeleteSelected(private val activity: FileManagerActivity) :
@@ -169,7 +40,7 @@ class AsyncDeleteSelected(private val activity: FileManagerActivity) :
             val file = File(fileUri)
             progressDialog.setProgressNumberFormat(((position + 1).toString() + "/" + selectedList.size))
 
-            if (selectedList[position].mimeType == FileManagerActivity.TYPE_FOLDER)
+            if (selectedList[position].mimeType == TYPE_FOLDER)
                 if (params[0].currentPath.toString()
                         .contains(params[0].rootPath.toString()) || vcIsR
                 )
@@ -278,7 +149,7 @@ class AsyncMoveSelected(private val activity: FileManagerActivity) :
 
             if (params[0].currentPath.toString() != element.path && !file.exists()) {
                 if (params[0].currentPath.toString().contains(params[0].sdCardPath.toString())) {
-                    if (element.mimeType == FileManagerActivity.TYPE_FOLDER) {
+                    if (element.mimeType == TYPE_FOLDER) {
                         if (vcIsR)
                             moveFolder(File(element.path), params[0])
                         else
@@ -316,7 +187,7 @@ class AsyncMoveSelected(private val activity: FileManagerActivity) :
                 } else if (params[0].currentPath.toString()
                         .contains(params[0].rootPath.toString())
                 ) {
-                    if (element.mimeType == FileManagerActivity.TYPE_FOLDER) {
+                    if (element.mimeType == TYPE_FOLDER) {
                         if (element.path.contains(params[0].rootPath.toString()))
                             File(element.path).renameTo(file)
                         else {
@@ -430,35 +301,3 @@ class AsyncMoveSelected(private val activity: FileManagerActivity) :
     }
 }
 
-@Suppress("DEPRECATION")
-suspend fun FileManagerActivity.asyncSearch(input: String): MutableList<File> {
-
-    val sBuilder = SpannableStringBuilder(getString(R.string.wait)).apply {
-        val spanResource = resources.getDimensionPixelSize(R.dimen.wait)
-        setSpan(StyleSpan(BOLD), 0, length, SPAN_INCLUSIVE_INCLUSIVE)
-        setSpan(AbsoluteSizeSpan(spanResource), 0, length, SPAN_INCLUSIVE_INCLUSIVE)
-    }
-
-    val searchResult = CoroutineScope(Dispatchers.IO).async {
-        val progressDialog = withContext(Dispatchers.Main) {
-            progressDialogBuilder(
-                titleText = R.string.searching,
-                message = sBuilder,
-                progressStyle = ProgressDialog.STYLE_SPINNER,
-                buttonFunctionality = { cancel() }
-            ).apply { show() }
-        }
-
-        val result = mutableListOf<File>()
-        currentPath.walk().takeWhile { isActive }.forEach {
-            if (it.name.lowercase().contains(input.lowercase()) && it.path != currentPath.path)
-                result += it
-            if (!isActive)
-                progressDialog.dismiss()
-        }
-        progressDialog.dismiss()
-
-        return@async result
-    }
-    return searchResult.await()
-}

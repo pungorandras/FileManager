@@ -6,25 +6,10 @@ import android.text.SpannableStringBuilder
 import android.view.LayoutInflater
 import android.widget.TextView
 import hu.pungor.filemanager.FileManagerActivity
+import hu.pungor.filemanager.FileManagerActivity.Companion.TYPE_FOLDER
 import hu.pungor.filemanager.R
 import hu.pungor.filemanager.model.AboutFile
-import hu.pungor.filemanager.operations.fillList
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import java.io.File
-
-fun FileManagerActivity.listFiles(fileList: List<File>? = null) {
-    if (fileList == null)
-        CoroutineScope(Dispatchers.Main).launch { asyncGetAllFiles() }
-    else
-        CoroutineScope(Dispatchers.Main).launch { fmAdapter.setFiles(fillList(fileList)) }
-}
-
-fun FileManagerActivity.listFilesRunBlocking() {
-    runBlocking { asyncGetAllFiles() }
-}
 
 @Suppress("DEPRECATION")
 fun FileManagerActivity.progressDialogBuilder(
@@ -57,7 +42,7 @@ fun getFolderSize(folder: File): Long {
 fun getSelectedListSize(selectedList: List<AboutFile>): Double {
     var selectedListSize = 0.0
     selectedList.forEach {
-        selectedListSize += if (it.mimeType == FileManagerActivity.TYPE_FOLDER)
+        selectedListSize += if (it.mimeType == TYPE_FOLDER)
             getFolderSize(File(it.path))
         else
             File(it.path).length()

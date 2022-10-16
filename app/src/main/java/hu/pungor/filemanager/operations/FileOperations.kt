@@ -3,7 +3,6 @@ package hu.pungor.filemanager.operations
 import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
 import android.content.Intent
-import android.os.Build
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.EditText
@@ -11,6 +10,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.FileProvider
 import hu.pungor.filemanager.FileManagerActivity
+import hu.pungor.filemanager.FileManagerActivity.Companion.TYPE_FOLDER
 import hu.pungor.filemanager.R
 import hu.pungor.filemanager.alertdialog.alreadyExistsDialog
 import hu.pungor.filemanager.alertdialog.nameIsNullDialog
@@ -19,8 +19,6 @@ import hu.pungor.filemanager.operations.async.*
 import hu.pungor.filemanager.permissions.checkPermissionsAndLoadFiles
 import java.io.File
 import java.io.FileWriter
-
-private val vcIsR = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
 
 fun FileManagerActivity.openFile(file: AboutFile) {
     val intent = Intent(Intent.ACTION_VIEW)
@@ -49,7 +47,7 @@ fun FileManagerActivity.openFile(file: AboutFile) {
 }
 
 fun FileManagerActivity.openFolder(file: AboutFile) {
-    if (file.mimeType == FileManagerActivity.TYPE_FOLDER) {
+    if (file.mimeType == TYPE_FOLDER) {
         if (fmAdapter.btnSearchPressed)
             fileTreeDepth++
 
@@ -174,8 +172,8 @@ fun FileManagerActivity.deleteSelectedFiles() {
     AsyncDeleteSelected(this).execute(this)
 }
 
-fun FileManagerActivity.copySelectedFiles() {
-    AsyncCopySelected(this).execute(this)
+suspend fun FileManagerActivity.copySelectedFiles() {
+    asyncCopySelected()
 }
 
 fun FileManagerActivity.moveSelectedFiles() {

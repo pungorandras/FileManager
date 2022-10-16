@@ -18,6 +18,8 @@ import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
+import hu.pungor.filemanager.FileManagerActivity.Companion.TYPE_FOLDER
+import hu.pungor.filemanager.FileManagerActivity.Companion.TYPE_UNKNOWN
 import hu.pungor.filemanager.R
 import hu.pungor.filemanager.model.AboutFile
 import kotlinx.android.synthetic.main.item_file.view.*
@@ -38,11 +40,6 @@ class FileManagerAdapter : RecyclerView.Adapter<FileManagerAdapter.FileManagerVi
     var popupMenuPressed = false
 
     var itemClickListener: FileItemClickListener? = null
-
-    companion object {
-        private const val TYPE_FOLDER = "folder"
-        private const val TYPE_UNKNOWN = "unknown"
-    }
 
     @SuppressLint("InflateParams")
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FileManagerViewHolder {

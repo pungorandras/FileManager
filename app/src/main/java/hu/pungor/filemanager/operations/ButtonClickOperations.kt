@@ -16,7 +16,7 @@ import hu.pungor.filemanager.permissions.checkPermissionsAndLoadFiles
 import hu.pungor.filemanager.permissions.getSDCardPath
 import kotlinx.android.synthetic.main.activity_filemanager.*
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
 import permissions.dispatcher.PermissionRequest
 import java.io.File
@@ -121,7 +121,7 @@ fun FileManagerActivity.copySelectedOperation() {
     } else if (fmAdapter.btnCopyPressed) {
         fmAdapter.clearSelectedList = true
         fmAdapter.btnCopyPressed = false
-        copySelectedFiles()
+        CoroutineScope(Main).launch { copySelectedFiles() }
         fmAdapter.popupMenuPressed = false
 
         revertButtonState(
@@ -209,7 +209,7 @@ fun FileManagerActivity.searchButtonOperations() {
             positiveButtonFunctionality = {
                 val inputText = dialogView.findViewById<EditText>(R.id.name_input).text.toString()
                 if (inputText.isNotEmpty()) {
-                    CoroutineScope(Dispatchers.Main).launch {
+                    CoroutineScope(Main).launch {
                         latestPathBeforeAction = currentPath
                         result = search(inputText)
 

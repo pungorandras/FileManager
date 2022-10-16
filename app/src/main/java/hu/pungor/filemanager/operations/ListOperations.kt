@@ -2,6 +2,8 @@ package hu.pungor.filemanager.operations
 
 import android.webkit.MimeTypeMap
 import hu.pungor.filemanager.FileManagerActivity
+import hu.pungor.filemanager.FileManagerActivity.Companion.TYPE_FOLDER
+import hu.pungor.filemanager.FileManagerActivity.Companion.TYPE_UNKNOWN
 import hu.pungor.filemanager.model.AboutFile
 import java.io.File
 import java.util.*
@@ -18,13 +20,13 @@ fun FileManagerActivity.fillList(fileList: List<File>): List<AboutFile> {
             val name = if (fmAdapter.btnSearchPressed) uriWithoutPrefix else currentFile.name
 
             if (currentFile.isDirectory)
-                mutableFileList += AboutFile(name, "", uri, FileManagerActivity.TYPE_FOLDER, false)
+                mutableFileList += AboutFile(name, "", uri, TYPE_FOLDER, false)
             else if (mimeType.isNullOrEmpty())
                 mutableFileList += AboutFile(
                     name,
                     getSize(currentFile),
                     uri,
-                    FileManagerActivity.TYPE_UNKNOWN,
+                    TYPE_UNKNOWN,
                     false
                 )
             else
@@ -57,7 +59,7 @@ private fun getSize(file: File): String {
 }
 
 private fun sortList(list: List<AboutFile>): List<AboutFile> {
-    val folders = list.filter { it.mimeType == FileManagerActivity.TYPE_FOLDER }
+    val folders = list.filter { it.mimeType == TYPE_FOLDER }
     val files = list.subtract(folders.toSet())
     return folders.sortedWith(compareBy { it.name }) + files.sortedWith(compareBy { it.name })
 }

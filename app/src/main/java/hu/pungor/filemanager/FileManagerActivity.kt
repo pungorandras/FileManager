@@ -3,6 +3,7 @@ package hu.pungor.filemanager
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.util.Log
@@ -32,8 +33,8 @@ import java.io.File
 @RuntimePermissions
 class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClickListener {
 
+    val vcIsR = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
     val fmAdapter = FileManagerAdapter()
-
     var rootPath = File(Environment.getExternalStorageDirectory().absolutePath)
     var sdCardPath: File? = null
     var currentPath = rootPath
