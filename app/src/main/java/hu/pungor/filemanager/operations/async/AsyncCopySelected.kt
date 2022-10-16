@@ -36,21 +36,20 @@ suspend fun FileManagerActivity.asyncCopySelected() {
             val index = (selectedList.indexOf(element) + 1).toString()
             progressDialog.setProgressNumberFormat((index + "/" + selectedList.size))
 
-            if (!file.exists()) {
-                if (element.mimeType == TYPE_FOLDER && !currentPath.path.contains(element.path)) {
-                    if (currentPath.path.contains(rootPath.path) || vcIsR)
-                        copyFolder(File(element.path))
-                    else
-                        copyFolderToSDCard(File(element.path))
-                } else if (!currentPath.path.contains(element.path)) {
-                    copyState += File(element.path).length()
-                    progressDialog.progress = (copyState * 100 / selectedListSize).toInt()
 
-                    if (currentPath.path.contains(rootPath.path) || vcIsR)
-                        File(element.path).copyTo(file)
-                    else
-                        copyToSDCard(currentPath, File(element.path))
-                }
+            if (element.mimeType == TYPE_FOLDER && !currentPath.path.contains(element.path) && !file.exists()) {
+                if (currentPath.path.contains(rootPath.path) || vcIsR)
+                    copyFolder(File(element.path))
+                else
+                    copyFolderToSDCard(File(element.path))
+            } else if (!currentPath.path.contains(element.path) && !file.exists()) {
+                copyState += File(element.path).length()
+                progressDialog.progress = (copyState * 100 / selectedListSize).toInt()
+
+                if (currentPath.path.contains(rootPath.path) || vcIsR)
+                    File(element.path).copyTo(file)
+                else
+                    copyToSDCard(currentPath, File(element.path))
             } else if (file.exists()) {
                 withContext(Main) {
                     alreadyExistsDialog(element.name)
@@ -65,7 +64,7 @@ suspend fun FileManagerActivity.asyncCopySelected() {
                 break
         }
 
-        TODO("cancel job + dismiss dialog + list files")
+//        TODO("cancel job + progress dialog show and dismiss + list files")
 //        progressDialog.dismiss()
 //        listFiles()
     }
