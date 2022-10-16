@@ -137,7 +137,7 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
         if (currentPath != rootPath && currentPath != sdCardPath && !fmAdapter.btnSearchPressed) {
             val location = currentPathString.substring(0, currentPathString.lastIndexOf("/") + 1)
             currentPath = File(location)
-            loadFiles()
+            listFiles()
         } else if (fmAdapter.btnSearchPressed && fileTreeDepth > 0) {
             fileTreeDepth--
 
@@ -147,7 +147,7 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
                 val location =
                     currentPathString.substring(0, currentPathString.lastIndexOf("/") + 1)
                 currentPath = File(location)
-                loadFiles()
+                listFiles()
             }
         }
     }

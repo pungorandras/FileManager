@@ -15,10 +15,7 @@ import hu.pungor.filemanager.R
 import hu.pungor.filemanager.alertdialog.alreadyExistsDialog
 import hu.pungor.filemanager.alertdialog.nameIsNullDialog
 import hu.pungor.filemanager.model.AboutFile
-import hu.pungor.filemanager.operations.async.AsyncCopySelected
-import hu.pungor.filemanager.operations.async.AsyncDeleteSelected
-import hu.pungor.filemanager.operations.async.AsyncMoveSelected
-import hu.pungor.filemanager.operations.async.asyncSearch
+import hu.pungor.filemanager.operations.async.*
 import hu.pungor.filemanager.permissions.checkPermissionsAndLoadFiles
 import java.io.File
 import java.io.FileWriter
@@ -57,7 +54,7 @@ fun FileManagerActivity.openFolder(file: AboutFile) {
             fileTreeDepth++
 
         currentPath = File(file.path)
-        loadFiles()
+        listFiles()
     }
 }
 
@@ -86,7 +83,7 @@ fun FileManagerActivity.createTextFile(name: String, notes: String) {
                 fileWriter.append(notes)
                 fileWriter.flush()
                 fileWriter.close()
-                loadFiles()
+                listFiles()
             } else if (name.isEmpty())
                 nameIsNullDialog()
             else
@@ -95,8 +92,13 @@ fun FileManagerActivity.createTextFile(name: String, notes: String) {
             checkPermissionsAndLoadFiles()
         }
     } else {
-        createTextFileOnSDCard(name, notes)
-        checkPermissionsAndLoadFiles()
+        try {
+            createTextFileOnSDCard(name, notes)
+            listFiles()
+        } catch (e: Exception) {
+            checkPermissionsAndLoadFiles()
+        }
+
     }
 }
 
@@ -107,7 +109,7 @@ fun FileManagerActivity.createFolder(name: String) {
             val folder = File(currentPath, name)
             if (!folder.exists()) {
                 folder.mkdir()
-                loadFiles()
+                listFiles()
             } else if (name.isEmpty())
                 nameIsNullDialog()
             else
@@ -116,8 +118,12 @@ fun FileManagerActivity.createFolder(name: String) {
             checkPermissionsAndLoadFiles()
         }
     } else {
-        createFolderOnSDCard(currentPath, name)
-        checkPermissionsAndLoadFiles()
+        try {
+            createFolderOnSDCard(currentPath, name)
+            listFiles()
+        } catch (e: Exception) {
+            checkPermissionsAndLoadFiles()
+        }
     }
 }
 
@@ -161,10 +167,10 @@ fun FileManagerActivity.renameFile(view: View, position: Int) {
                             newName
                         )
                     )
-                    loadFiles()
+                    listFiles()
                 } else {
                     renameOnSDCard(currentItem, newName)
-                    loadFiles()
+                    listFiles()
                 }
             } else
                 nameIsNullDialog()

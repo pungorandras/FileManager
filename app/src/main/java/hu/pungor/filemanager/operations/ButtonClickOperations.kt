@@ -245,7 +245,7 @@ fun FileManagerActivity.searchButtonOperations() {
     } else {
         currentPath = latestPathBeforeAction
         fmAdapter.btnSearchPressed = false
-        loadFiles()
+        listFiles()
         Internal.isEnabled = true
         SDCard.isEnabled = true
 
