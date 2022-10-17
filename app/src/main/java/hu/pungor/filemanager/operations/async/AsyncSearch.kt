@@ -10,8 +10,9 @@ import hu.pungor.filemanager.FileManagerActivity
 import hu.pungor.filemanager.R
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.Dispatchers.Main
 import java.io.File
+
+private lateinit var searchResult: Deferred<MutableList<File>>
 
 @Suppress("DEPRECATION")
 suspend fun FileManagerActivity.asyncSearch(input: String): MutableList<File> {
@@ -22,22 +23,20 @@ suspend fun FileManagerActivity.asyncSearch(input: String): MutableList<File> {
         setSpan(AbsoluteSizeSpan(spanResource), 0, length, Spanned.SPAN_INCLUSIVE_INCLUSIVE)
     }
 
-    val progressDialog = withContext(Main) {
-        progressDialogBuilder(
-            titleText = R.string.searching,
-            message = sBuilder,
-            progressStyle = ProgressDialog.STYLE_SPINNER,
-            buttonFunctionality = { cancel() }
-        ).apply { show() }
-    }
+    val progressDialog = progressDialogBuilder(
+        titleText = R.string.searching,
+        message = sBuilder,
+        progressStyle = ProgressDialog.STYLE_SPINNER,
+        buttonFunctionality = { searchResult.cancel() }
+    ).apply { show() }
 
-    val searchResult = CoroutineScope(IO).async {
+    searchResult = CoroutineScope(IO).async {
         val result = mutableListOf<File>()
         currentPath.walk().takeWhile { isActive }.forEach {
             if (it.name.lowercase().contains(input.lowercase()) && it.path != currentPath.path)
                 result += it
             if (!isActive)
-                progressDialog.dismiss()
+                return@forEach
         }
         progressDialog.dismiss()
         return@async result

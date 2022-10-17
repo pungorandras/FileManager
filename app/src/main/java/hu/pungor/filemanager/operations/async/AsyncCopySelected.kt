@@ -15,19 +15,20 @@ import java.io.File
 
 private var selectedListSize = 0.0
 private var copyState = 0.0
-lateinit var progressDialog: ProgressDialog
+private lateinit var job: Job
+private lateinit var progressDialog: ProgressDialog
 
 @Suppress("DEPRECATION")
 suspend fun FileManagerActivity.asyncCopySelected() {
+    selectedListSize = 0.0
+    copyState = 0.0
 
-    progressDialog = withContext(Main) {
-        progressDialogBuilder(
-            titleText = R.string.copying,
-            buttonFunctionality = { cancel() }
-        ).apply { show() }
-    }
+    progressDialog = progressDialogBuilder(
+        titleText = R.string.copying,
+        buttonFunctionality = { job.cancel() }
+    ).apply { show() }
 
-    CoroutineScope(IO).launch {
+    job = CoroutineScope(IO).launch {
         val selectedList = fmAdapter.getSelectedList()
         selectedListSize = getSelectedListSize(selectedList)
 
@@ -35,7 +36,6 @@ suspend fun FileManagerActivity.asyncCopySelected() {
             val file = File(currentPath.path + "/" + element.name)
             val index = (selectedList.indexOf(element) + 1).toString()
             progressDialog.setProgressNumberFormat((index + "/" + selectedList.size))
-
 
             if (element.mimeType == TYPE_FOLDER && !currentPath.path.contains(element.path) && !file.exists()) {
                 if (currentPath.path.contains(rootPath.path) || vcIsR)
@@ -63,52 +63,47 @@ suspend fun FileManagerActivity.asyncCopySelected() {
             if (!isActive)
                 break
         }
-
-//        TODO("cancel job + progress dialog show and dismiss + list files")
-//        progressDialog.dismiss()
-//        listFiles()
     }
+
+    job.join()
+    progressDialog.dismiss()
+    listFiles()
 }
 
 @Suppress("DEPRECATION")
 private fun FileManagerActivity.copyFolder(folder: File) {
-    CoroutineScope(IO).launch {
-        for (src in folder.walkTopDown()) {
-            val relPath = folder.parentFile?.let { src.toRelativeString(it) }
-            val dstFile = relPath?.let { File(currentPath, it) }
+    for (src in folder.walkTopDown()) {
+        val relPath = folder.parentFile?.let { src.toRelativeString(it) }
+        val dstFile = relPath?.let { File(currentPath, it) }
 
-            copyState += src.length()
-            progressDialog.progress = (copyState * 100 / selectedListSize).toInt()
+        copyState += src.length()
+        progressDialog.progress = (copyState * 100 / selectedListSize).toInt()
 
-            if (src.isDirectory)
-                dstFile?.mkdirs()
-            else
-                dstFile?.let { src.copyTo(it) }
+        if (src.isDirectory)
+            dstFile?.mkdirs()
+        else
+            dstFile?.let { src.copyTo(it) }
 
-            if (!isActive)
-                break
-        }
+        if (!job.isActive)
+            break
     }
-
 }
 
 @Suppress("DEPRECATION")
 private fun FileManagerActivity.copyFolderToSDCard(folder: File) {
-    CoroutineScope(IO).launch {
-        for (src in folder.walkTopDown()) {
-            val relPath = folder.parentFile?.let { src.toRelativeString(it) }
-            val dstFile = relPath?.let { File(currentPath, it) }
+    for (src in folder.walkTopDown()) {
+        val relPath = folder.parentFile?.let { src.toRelativeString(it) }
+        val dstFile = relPath?.let { File(currentPath, it) }
 
-            copyState += src.length()
-            progressDialog.progress = (copyState * 100 / selectedListSize).toInt()
+        copyState += src.length()
+        progressDialog.progress = (copyState * 100 / selectedListSize).toInt()
 
-            if (src.isDirectory)
-                dstFile?.parentFile?.let { createFolderOnSDCard(it, src.name) }
-            else
-                dstFile?.parentFile?.let { copyToSDCard(it, src) }
+        if (src.isDirectory)
+            dstFile?.parentFile?.let { createFolderOnSDCard(it, src.name) }
+        else
+            dstFile?.parentFile?.let { copyToSDCard(it, src) }
 
-            if (!isActive)
-                break
-        }
+        if (!job.isActive)
+            break
     }
 }
