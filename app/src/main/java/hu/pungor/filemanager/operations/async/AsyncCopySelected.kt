@@ -94,6 +94,7 @@ private fun FileManagerActivity.copyFolderToSDCard(folder: File) {
     }
 }
 
+@Suppress("DEPRECATION")
 private fun FileManagerActivity.copy(fileObject: AboutFile) {
     val file = File(currentPath.path + "/" + fileObject.name)
 
