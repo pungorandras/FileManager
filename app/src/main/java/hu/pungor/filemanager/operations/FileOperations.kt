@@ -6,12 +6,11 @@ import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.widget.EditText
-import android.widget.TextView
-import androidx.appcompat.app.AlertDialog
 import androidx.core.content.FileProvider
 import hu.pungor.filemanager.FileManagerActivity
 import hu.pungor.filemanager.FileManagerActivity.Companion.TYPE_FOLDER
 import hu.pungor.filemanager.R
+import hu.pungor.filemanager.alertdialog.alertDialogBuilder
 import hu.pungor.filemanager.alertdialog.alreadyExistsDialog
 import hu.pungor.filemanager.alertdialog.nameIsNullDialog
 import hu.pungor.filemanager.model.AboutFile
@@ -131,41 +130,28 @@ fun FileManagerActivity.shareFile(view: View, position: Int) {
 @SuppressLint("InflateParams")
 fun FileManagerActivity.renameFile(view: View, position: Int) {
     val currentItem = fmAdapter.getItem(position)
-
     val dialogView = LayoutInflater.from(view.context).inflate(R.layout.layout_dialog, null)
     dialogView.findViewById<EditText>(R.id.name_input).setText(currentItem.name)
 
-    val customTitle = LayoutInflater.from(this).inflate(R.layout.custom_title, null)
-    customTitle.findViewById<TextView>(R.id.title_text).text = getString(R.string.rename)
-
-    val builder = AlertDialog.Builder(view.context)
-        .setView(dialogView)
-        .setCustomTitle(customTitle)
-        .setCancelable(false)
-        .setPositiveButton(getString(R.string.ok)) { dialog, which ->
+    alertDialogBuilder(
+        titleText = R.string.rename,
+        dialogLayout = dialogView,
+        positiveButtonFunctionality = {
             val file = File(currentItem.path)
             val newName = dialogView.findViewById<EditText>(R.id.name_input).text.toString()
 
             if (newName.isNotEmpty()) {
-                if (currentPath.toString()
-                        .contains(sdCardPath.toString()) || vcIsR
-                ) {
-                    file.renameTo(
-                        File(
-                            currentPath,
-                            newName
-                        )
-                    )
-                    listFiles()
-                } else {
+                if (sdCardPath?.let { currentPath.path.contains(it.path) } == true || vcIsR)
+                    file.renameTo(File(currentPath, newName))
+                else
                     renameOnSDCard(currentItem, newName)
-                    listFiles()
-                }
+
+                listFiles()
             } else
                 nameIsNullDialog()
-        }
-        .setNegativeButton(getString(R.string.cancel), null)
-    builder.show()
+        },
+        negativeButtonLabel = R.string.cancel
+    )?.show()
 }
 
 fun FileManagerActivity.deleteSelectedFiles() {

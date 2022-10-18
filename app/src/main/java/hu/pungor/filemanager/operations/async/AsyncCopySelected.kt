@@ -6,6 +6,7 @@ import hu.pungor.filemanager.FileManagerActivity.Companion.TYPE_FOLDER
 import hu.pungor.filemanager.R
 import hu.pungor.filemanager.alertdialog.alreadyExistsDialog
 import hu.pungor.filemanager.alertdialog.copyOrMoveIntoItselfDialog
+import hu.pungor.filemanager.model.AboutFile
 import hu.pungor.filemanager.operations.copyToSDCard
 import hu.pungor.filemanager.operations.createFolderOnSDCard
 import kotlinx.coroutines.*
@@ -37,28 +38,13 @@ suspend fun FileManagerActivity.asyncCopySelected() {
             val index = (selectedList.indexOf(element) + 1).toString()
             progressDialog.setProgressNumberFormat((index + "/" + selectedList.size))
 
-            if (element.mimeType == TYPE_FOLDER && !currentPath.path.contains(element.path) && !file.exists()) {
-                if (currentPath.path.contains(rootPath.path) || vcIsR)
-                    copyFolder(File(element.path))
+            if (!currentPath.path.contains(element.path)) {
+                if (!file.exists())
+                    copy(element)
                 else
-                    copyFolderToSDCard(File(element.path))
-            } else if (!currentPath.path.contains(element.path) && !file.exists()) {
-                copyState += File(element.path).length()
-                progressDialog.progress = (copyState * 100 / selectedListSize).toInt()
-
-                if (currentPath.path.contains(rootPath.path) || vcIsR)
-                    File(element.path).copyTo(file)
-                else
-                    copyToSDCard(currentPath, File(element.path))
-            } else if (file.exists()) {
-                withContext(Main) {
-                    alreadyExistsDialog(element.name)
-                }
-            } else {
-                withContext(Main) {
-                    copyOrMoveIntoItselfDialog("copy")
-                }
-            }
+                    withContext(Main) { alreadyExistsDialog(element.name) }
+            } else
+                withContext(Main) { copyOrMoveIntoItselfDialog("copy") }
 
             if (!isActive)
                 break
@@ -105,5 +91,24 @@ private fun FileManagerActivity.copyFolderToSDCard(folder: File) {
 
         if (!job.isActive)
             break
+    }
+}
+
+private fun FileManagerActivity.copy(fileObject: AboutFile) {
+    val file = File(currentPath.path + "/" + fileObject.name)
+
+    if (fileObject.mimeType == TYPE_FOLDER) {
+        if (currentPath.path.contains(rootPath.path) || vcIsR)
+            copyFolder(File(fileObject.path))
+        else
+            copyFolderToSDCard(File(fileObject.path))
+    } else {
+        copyState += File(fileObject.path).length()
+        progressDialog.progress = (copyState * 100 / selectedListSize).toInt()
+
+        if (currentPath.path.contains(rootPath.path) || vcIsR)
+            File(fileObject.path).copyTo(file)
+        else
+            copyToSDCard(currentPath, File(fileObject.path))
     }
 }

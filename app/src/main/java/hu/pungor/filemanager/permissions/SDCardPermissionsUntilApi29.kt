@@ -5,11 +5,9 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.util.Log
-import android.view.LayoutInflater
-import android.widget.TextView
-import androidx.appcompat.app.AlertDialog
 import hu.pungor.filemanager.FileManagerActivity
 import hu.pungor.filemanager.R
+import hu.pungor.filemanager.alertdialog.alertDialogBuilder
 import java.io.File
 import java.util.regex.Pattern
 
@@ -47,21 +45,13 @@ fun FileManagerActivity.getUri(): Uri? {
 
 @SuppressLint("InflateParams")
 fun FileManagerActivity.sdCardPermissionsBuilder() {
-    val customTitle =
-        LayoutInflater.from(this).inflate(R.layout.custom_title, null)
-    customTitle.findViewById<TextView>(R.id.title_text).text = getString(R.string.info)
-    val customText =
-        LayoutInflater.from(this).inflate(R.layout.custom_text_alertdialog, null)
-    customText.findViewById<TextView>(R.id.custom_text).text = getString(R.string.sdcard_permission)
-
-    val builder = AlertDialog.Builder(this)
-        .setCustomTitle(customTitle)
-        .setView(customText)
-        .setCancelable(false)
-        .setPositiveButton(getString(R.string.ok)) { dialog, which ->
+    alertDialogBuilder(
+        titleText = R.string.info,
+        dialogText = R.string.sdcard_permission,
+        positiveButtonFunctionality = {
             startActivityForResult(Intent(Intent.ACTION_OPEN_DOCUMENT_TREE), 1001)
         }
-    builder.show()
+    )?.show()
 }
 
 fun FileManagerActivity.activityResult(requestCode: Int, data: Intent?) {
