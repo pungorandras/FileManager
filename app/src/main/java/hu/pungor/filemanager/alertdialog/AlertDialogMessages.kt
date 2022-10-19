@@ -29,12 +29,17 @@ fun FileManagerActivity.alertDialogBuilder(
         dialogView.findViewById<TextView>(R.id.custom_text).text =
             if (dialogText is Int) getString(dialogText) else dialogText as CharSequence
 
-    return AlertDialog.Builder(this).setCustomTitle(titleTextView).setView(dialogView)
-        .setCancelable(false).setPositiveButton(getString(positiveButtonLabel)) { _, _ ->
+    return AlertDialog.Builder(this).apply {
+        setCustomTitle(titleTextView)
+        setView(dialogView)
+        setCancelable(false)
+        setPositiveButton(getString(positiveButtonLabel)) { _, _ ->
             positiveButtonFunctionality?.invoke()
-        }.setNegativeButton(negativeButtonLabel?.let { getString(it) }) { _, _ ->
+        }
+        setNegativeButton(negativeButtonLabel?.let { getString(it) }) { _, _ ->
             negativeButtonFunctionality?.invoke()
         }
+    }
 }
 
 fun FileManagerActivity.noItemsSelectedDialog() {

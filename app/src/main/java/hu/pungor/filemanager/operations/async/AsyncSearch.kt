@@ -35,8 +35,6 @@ suspend fun FileManagerActivity.asyncSearch(input: String): MutableList<File> {
         currentPath.walk().takeWhile { isActive }.forEach {
             if (it.name.lowercase().contains(input.lowercase()) && it.path != currentPath.path)
                 result += it
-            if (!isActive)
-                return@forEach
         }
         progressDialog.dismiss()
         return@async result

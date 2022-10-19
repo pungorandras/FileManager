@@ -83,7 +83,7 @@ fun FileManagerActivity.deleteSelectedDialog() {
         dialogText = message,
         positiveButtonLabel = R.string.yes,
         positiveButtonFunctionality = {
-            deleteSelectedFiles()
+            CoroutineScope(Main).launch { deleteSelectedFiles() }
             fmAdapter.popupMenuPressed = false
         },
         negativeButtonLabel = R.string.no,

@@ -154,8 +154,8 @@ fun FileManagerActivity.renameFile(view: View, position: Int) {
     )?.show()
 }
 
-fun FileManagerActivity.deleteSelectedFiles() {
-    AsyncDeleteSelected(this).execute(this)
+suspend fun FileManagerActivity.deleteSelectedFiles() {
+    asyncDeleteSelected()
 }
 
 suspend fun FileManagerActivity.copySelectedFiles() {

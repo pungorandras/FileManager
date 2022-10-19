@@ -165,13 +165,19 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
     override fun onItemLongClick(position: Int, view: View) {
         if (!fmAdapter.btnSearchPressed && !fmAdapter.btnCopyPressed && !fmAdapter.btnMovePressed) {
             val wrapper = ContextThemeWrapper(this, R.style.NoPopupAnimation)
-            val popup = PopupMenu(wrapper, view, Gravity.END)
-            popup.inflate(R.menu.menu_options)
+            val popup = PopupMenu(wrapper, view, Gravity.END).apply { inflate(R.menu.menu_options) }
+            val currentItem = fmAdapter.getItem(position)
+
+            if (currentItem.mimeType == TYPE_FOLDER) {
+                val menu = popup.menu
+                menu.findItem(R.id.open_with).isVisible = false
+                menu.findItem(R.id.share).isVisible = false
+            }
 
             popup.setOnMenuItemClickListener { item ->
                 when (item.itemId) {
                     R.id.open_with -> {
-                        openUnknown(fmAdapter.getItem(position))
+                        openUnknown(currentItem)
                         true
                     }
                     R.id.share -> {

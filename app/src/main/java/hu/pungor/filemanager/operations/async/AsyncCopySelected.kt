@@ -16,7 +16,7 @@ import java.io.File
 
 private var selectedListSize = 0.0
 private var copyState = 0.0
-private lateinit var job: Job
+private lateinit var copyJob: Job
 private lateinit var progressDialog: ProgressDialog
 
 @Suppress("DEPRECATION")
@@ -26,10 +26,10 @@ suspend fun FileManagerActivity.asyncCopySelected() {
 
     progressDialog = progressDialogBuilder(
         titleText = R.string.copying,
-        buttonFunctionality = { job.cancel() }
+        buttonFunctionality = { copyJob.cancel() }
     ).apply { show() }
 
-    job = CoroutineScope(IO).launch {
+    copyJob = CoroutineScope(IO).launch {
         val selectedList = fmAdapter.getSelectedList()
         selectedListSize = getSelectedListSize(selectedList)
 
@@ -51,7 +51,7 @@ suspend fun FileManagerActivity.asyncCopySelected() {
         }
     }
 
-    job.join()
+    copyJob.join()
     progressDialog.dismiss()
     listFiles()
 }
@@ -70,7 +70,7 @@ private fun FileManagerActivity.copyFolder(folder: File) {
         else
             dstFile?.let { src.copyTo(it) }
 
-        if (!job.isActive)
+        if (!copyJob.isActive)
             break
     }
 }
@@ -89,7 +89,7 @@ private fun FileManagerActivity.copyFolderToSDCard(folder: File) {
         else
             dstFile?.parentFile?.let { copyToSDCard(it, src) }
 
-        if (!job.isActive)
+        if (!copyJob.isActive)
             break
     }
 }
