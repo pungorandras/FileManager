@@ -20,9 +20,8 @@ fun FileManagerActivity.copyToSDCard(dstPath: File, file: File) {
 
     bufferedInput.use { input ->
         bufferedOutput.use { output ->
-            if (output != null) {
+            if (output != null)
                 input.copyTo(output, bufferSize)
-            }
         }
     }
 
@@ -54,7 +53,7 @@ fun FileManagerActivity.deleteOnSDCard(path: File, file: File) {
 fun FileManagerActivity.getChildren(dstPath: File): DocumentFile? {
     try {
         var id = DocumentsContract.getTreeDocumentId(getUri())
-        id += dstPath.toString().removePrefix(sdCardPath.toString())
+        id += sdCardPath?.let { dstPath.path.removePrefix(it.path) }
         val childrenUri =
             DocumentsContract.buildDocumentUriUsingTree(getUri(), id)
         return DocumentFile.fromTreeUri(this, childrenUri)

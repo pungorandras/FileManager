@@ -28,10 +28,9 @@ fun FileManagerActivity.progressDialogBuilder(
         max = 100
         progress = 0
         setCancelable(false)
-        setButton(
-            DialogInterface.BUTTON_NEGATIVE,
-            getString(R.string.cancel)
-        ) { _, _ -> buttonFunctionality.invoke() }
+        setButton(DialogInterface.BUTTON_NEGATIVE, getString(R.string.cancel)) { _, _ ->
+            buttonFunctionality.invoke()
+        }
     }
 }
 

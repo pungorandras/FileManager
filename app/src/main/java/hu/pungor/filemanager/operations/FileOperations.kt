@@ -22,7 +22,7 @@ import java.io.FileWriter
 fun FileManagerActivity.openFile(file: AboutFile) {
     val intent = Intent(Intent.ACTION_VIEW)
 
-    if (currentPath.toString().contains(rootPath.toString()) || vcIsR) {
+    if (currentPath.path.contains(rootPath.path) || vcIsR) {
         intent.setDataAndType(
             FileProvider.getUriForFile(
                 this,
@@ -31,8 +31,7 @@ fun FileManagerActivity.openFile(file: AboutFile) {
             ), file.mimeType
         )
     } else {
-        val uri = getChildren(currentPath)
-            ?.findFile(file.name)?.uri
+        val uri = getChildren(currentPath)?.findFile(file.name)?.uri
         intent.setDataAndType(uri, file.mimeType)
     }
 
@@ -60,7 +59,8 @@ fun FileManagerActivity.openUnknown(file: AboutFile) {
 
     intent.setDataAndType(
         FileProvider.getUriForFile(
-            applicationContext, "$packageName.provider",
+            this,
+            "$packageName.provider",
             File(file.path)
         ), "*/*"
     )
@@ -119,7 +119,7 @@ fun FileManagerActivity.shareFile(view: View, position: Int) {
     val intent = Intent(Intent.ACTION_SEND)
     intent.putExtra(
         Intent.EXTRA_STREAM, FileProvider.getUriForFile(
-            view.context, view.context.packageName + ".provider",
+            view.context, "$packageName.provider",
             File(fmAdapter.getItem(position).path)
         )
     )
@@ -162,8 +162,8 @@ suspend fun FileManagerActivity.copySelectedFiles() {
     asyncCopySelected()
 }
 
-fun FileManagerActivity.moveSelectedFiles() {
-    AsyncMoveSelected(this).execute(this)
+suspend fun FileManagerActivity.moveSelectedFiles() {
+    asyncMoveSelected()
 }
 
 suspend fun FileManagerActivity.search(input: String): MutableList<File> {

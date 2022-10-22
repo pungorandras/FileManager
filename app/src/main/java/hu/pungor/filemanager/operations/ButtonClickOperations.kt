@@ -155,7 +155,7 @@ fun FileManagerActivity.moveSelectedOperation() {
     } else if (fmAdapter.btnMovePressed) {
         fmAdapter.clearSelectedList = true
         fmAdapter.btnMovePressed = false
-        moveSelectedFiles()
+        CoroutineScope(Main).launch { moveSelectedFiles() }
         fmAdapter.popupMenuPressed = false
 
         revertButtonState(

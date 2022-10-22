@@ -34,12 +34,12 @@ suspend fun FileManagerActivity.asyncCopySelected() {
         selectedListSize = getSelectedListSize(selectedList)
 
         for (element in selectedList) {
-            val file = File(currentPath.path + "/" + element.name)
+            val dstObj = File(currentPath.path + "/" + element.name)
             val index = (selectedList.indexOf(element) + 1).toString()
-            progressDialog.setProgressNumberFormat((index + "/" + selectedList.size))
+            progressDialog.setProgressNumberFormat(index + "/" + selectedList.size)
 
             if (!currentPath.path.contains(element.path)) {
-                if (!file.exists())
+                if (!dstObj.exists())
                     copy(element)
                 else
                     withContext(Main) { alreadyExistsDialog(element.name) }
@@ -57,7 +57,7 @@ suspend fun FileManagerActivity.asyncCopySelected() {
 }
 
 @Suppress("DEPRECATION")
-private fun FileManagerActivity.copyFolder(folder: File) {
+private fun FileManagerActivity.copyFolderToInternal(folder: File) {
     for (src in folder.walkTopDown()) {
         val relPath = folder.parentFile?.let { src.toRelativeString(it) }
         val dstFile = relPath?.let { File(currentPath, it) }
@@ -100,7 +100,7 @@ private fun FileManagerActivity.copy(fileObject: AboutFile) {
 
     if (fileObject.mimeType == TYPE_FOLDER) {
         if (currentPath.path.contains(rootPath.path) || vcIsR)
-            copyFolder(File(fileObject.path))
+            copyFolderToInternal(File(fileObject.path))
         else
             copyFolderToSDCard(File(fileObject.path))
     } else {

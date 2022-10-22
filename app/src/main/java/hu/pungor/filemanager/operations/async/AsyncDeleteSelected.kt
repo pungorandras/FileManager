@@ -13,7 +13,7 @@ import java.io.File
 
 private var selectedListSize = 0.0
 private var deleteState = 0.0
-private lateinit var deleteJob: Job
+lateinit var deleteJob: Job
 private lateinit var progressDialog: ProgressDialog
 
 @Suppress("DEPRECATION")
@@ -32,7 +32,8 @@ suspend fun FileManagerActivity.asyncDeleteSelected() {
 
         for (position in selectedList.indices) {
             val fileObject = selectedList[position]
-            progressDialog.setProgressNumberFormat(((position + 1).toString() + "/" + selectedList.size))
+            val index = (position + 1).toString()
+            progressDialog.setProgressNumberFormat(index + "/" + selectedList.size)
 
             delete(fileObject)
 

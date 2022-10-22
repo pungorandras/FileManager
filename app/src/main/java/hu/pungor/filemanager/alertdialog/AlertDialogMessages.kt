@@ -17,7 +17,7 @@ fun FileManagerActivity.alertDialogBuilder(
     positiveButtonFunctionality: (() -> Unit)? = null,
     negativeButtonLabel: Int? = null,
     negativeButtonFunctionality: (() -> Unit)? = null
-): AlertDialog.Builder? {
+): AlertDialog.Builder {
     val titleTextView = LayoutInflater.from(this).inflate(R.layout.custom_title, null)
     titleTextView.findViewById<TextView>(R.id.title_text).text =
         if (titleText is Int) getString(titleText) else titleText as CharSequence
