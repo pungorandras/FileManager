@@ -99,7 +99,7 @@ private fun FileManagerActivity.moveFolderToSDCard(folder: File) {
     }
 }
 
-private fun FileManagerActivity.folderMovingLogicToSDCard(folder: AboutFile) {
+private fun FileManagerActivity.folderMovingStepsToSDCard(folder: AboutFile) {
     val folderObj = File(folder.path)
 
     if (vcIsR)
@@ -117,7 +117,7 @@ private fun FileManagerActivity.folderMovingLogicToSDCard(folder: AboutFile) {
 }
 
 @Suppress("DEPRECATION")
-private fun FileManagerActivity.fileMovingLogicToSDCard(file: AboutFile, dstFile: File) {
+private fun FileManagerActivity.fileMovingStepsToSDCard(file: AboutFile, dstFile: File) {
     val fileObj = File(file.path)
 
     moveState += fileObj.length()
@@ -137,7 +137,7 @@ private fun FileManagerActivity.fileMovingLogicToSDCard(file: AboutFile, dstFile
     }
 }
 
-private fun FileManagerActivity.folderMovingLogicToInternal(
+private fun FileManagerActivity.folderMovingStepsToInternal(
     folder: AboutFile,
     dstFolder: File
 ) {
@@ -158,7 +158,7 @@ private fun FileManagerActivity.folderMovingLogicToInternal(
 }
 
 @Suppress("DEPRECATION")
-private fun FileManagerActivity.fileMovingLogicToInternal(file: AboutFile, dstFile: File) {
+private fun FileManagerActivity.fileMovingStepsToInternal(file: AboutFile, dstFile: File) {
     val fileObj = File(file.path)
 
     moveState += fileObj.length()
@@ -181,13 +181,13 @@ private fun FileManagerActivity.fileMovingLogicToInternal(file: AboutFile, dstFi
 private fun FileManagerActivity.move(srcObj: AboutFile, dstObj: File) {
     if (sdCardPath?.let { currentPath.path.contains(it.path) } == true) {
         if (srcObj.mimeType == TYPE_FOLDER)
-            folderMovingLogicToSDCard(srcObj)
+            folderMovingStepsToSDCard(srcObj)
         else
-            fileMovingLogicToSDCard(srcObj, dstObj)
+            fileMovingStepsToSDCard(srcObj, dstObj)
     } else if (currentPath.path.contains(rootPath.path)) {
         if (srcObj.mimeType == TYPE_FOLDER)
-            folderMovingLogicToInternal(srcObj, dstObj)
+            folderMovingStepsToInternal(srcObj, dstObj)
         else
-            fileMovingLogicToInternal(srcObj, dstObj)
+            fileMovingStepsToInternal(srcObj, dstObj)
     }
 }
