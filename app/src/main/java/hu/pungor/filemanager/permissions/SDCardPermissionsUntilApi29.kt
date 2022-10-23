@@ -51,7 +51,7 @@ fun FileManagerActivity.sdCardPermissionsBuilder() {
         positiveButtonFunctionality = {
             startActivityForResult(Intent(Intent.ACTION_OPEN_DOCUMENT_TREE), 1001)
         }
-    )?.show()
+    ).show()
 }
 
 fun FileManagerActivity.activityResult(requestCode: Int, data: Intent?) {

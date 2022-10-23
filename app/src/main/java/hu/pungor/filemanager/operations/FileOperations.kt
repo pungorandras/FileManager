@@ -151,7 +151,7 @@ fun FileManagerActivity.renameFile(view: View, position: Int) {
                 nameIsNullDialog()
         },
         negativeButtonLabel = R.string.cancel
-    )?.show()
+    ).show()
 }
 
 suspend fun FileManagerActivity.deleteSelectedFiles() {

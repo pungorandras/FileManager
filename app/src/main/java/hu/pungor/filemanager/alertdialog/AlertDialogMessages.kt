@@ -46,21 +46,21 @@ fun FileManagerActivity.noItemsSelectedDialog() {
     alertDialogBuilder(
         titleText = R.string.no_items_selected,
         dialogText = R.string.to_select_items
-    )?.show()
+    ).show()
 }
 
 fun FileManagerActivity.alreadyExistsDialog(name: String) {
     alertDialogBuilder(
         titleText = name,
         dialogText = R.string.already_exist
-    )?.show()
+    ).show()
 }
 
 fun FileManagerActivity.nameIsNullDialog() {
     alertDialogBuilder(
         titleText = R.string.empty_name,
         dialogText = R.string.enter_name
-    )?.show()
+    ).show()
 }
 
 fun FileManagerActivity.copyOrMoveIntoItselfDialog(copyOrMove: String) {
@@ -73,12 +73,12 @@ fun FileManagerActivity.copyOrMoveIntoItselfDialog(copyOrMove: String) {
     alertDialogBuilder(
         titleText = getString(R.string.attention),
         dialogText = text
-    )?.show()
+    ).show()
 }
 
 fun FileManagerActivity.noResultsDialog() {
     alertDialogBuilder(
         titleText = R.string.info,
         dialogText = R.string.no_results
-    )?.show()
+    ).show()
 }

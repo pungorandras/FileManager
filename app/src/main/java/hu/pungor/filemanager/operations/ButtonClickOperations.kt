@@ -40,7 +40,7 @@ fun FileManagerActivity.createTextFileDialog() {
             )
         },
         negativeButtonLabel = R.string.cancel
-    )?.show()
+    ).show()
 }
 
 @SuppressLint("InflateParams")
@@ -54,7 +54,7 @@ fun FileManagerActivity.createFolderDialog() {
             createFolder(dialogView.findViewById<EditText>(R.id.name_input).text.toString())
         },
         negativeButtonLabel = R.string.cancel
-    )?.show()
+    ).show()
 }
 
 fun FileManagerActivity.selectAllOperation() {
@@ -97,7 +97,7 @@ fun FileManagerActivity.deleteSelectedDialog() {
     )
 
     if (!selectedList.isNullOrEmpty())
-        builder?.show()
+        builder.show()
     else
         noItemsSelectedDialog()
 }
@@ -241,7 +241,7 @@ fun FileManagerActivity.searchButtonOperations() {
                     nameIsNullDialog()
             },
             negativeButtonLabel = R.string.cancel
-        )?.show()
+        ).show()
     } else {
         currentPath = latestPathBeforeAction
         fmAdapter.btnSearchPressed = false
@@ -332,5 +332,5 @@ fun FileManagerActivity.showRationaleForStoragePermissionsDialog(request: Permis
         positiveButtonFunctionality = { request.proceed() },
         negativeButtonLabel = R.string.exit,
         negativeButtonFunctionality = { request.cancel() }
-    )?.show()
+    ).show()
 }
