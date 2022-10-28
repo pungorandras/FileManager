@@ -24,21 +24,17 @@ fun FileManagerActivity.getSDCardPath(): File? {
         }
     } else if ((getUri() == null)) {
         sdCardPermissionsBuilder()
+    } else
         return File("/storage/" + getUri()?.path?.let { regex.find(it)?.value })
-    }
     return null
 }
 
 fun FileManagerActivity.getUri(): Uri? {
-    try {
-        val persistedUriPermissions =
-            contentResolver.persistedUriPermissions
-        if (persistedUriPermissions.size > 0) {
-            val uriPermission = persistedUriPermissions[0]
-            return uriPermission.uri
-        }
-    } catch (e: Exception) {
-        sdCardPermissionsBuilder()
+    val persistedUriPermissions =
+        contentResolver.persistedUriPermissions
+    if (persistedUriPermissions.size > 0) {
+        val uriPermission = persistedUriPermissions[0]
+        return uriPermission.uri
     }
     return null
 }

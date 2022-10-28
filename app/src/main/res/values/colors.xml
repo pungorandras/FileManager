@@ -10,4 +10,6 @@
     <color name="disabled">#757575</color>
     <color name="scrollbar">#9E9E9E</color>
     <color name="item_ripple">#9E9E9E</color>
+    <color name="progressbar_layout_bg">#212121</color>
+    <color name="progressbar">#E91E63</color>
 </resources>
