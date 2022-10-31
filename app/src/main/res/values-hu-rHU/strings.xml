@@ -66,4 +66,5 @@
     <string name="switch_source">Forrás váltás</string>
     <string name="switch_source_msg">A belső tárhely és az SD-kártya között válthatsz, ha van behelyezett SD-kártya.</string>
     <string name="version">"Verzió: "</string>
+    <string name="placeholder">Helykitöltő</string>
 </resources>

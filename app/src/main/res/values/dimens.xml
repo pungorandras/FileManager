@@ -6,4 +6,9 @@
     <dimen name="top_button_height">60dp</dimen>
     <dimen name="progress_layout_height">45dp</dimen>
     <dimen name="wait">15dp</dimen>
+    <dimen name="progressbar_margin_start_end">10dp</dimen>
+    <dimen name="progressbar_margin_top_bottom">12dp</dimen>
+    <dimen name="progressbar_title_size">12dp</dimen>
+    <dimen name="scrollbar_size">6dp</dimen>
+    <dimen name="progress_stop_button_width">80dp</dimen>
 </resources>

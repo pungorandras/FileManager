@@ -10,7 +10,7 @@
     <string name="type_a_name_here">Type a name here</string>
     <string name="no_items_selected">No items selected</string>
     <string name="to_select_items">To select items click on their icons.</string>
-    <string name="ok">Ok</string>
+    <string name="ok">OK</string>
     <string name="already_exist">Already exists!</string>
     <string name="empty_name">Empty name</string>
     <string name="enter_name">Please enter a name!</string>
@@ -65,4 +65,5 @@
     <string name="switch_source">Switch source</string>
     <string name="switch_source_msg">You can switch between internal storage and SD card, if an SD card is inserted.</string>
     <string name="version">"Version: "</string>
+    <string name="placeholder">Placeholder</string>
 </resources>
