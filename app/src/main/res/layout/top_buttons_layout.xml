@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/top_buttons_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:baselineAligned="false"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent">
+
+    <Button
+        android:id="@+id/Internal"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/top_button_height"
+        android:layout_weight="1"
+        android:backgroundTint="@color/button_pressed"
+        android:drawableStart="@drawable/phone_storage"
+        android:text="@string/phone_storage"
+        android:textColor="@color/white" />
+
+    <Button
+        android:id="@+id/SDCard"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/top_button_height"
+        android:layout_weight="1"
+        android:backgroundTint="@color/button"
+        android:drawableStart="@drawable/sdcard"
+        android:text="@string/sd_card"
+        android:textColor="@color/white" />
+
+</LinearLayout>

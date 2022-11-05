@@ -22,6 +22,9 @@ import hu.pungor.filemanager.operations.async.listFiles
 import hu.pungor.filemanager.permissions.activityResult
 import hu.pungor.filemanager.permissions.checkPermissionsAndLoadFiles
 import kotlinx.android.synthetic.main.activity_filemanager.*
+import kotlinx.android.synthetic.main.bottom_buttons_layout.*
+import kotlinx.android.synthetic.main.filemanager_recyclerview.*
+import kotlinx.android.synthetic.main.top_buttons_layout.*
 import permissions.dispatcher.NeedsPermission
 import permissions.dispatcher.OnShowRationale
 import permissions.dispatcher.PermissionRequest

@@ -4,11 +4,17 @@ import android.app.ProgressDialog
 import android.content.DialogInterface
 import android.text.SpannableStringBuilder
 import android.view.LayoutInflater
+import android.view.View
+import android.widget.RelativeLayout
 import android.widget.TextView
 import hu.pungor.filemanager.FileManagerActivity
 import hu.pungor.filemanager.FileManagerActivity.Companion.TYPE_FOLDER
 import hu.pungor.filemanager.R
 import hu.pungor.filemanager.model.AboutFile
+import ir.nardana.linearprogressbar.LinearProgressBar
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers.Main
+import kotlinx.coroutines.launch
 import java.io.File
 
 @Suppress("DEPRECATION")
@@ -32,6 +38,21 @@ fun FileManagerActivity.progressDialogBuilder(
             buttonFunctionality.invoke()
         }
     }
+}
+
+fun FileManagerActivity.progressBarBuilder(titleText: Int): LinearProgressBar {
+    setProgressLayoutVisibility(View.VISIBLE)
+    return findViewById<LinearProgressBar>(R.id.LinearProgressBar).apply {
+        setTitleProgress(getString(titleText))
+    }
+}
+
+fun FileManagerActivity.setProgressLayoutVisibility(visibility: Int) {
+    findViewById<RelativeLayout>(R.id.progressbar_layout).visibility = visibility
+}
+
+fun setProgressBarState(progressBar: LinearProgressBar, progressState: Double) {
+    CoroutineScope(Main).launch { progressBar.setToProgressPercent(progressState.toFloat()) }
 }
 
 fun getFolderSize(folder: File): Long {

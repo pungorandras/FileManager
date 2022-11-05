@@ -13,7 +13,7 @@ var index = 0
 fun FileManagerActivity.showTutorial() {
     val buttons = listOf(
         listOf(
-            R.id.switch_source,
+            R.id.top_buttons_layout,
             getString(R.string.switch_source),
             getString(R.string.switch_source_msg)
         ),
@@ -61,7 +61,7 @@ fun FileManagerActivity.showTutorial() {
             secondaryText = buttons[index][2] as String
             backgroundColour = resources.getColor(R.color.colorPrimary)
             captureTouchEventOnFocal = true
-            if (buttons[index][0] == R.id.switch_source)
+            if (buttons[index][0] == R.id.top_buttons_layout)
                 promptFocal = RectanglePromptFocal()
             setPromptStateChangeListener { _, state ->
                 if (state == MaterialTapTargetPrompt.STATE_FOCAL_PRESSED || state == MaterialTapTargetPrompt.STATE_NON_FOCAL_PRESSED) {

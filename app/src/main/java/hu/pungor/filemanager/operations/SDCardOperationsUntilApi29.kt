@@ -11,7 +11,7 @@ import java.io.BufferedOutputStream
 import java.io.File
 import java.io.FileInputStream
 
-fun FileManagerActivity.copyToSDCard(dstPath: File, file: File) {
+fun FileManagerActivity.copyToSDCard(file: File, dstPath: File) {
     val sdCardFile = getChildren(dstPath)?.createFile("", file.name)
     val bufferSize = 8 * 1024
     val bufferedInput = BufferedInputStream(FileInputStream(file))

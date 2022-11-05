@@ -15,6 +15,8 @@ import hu.pungor.filemanager.operations.async.listFilesRunBlocking
 import hu.pungor.filemanager.permissions.checkPermissionsAndLoadFiles
 import hu.pungor.filemanager.permissions.getSDCardPath
 import kotlinx.android.synthetic.main.activity_filemanager.*
+import kotlinx.android.synthetic.main.bottom_buttons_layout.*
+import kotlinx.android.synthetic.main.top_buttons_layout.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
