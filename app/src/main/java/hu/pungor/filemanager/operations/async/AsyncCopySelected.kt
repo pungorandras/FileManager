@@ -1,6 +1,7 @@
 package hu.pungor.filemanager.operations.async
 
 import android.view.View
+import com.mackhartley.roundedprogressbar.RoundedProgressBar
 import hu.pungor.filemanager.FileManagerActivity
 import hu.pungor.filemanager.FileManagerActivity.Companion.TYPE_FOLDER
 import hu.pungor.filemanager.R
@@ -9,7 +10,6 @@ import hu.pungor.filemanager.alertdialog.copyOrMoveIntoItselfDialog
 import hu.pungor.filemanager.model.AboutFile
 import hu.pungor.filemanager.operations.copyToSDCard
 import hu.pungor.filemanager.operations.createFolderOnSDCard
-import ir.nardana.linearprogressbar.LinearProgressBar
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
@@ -18,7 +18,7 @@ import java.io.File
 private var selectedListSize = 0.0
 private var copyState = 0.0
 private lateinit var copyJob: Job
-private lateinit var progressBar: LinearProgressBar
+private lateinit var progressBar: RoundedProgressBar
 
 @Suppress("DEPRECATION")
 suspend fun FileManagerActivity.asyncCopySelected() {
@@ -49,7 +49,6 @@ suspend fun FileManagerActivity.asyncCopySelected() {
     copyJob.join()
     setProgressLayoutVisibility(View.GONE)
     listFiles()
-    setProgressBarState(progressBar, 0.0)
 }
 
 @Suppress("DEPRECATION")

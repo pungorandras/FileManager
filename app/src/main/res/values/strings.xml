@@ -44,7 +44,7 @@
     <string name="sdcard_permission">In the next dialog you need to choose your SD card to grant write permission!</string>
     <string name="welcome">Welcome!</string>
     <string name="thanks">Thanks for using my app!</string>
-    <string name="copying">Copying…</string>
+    <string name="copying">Copying</string>
     <string name="deleting">Deleting…</string>
     <string name="moving">Moving…</string>
     <string name="searching">Searching…</string>
@@ -65,5 +65,4 @@
     <string name="switch_source">Switch source</string>
     <string name="switch_source_msg">You can switch between internal storage and SD card, if an SD card is inserted.</string>
     <string name="version">"Version: "</string>
-    <string name="placeholder">Placeholder</string>
 </resources>

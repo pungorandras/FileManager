@@ -7,15 +7,17 @@ import android.view.LayoutInflater
 import android.view.View
 import android.widget.RelativeLayout
 import android.widget.TextView
+import com.mackhartley.roundedprogressbar.ProgressTextFormatter
+import com.mackhartley.roundedprogressbar.RoundedProgressBar
 import hu.pungor.filemanager.FileManagerActivity
 import hu.pungor.filemanager.FileManagerActivity.Companion.TYPE_FOLDER
 import hu.pungor.filemanager.R
 import hu.pungor.filemanager.model.AboutFile
-import ir.nardana.linearprogressbar.LinearProgressBar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
 import java.io.File
+import kotlin.math.roundToInt
 
 @Suppress("DEPRECATION")
 fun FileManagerActivity.progressDialogBuilder(
@@ -40,19 +42,45 @@ fun FileManagerActivity.progressDialogBuilder(
     }
 }
 
-fun FileManagerActivity.progressBarBuilder(titleText: Int): LinearProgressBar {
-    setProgressLayoutVisibility(View.VISIBLE)
-    return findViewById<LinearProgressBar>(R.id.LinearProgressBar).apply {
-        setTitleProgress(getString(titleText))
+fun FileManagerActivity.progressBarBuilder(titleText: Int): RoundedProgressBar {
+    val progressBar = findViewById<RoundedProgressBar>(R.id.progressBar).also {
+        setProgressBarState(it, 0.0, false)
+        setUpCustomProgressText(it, titleText)
     }
+    setProgressLayoutVisibility(View.VISIBLE)
+
+    return progressBar
+}
+
+private fun FileManagerActivity.setUpCustomProgressText(
+    advancedBar: RoundedProgressBar,
+    titleText: Int
+) {
+    val exampleCustomFormatter = object : ProgressTextFormatter {
+        override fun getProgressText(progressValue: Float): String {
+            return getString(titleText) + " | " + (progressValue * 100).roundToInt()
+                .toString() + "%"
+        }
+    }
+
+    advancedBar.setProgressTextFormatter(exampleCustomFormatter)
 }
 
 fun FileManagerActivity.setProgressLayoutVisibility(visibility: Int) {
     findViewById<RelativeLayout>(R.id.progressbar_layout).visibility = visibility
 }
 
-fun setProgressBarState(progressBar: LinearProgressBar, progressState: Double) {
-    CoroutineScope(Main).launch { progressBar.setToProgressPercent(progressState.toFloat()) }
+fun setProgressBarState(
+    progressBar: RoundedProgressBar,
+    progressPercentage: Double,
+    animate: Boolean = true
+) {
+    CoroutineScope(Main).launch {
+        progressBar.setProgressPercentage(
+            progressPercentage = progressPercentage,
+            shouldAnimate = animate
+        )
+    }
 }
 
 fun getFolderSize(folder: File): Long {

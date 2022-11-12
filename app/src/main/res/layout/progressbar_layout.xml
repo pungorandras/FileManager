@@ -27,8 +27,8 @@
         android:text="@string/cancel"
         android:textColor="@color/white" />
 
-    <ir.nardana.linearprogressbar.LinearProgressBar
-        android:id="@+id/LinearProgressBar"
+    <com.mackhartley.roundedprogressbar.RoundedProgressBar
+        android:id="@+id/progressBar"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_alignParentStart="true"
@@ -40,10 +40,12 @@
         android:layout_marginEnd="@dimen/progressbar_margin_start_end"
         android:layout_marginBottom="@dimen/progressbar_margin_top_bottom"
         android:layout_toStartOf="@+id/cancel_progress"
-        app:ProgressBackground="@color/background"
-        app:ProgressToBackground="@color/progressbar"
-        app:RadiusAll="20"
-        app:TitleProgress="@string/placeholder"
-        app:TitleSize="@dimen/progressbar_title_size" />
+        app:rpbAnimationLength="500"
+        app:rpbBackgroundColor="@color/background"
+        app:rpbBackgroundTextColor="@color/white"
+        app:rpbCornerRadius="@dimen/progressbar_corner_radius"
+        app:rpbProgressColor="@color/progressbar"
+        app:rpbProgressTextColor="@color/white"
+        app:rpbTextSize="@dimen/progressbar_text_size" />
 
 </RelativeLayout>
