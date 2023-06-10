@@ -72,7 +72,7 @@ private fun FileManagerActivity.moveFolderToInternal(folder: File) {
             dstFile?.let { src.copyTo(it) }
 
         if (!moveJob.isActive) {
-            deleteJob.cancel()
+            job.cancel()
             break
         }
     }
@@ -93,7 +93,7 @@ private fun FileManagerActivity.moveFolderToSDCard(folder: File) {
             dstFile?.parentFile?.let { copyToSDCard(it, src) }
 
         if (!moveJob.isActive) {
-            deleteJob.cancel()
+            job.cancel()
             break
         }
     }

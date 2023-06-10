@@ -15,6 +15,7 @@ import hu.pungor.filemanager.R
 import hu.pungor.filemanager.model.AboutFile
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.Main
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import java.io.File
 import kotlin.math.roundToInt
@@ -56,14 +57,14 @@ private fun FileManagerActivity.setUpCustomProgressText(
     advancedBar: RoundedProgressBar,
     titleText: Int
 ) {
-    val exampleCustomFormatter = object : ProgressTextFormatter {
+    val customFormatter = object : ProgressTextFormatter {
         override fun getProgressText(progressValue: Float): String {
             return getString(titleText) + " | " + (progressValue * 100).roundToInt()
                 .toString() + "%"
         }
     }
 
-    advancedBar.setProgressTextFormatter(exampleCustomFormatter)
+    advancedBar.setProgressTextFormatter(customFormatter)
 }
 
 fun FileManagerActivity.setProgressLayoutVisibility(visibility: Int) {
@@ -97,4 +98,8 @@ fun getSelectedListSize(selectedList: List<AboutFile>): Double {
     }
 
     return selectedListSize
+}
+
+fun cancelProgress(job: Job) {
+    job.cancel()
 }

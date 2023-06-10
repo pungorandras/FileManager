@@ -13,18 +13,22 @@ import android.view.View
 import android.widget.PopupMenu
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.mackhartley.roundedprogressbar.RoundedProgressBar
 import hu.pungor.filemanager.adapter.FileManagerAdapter
 import hu.pungor.filemanager.intro.loadIntroScreen
 import hu.pungor.filemanager.intro.loadTutorial
 import hu.pungor.filemanager.model.AboutFile
 import hu.pungor.filemanager.operations.*
+import hu.pungor.filemanager.operations.async.cancelProgress
 import hu.pungor.filemanager.operations.async.listFiles
 import hu.pungor.filemanager.permissions.activityResult
 import hu.pungor.filemanager.permissions.checkPermissionsAndLoadFiles
 import kotlinx.android.synthetic.main.activity_filemanager.*
 import kotlinx.android.synthetic.main.bottom_buttons_layout.*
 import kotlinx.android.synthetic.main.filemanager_recyclerview.*
+import kotlinx.android.synthetic.main.progressbar_layout.cancel_progress
 import kotlinx.android.synthetic.main.top_buttons_layout.*
+import kotlinx.coroutines.Job
 import permissions.dispatcher.NeedsPermission
 import permissions.dispatcher.OnShowRationale
 import permissions.dispatcher.PermissionRequest
@@ -41,6 +45,11 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
     var rootPath = File(Environment.getExternalStorageDirectory().absolutePath)
     var sdCardPath: File? = null
     var currentPath = rootPath
+
+    lateinit var progressBar: RoundedProgressBar
+    lateinit var job: Job
+    var selectedListSize = 0.0
+    var progressState = 0.0
 
     companion object {
         const val TYPE_FOLDER = "folder"
@@ -90,6 +99,10 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
 
         search.setOnClickListener {
             searchButtonOperations()
+        }
+
+        cancel_progress.setOnClickListener {
+            cancelProgress(job)
         }
     }
 
