@@ -38,7 +38,7 @@ suspend fun FileManagerActivity.asyncCopySelected() {
                 withContext(Main) { copyOrMoveIntoItselfDialog("copy") }
 
             if (!isActive)
-                break
+                return@launch
         }
     }
 
@@ -61,7 +61,7 @@ private fun FileManagerActivity.copyFolderToInternal(srcPath: File, dstPath: Fil
             dstFile?.let { src.copyTo(it) }
 
         if (!job.isActive)
-            break
+            return
     }
 }
 
@@ -79,7 +79,7 @@ private fun FileManagerActivity.copyFolderToSDCard(srcPath: File, dstPath: File)
             dstFile?.parentFile?.let { copyToSDCard(it, src) }
 
         if (!job.isActive)
-            break
+            return
     }
 }
 

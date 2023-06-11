@@ -1,6 +1,6 @@
 package hu.pungor.filemanager.operations.async
 
-import android.app.ProgressDialog
+import android.view.View
 import hu.pungor.filemanager.FileManagerActivity
 import hu.pungor.filemanager.FileManagerActivity.Companion.TYPE_FOLDER
 import hu.pungor.filemanager.R
@@ -11,33 +11,25 @@ import hu.pungor.filemanager.operations.copyToSDCard
 import hu.pungor.filemanager.operations.createFolderOnSDCard
 import hu.pungor.filemanager.operations.deleteOnSDCard
 import hu.pungor.filemanager.operations.getChildren
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Dispatchers.Main
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.File
 
-private var selectedListSize = 0.0
-private var moveState = 0.0
-private lateinit var moveJob: Job
-private lateinit var progressDialog: ProgressDialog
-
-@Suppress("DEPRECATION")
 suspend fun FileManagerActivity.asyncMoveSelected() {
     selectedListSize = 0.0
-    moveState = 0.0
+    progressState = 0.0
+    progressBar = progressBarBuilder(R.string.moving)
 
-    progressDialog = progressDialogBuilder(
-        titleText = R.string.moving,
-        buttonFunctionality = { moveJob.cancel() }
-    ).apply { show() }
-
-    moveJob = CoroutineScope(Dispatchers.IO).launch {
+    job = CoroutineScope(Dispatchers.IO).launch {
         val selectedList = fmAdapter.getSelectedList()
         selectedListSize = getSelectedListSize(selectedList)
 
         for (element in selectedList) {
             val dstObj = File(currentPath.path + "/" + element.name)
-            val index = (selectedList.indexOf(element) + 1).toString()
-            progressDialog.setProgressNumberFormat(index + "/" + selectedList.size)
 
             if (!currentPath.path.contains(element.path)) {
                 if (!dstObj.exists())
@@ -48,53 +40,49 @@ suspend fun FileManagerActivity.asyncMoveSelected() {
                 withContext(Main) { copyOrMoveIntoItselfDialog("move") }
 
             if (!isActive)
-                break
+                return@launch
         }
     }
 
-    moveJob.join()
-    progressDialog.dismiss()
+    job.join()
+    setProgressLayoutVisibility(View.GONE)
     listFiles()
 }
 
-@Suppress("DEPRECATION")
 private fun FileManagerActivity.moveFolderToInternal(folder: File) {
     for (src in folder.walkTopDown()) {
         val relPath = folder.parentFile?.let { src.toRelativeString(it) }
         val dstFile = relPath?.let { File(currentPath, it) }
 
-        moveState += src.length()
-        progressDialog.progress = (moveState * 100 / selectedListSize).toInt()
+        progressState += src.length()
+        setProgressBarState(progressBar, progressState * 100 / selectedListSize)
 
         if (src.isDirectory)
             dstFile?.mkdirs()
         else
             dstFile?.let { src.copyTo(it) }
 
-        if (!moveJob.isActive) {
-            job.cancel()
-            break
+        if (!job.isActive) {
+            return
         }
     }
 }
 
-@Suppress("DEPRECATION")
 private fun FileManagerActivity.moveFolderToSDCard(folder: File) {
     for (src in folder.walkTopDown()) {
         val relPath = folder.parentFile?.let { src.toRelativeString(it) }
         val dstFile = relPath?.let { File(currentPath, it) }
 
-        moveState += src.length()
-        progressDialog.progress = (moveState * 100 / selectedListSize).toInt()
+        progressState += src.length()
+        setProgressBarState(progressBar, progressState * 100 / selectedListSize)
 
         if (src.isDirectory)
             dstFile?.parentFile?.let { createFolderOnSDCard(it, src.name) }
         else
             dstFile?.parentFile?.let { copyToSDCard(it, src) }
 
-        if (!moveJob.isActive) {
-            job.cancel()
-            break
+        if (!job.isActive) {
+            return
         }
     }
 }
@@ -116,12 +104,11 @@ private fun FileManagerActivity.folderMovingStepsToSDCard(folder: AboutFile) {
     }
 }
 
-@Suppress("DEPRECATION")
 private fun FileManagerActivity.fileMovingStepsToSDCard(file: AboutFile, dstFile: File) {
     val fileObj = File(file.path)
 
-    moveState += fileObj.length()
-    progressDialog.progress = (moveState * 100 / selectedListSize).toInt()
+    progressState += fileObj.length()
+    setProgressBarState(progressBar, progressState * 100 / selectedListSize)
 
     if (vcIsR)
         fileObj.copyTo(dstFile)
@@ -157,12 +144,11 @@ private fun FileManagerActivity.folderMovingStepsToInternal(
     }
 }
 
-@Suppress("DEPRECATION")
 private fun FileManagerActivity.fileMovingStepsToInternal(file: AboutFile, dstFile: File) {
     val fileObj = File(file.path)
 
-    moveState += fileObj.length()
-    progressDialog.progress = (moveState * 100 / selectedListSize).toInt()
+    progressState += fileObj.length()
+    setProgressBarState(progressBar, progressState * 100 / selectedListSize)
 
     if (file.path.contains(rootPath.path))
         fileObj.renameTo(dstFile)

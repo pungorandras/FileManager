@@ -28,7 +28,7 @@ suspend fun FileManagerActivity.asyncDeleteSelected() {
             delete(fileObject)
 
             if (!isActive)
-                break
+                return@launch
         }
     }
 
