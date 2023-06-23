@@ -47,7 +47,7 @@ suspend fun FileManagerActivity.asyncMoveSelected() {
     job.join()
     setProgressLayoutVisibility(View.GONE)
     listFiles()
-    setProgressBarState(progressBar, 0.0)
+    resetProgressBar()
 }
 
 private fun FileManagerActivity.moveFolderToInternal(folder: File) {

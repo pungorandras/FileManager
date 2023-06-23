@@ -45,7 +45,7 @@ suspend fun FileManagerActivity.asyncCopySelected() {
     job.join()
     setProgressLayoutVisibility(View.GONE)
     listFiles()
-    setProgressBarState(progressBar, 0.0)
+    resetProgressBar()
 }
 
 private fun FileManagerActivity.copyFolderToInternal(srcPath: File, dstPath: File) {

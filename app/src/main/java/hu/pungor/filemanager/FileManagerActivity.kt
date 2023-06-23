@@ -20,7 +20,11 @@ import hu.pungor.filemanager.intro.loadTutorial
 import hu.pungor.filemanager.model.AboutFile
 import hu.pungor.filemanager.operations.*
 import hu.pungor.filemanager.operations.async.cancelProgress
+import hu.pungor.filemanager.operations.async.isSearchResultInitialized
 import hu.pungor.filemanager.operations.async.listFiles
+import hu.pungor.filemanager.operations.async.resetProgressBar
+import hu.pungor.filemanager.operations.async.searchResult
+import hu.pungor.filemanager.operations.async.setProgressLayoutVisibility
 import hu.pungor.filemanager.permissions.activityResult
 import hu.pungor.filemanager.permissions.checkPermissionsAndLoadFiles
 import kotlinx.android.synthetic.main.activity_filemanager.*
@@ -102,7 +106,14 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
         }
 
         cancel_progress.setOnClickListener {
-            cancelProgress(job)
+            if (this::job.isInitialized)
+                cancelProgress(job)
+            if (isSearchResultInitialized()) {
+                searchResult.cancel()
+                setProgressLayoutVisibility(View.GONE)
+            }
+
+            resetProgressBar()
         }
     }
 

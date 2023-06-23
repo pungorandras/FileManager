@@ -35,7 +35,7 @@ suspend fun FileManagerActivity.asyncDeleteSelected() {
     job.join()
     setProgressLayoutVisibility(View.GONE)
     listFiles()
-    setProgressBarState(progressBar, 0.0)
+    resetProgressBar()
 }
 
 fun FileManagerActivity.deleteFolder(fileObject: File) {

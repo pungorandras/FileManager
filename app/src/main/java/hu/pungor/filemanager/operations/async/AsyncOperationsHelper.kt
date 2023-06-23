@@ -44,6 +44,7 @@ fun FileManagerActivity.progressDialogBuilder(
 fun FileManagerActivity.progressBarBuilder(titleText: Int): ProgressBar {
     val progressBar = findViewById<ProgressBar>(R.id.progressBar)
     findViewById<TextView>(R.id.progressText).text = getText(titleText)
+    findViewById<TextView>(R.id.percentage).text = null
     setProgressLayoutVisibility(View.VISIBLE)
 
     return progressBar
@@ -62,6 +63,13 @@ fun FileManagerActivity.setProgressBarState(
         val percentageString = progressBar.progress.toString() + "%"
         findViewById<TextView>(R.id.percentage).text = percentageString
     }
+}
+
+fun FileManagerActivity.resetProgressBar() {
+    progressBar.isIndeterminate = false
+    setProgressBarState(progressBar, 0.0)
+    findViewById<TextView>(R.id.progressText).text = null
+    findViewById<TextView>(R.id.percentage).text = null
 }
 
 fun getFolderSize(folder: File): Long {

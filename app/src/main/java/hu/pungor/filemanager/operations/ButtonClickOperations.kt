@@ -2,6 +2,7 @@ package hu.pungor.filemanager.operations
 
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
+import android.view.View
 import android.widget.EditText
 import android.widget.ImageButton
 import hu.pungor.filemanager.FileManagerActivity
@@ -12,6 +13,8 @@ import hu.pungor.filemanager.alertdialog.noItemsSelectedDialog
 import hu.pungor.filemanager.alertdialog.noResultsDialog
 import hu.pungor.filemanager.operations.async.listFiles
 import hu.pungor.filemanager.operations.async.listFilesRunBlocking
+import hu.pungor.filemanager.operations.async.resetProgressBar
+import hu.pungor.filemanager.operations.async.setProgressLayoutVisibility
 import hu.pungor.filemanager.permissions.checkPermissionsAndLoadFiles
 import hu.pungor.filemanager.permissions.getSDCardPath
 import kotlinx.android.synthetic.main.activity_filemanager.*
@@ -214,6 +217,8 @@ fun FileManagerActivity.searchButtonOperations() {
                     CoroutineScope(Main).launch {
                         latestPathBeforeAction = currentPath
                         result = search(inputText)
+                        setProgressLayoutVisibility(View.GONE)
+                        resetProgressBar()
 
                         if (result.isNullOrEmpty())
                             noResultsDialog()

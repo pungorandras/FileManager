@@ -1,42 +1,33 @@
 package hu.pungor.filemanager.operations.async
 
-import android.app.ProgressDialog
-import android.graphics.Typeface
-import android.text.SpannableStringBuilder
-import android.text.Spanned
-import android.text.style.AbsoluteSizeSpan
-import android.text.style.StyleSpan
 import hu.pungor.filemanager.FileManagerActivity
 import hu.pungor.filemanager.R
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Dispatchers.Main
+import kotlinx.coroutines.async
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.withContext
 import java.io.File
 
-private lateinit var searchResult: Deferred<MutableList<File>>
+lateinit var searchResult: Deferred<MutableList<File>>
+fun isSearchResultInitialized() = ::searchResult.isInitialized
 
-@Suppress("DEPRECATION")
 suspend fun FileManagerActivity.asyncSearch(input: String): MutableList<File> {
 
-    val sBuilder = SpannableStringBuilder(getString(R.string.wait)).apply {
-        val spanResource = resources.getDimensionPixelSize(R.dimen.wait)
-        setSpan(StyleSpan(Typeface.BOLD), 0, length, Spanned.SPAN_INCLUSIVE_INCLUSIVE)
-        setSpan(AbsoluteSizeSpan(spanResource), 0, length, Spanned.SPAN_INCLUSIVE_INCLUSIVE)
-    }
-
-    val progressDialog = progressDialogBuilder(
-        titleText = R.string.searching,
-        message = sBuilder,
-        progressStyle = ProgressDialog.STYLE_SPINNER,
-        buttonFunctionality = { searchResult.cancel() }
-    ).apply { show() }
-
     searchResult = CoroutineScope(IO).async {
+        withContext(Main) {
+            progressBar = progressBarBuilder(R.string.searching).apply {
+                isIndeterminate = true
+            }
+        }
+
         val result = mutableListOf<File>()
         currentPath.walk().takeWhile { isActive }.forEach {
             if (it.name.lowercase().contains(input.lowercase()) && it.path != currentPath.path)
                 result += it
         }
-        progressDialog.dismiss()
         return@async result
     }
     return searchResult.await()
