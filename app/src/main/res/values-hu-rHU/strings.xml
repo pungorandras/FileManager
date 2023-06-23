@@ -44,7 +44,7 @@
     <string name="sdcard_permission">A következő felugró ablakban ki kell választanod az SD-kártyádat, hogy megadd az írási engedélyt!</string>
     <string name="welcome">Üdvözöllek!</string>
     <string name="thanks">Köszönöm, hogy használod az alkalmazásomat!</string>
-    <string name="copying">Másolás</string>
+    <string name="copying">Másolás…</string>
     <string name="deleting">Törlés…</string>
     <string name="moving">Áthelyezés…</string>
     <string name="searching">Keresés…</string>

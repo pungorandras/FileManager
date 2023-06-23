@@ -15,9 +15,9 @@ import kotlinx.coroutines.launch
 import java.io.File
 
 suspend fun FileManagerActivity.asyncDeleteSelected() {
+    progressBar = progressBarBuilder(R.string.deleting)
     selectedListSize = 0.0
     progressState = 0.0
-    progressBar = progressBarBuilder(R.string.deleting)
 
     job = CoroutineScope(Dispatchers.IO).launch {
         val selectedList = fmAdapter.getSelectedList()
@@ -35,6 +35,7 @@ suspend fun FileManagerActivity.asyncDeleteSelected() {
     job.join()
     setProgressLayoutVisibility(View.GONE)
     listFiles()
+    setProgressBarState(progressBar, 0.0)
 }
 
 fun FileManagerActivity.deleteFolder(fileObject: File) {

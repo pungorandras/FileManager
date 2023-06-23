@@ -11,9 +11,9 @@ import android.view.ContextThemeWrapper
 import android.view.Gravity
 import android.view.View
 import android.widget.PopupMenu
+import android.widget.ProgressBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.mackhartley.roundedprogressbar.RoundedProgressBar
 import hu.pungor.filemanager.adapter.FileManagerAdapter
 import hu.pungor.filemanager.intro.loadIntroScreen
 import hu.pungor.filemanager.intro.loadTutorial
@@ -46,7 +46,7 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
     var sdCardPath: File? = null
     var currentPath = rootPath
 
-    lateinit var progressBar: RoundedProgressBar
+    lateinit var progressBar: ProgressBar
     lateinit var job: Job
     var selectedListSize = 0.0
     var progressState = 0.0

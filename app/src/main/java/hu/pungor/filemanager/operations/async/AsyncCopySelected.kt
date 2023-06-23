@@ -18,9 +18,9 @@ import kotlinx.coroutines.withContext
 import java.io.File
 
 suspend fun FileManagerActivity.asyncCopySelected() {
+    progressBar = progressBarBuilder(R.string.copying)
     selectedListSize = 0.0
     progressState = 0.0
-    progressBar = progressBarBuilder(R.string.copying)
 
     job = CoroutineScope(IO).launch {
         val selectedList = fmAdapter.getSelectedList()
@@ -45,6 +45,7 @@ suspend fun FileManagerActivity.asyncCopySelected() {
     job.join()
     setProgressLayoutVisibility(View.GONE)
     listFiles()
+    setProgressBarState(progressBar, 0.0)
 }
 
 private fun FileManagerActivity.copyFolderToInternal(srcPath: File, dstPath: File) {

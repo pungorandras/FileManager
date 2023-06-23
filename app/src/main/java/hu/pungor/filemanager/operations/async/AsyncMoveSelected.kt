@@ -20,9 +20,9 @@ import kotlinx.coroutines.withContext
 import java.io.File
 
 suspend fun FileManagerActivity.asyncMoveSelected() {
+    progressBar = progressBarBuilder(R.string.moving)
     selectedListSize = 0.0
     progressState = 0.0
-    progressBar = progressBarBuilder(R.string.moving)
 
     job = CoroutineScope(Dispatchers.IO).launch {
         val selectedList = fmAdapter.getSelectedList()
@@ -47,6 +47,7 @@ suspend fun FileManagerActivity.asyncMoveSelected() {
     job.join()
     setProgressLayoutVisibility(View.GONE)
     listFiles()
+    setProgressBarState(progressBar, 0.0)
 }
 
 private fun FileManagerActivity.moveFolderToInternal(folder: File) {
