@@ -8,7 +8,7 @@
     <string name="share_with">Megosztás ezzel…</string>
     <string name="rename">Átnevezés</string>
     <string name="delete">Törlés</string>
-    <string name="type_a_name_here">Ide írd a fájlnevet</string>
+    <string name="type_the_name_here">Ide írd a nevet</string>
     <string name="no_items_selected">Nincs semmi kiválasztva</string>
     <string name="to_select_items">Fájlok/mappák kiválasztásához kattints az ikonjukra.</string>
     <string name="ok">OK</string>
@@ -66,4 +66,5 @@
     <string name="switch_source">Forrás váltás</string>
     <string name="switch_source_msg">A belső tárhely és az SD-kártya között válthatsz, ha van behelyezett SD-kártya.</string>
     <string name="version">"Verzió: "</string>
+    <string name="multi_thread_op_not_impl">A többszálas műveletek még nem támogatottak.</string>
 </resources>

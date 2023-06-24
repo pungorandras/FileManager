@@ -15,6 +15,7 @@ import android.widget.ProgressBar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import hu.pungor.filemanager.adapter.FileManagerAdapter
+import hu.pungor.filemanager.alertdialog.multiThreadedOperationsDialog
 import hu.pungor.filemanager.intro.loadIntroScreen
 import hu.pungor.filemanager.intro.loadTutorial
 import hu.pungor.filemanager.model.AboutFile
@@ -25,6 +26,7 @@ import hu.pungor.filemanager.operations.async.listFiles
 import hu.pungor.filemanager.operations.async.resetProgressBar
 import hu.pungor.filemanager.operations.async.searchResult
 import hu.pungor.filemanager.operations.async.setProgressLayoutVisibility
+import hu.pungor.filemanager.operations.async.somethingInProgress
 import hu.pungor.filemanager.permissions.activityResult
 import hu.pungor.filemanager.permissions.checkPermissionsAndLoadFiles
 import kotlinx.android.synthetic.main.activity_filemanager.*
@@ -54,6 +56,8 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
     lateinit var job: Job
     var selectedListSize = 0.0
     var progressState = 0.0
+
+    fun isJobInitialized() = ::job.isInitialized
 
     companion object {
         const val TYPE_FOLDER = "folder"
@@ -90,19 +94,31 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
         }
 
         delete_selected.setOnClickListener {
-            deleteSelectedDialog()
+            if (!somethingInProgress())
+                deleteSelectedDialog()
+            else
+                multiThreadedOperationsDialog()
         }
 
         copy_selected.setOnClickListener {
-            copySelectedOperation()
+            if (!somethingInProgress())
+                copySelectedOperation()
+            else
+                multiThreadedOperationsDialog()
         }
 
         move_selected.setOnClickListener {
-            moveSelectedOperation()
+            if (!somethingInProgress())
+                moveSelectedOperation()
+            else
+                multiThreadedOperationsDialog()
         }
 
         search.setOnClickListener {
-            searchButtonOperations()
+            if (!somethingInProgress())
+                searchButtonOperations()
+            else
+                multiThreadedOperationsDialog()
         }
 
         cancel_progress.setOnClickListener {

@@ -82,3 +82,10 @@ fun FileManagerActivity.noResultsDialog() {
         dialogText = R.string.no_results
     ).show()
 }
+
+fun FileManagerActivity.multiThreadedOperationsDialog() {
+    alertDialogBuilder(
+        titleText = R.string.info,
+        dialogText = getString(R.string.multi_thread_op_not_impl)
+    ).show()
+}

@@ -19,7 +19,7 @@
         android:layout_below="@+id/name"
         android:layout_marginBottom="15dp"
         android:background="@drawable/edittext_border"
-        android:hint="@string/type_a_name_here"
+        android:hint="@string/type_the_name_here"
         android:padding="8dp" />
 
 </RelativeLayout>

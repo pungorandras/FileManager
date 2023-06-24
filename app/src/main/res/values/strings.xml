@@ -7,7 +7,7 @@
     <string name="share_with">Share with…</string>
     <string name="rename">Rename</string>
     <string name="delete">Delete</string>
-    <string name="type_a_name_here">Type a name here</string>
+    <string name="type_the_name_here">Type the name here</string>
     <string name="no_items_selected">No items selected</string>
     <string name="to_select_items">To select items click on their icons.</string>
     <string name="ok">OK</string>
@@ -65,4 +65,5 @@
     <string name="switch_source">Switch source</string>
     <string name="switch_source_msg">You can switch between internal storage and SD card, if an SD card is inserted.</string>
     <string name="version">"Version: "</string>
+    <string name="multi_thread_op_not_impl">Multi-threaded operations are not supported yet.</string>
 </resources>

@@ -45,6 +45,8 @@
             android:layout_marginTop="@dimen/progressbar_margin_top_bottom"
             android:layout_marginEnd="@dimen/progressbar_margin_start_end"
             android:layout_marginBottom="@dimen/progressbar_margin_top_bottom"
+            android:indeterminateBehavior="cycle"
+            android:indeterminateDuration="1000"
             android:indeterminateDrawable="@drawable/progressbar_customization"
             android:progressDrawable="@drawable/progressbar_customization" />
 

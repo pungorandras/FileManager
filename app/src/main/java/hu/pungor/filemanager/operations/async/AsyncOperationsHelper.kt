@@ -91,3 +91,8 @@ fun getSelectedListSize(selectedList: List<AboutFile>): Double {
 fun cancelProgress(job: Job) {
     job.cancel()
 }
+
+fun FileManagerActivity.somethingInProgress(): Boolean {
+    val progressbarLayout = findViewById<RelativeLayout>(R.id.progressbar_layout)
+    return (isJobInitialized() || isSearchResultInitialized()) && progressbarLayout.visibility == View.VISIBLE
+}
