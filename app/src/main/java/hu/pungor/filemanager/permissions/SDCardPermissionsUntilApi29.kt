@@ -50,18 +50,16 @@ fun FileManagerActivity.sdCardPermissionsBuilder() {
     ).show()
 }
 
-fun FileManagerActivity.activityResult(requestCode: Int, data: Intent?) {
+fun FileManagerActivity.activityResult(data: Intent?) {
     try {
-        if (requestCode == 1001) {
-            val uri = data?.data
-            grantUriPermission(
-                packageName, uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION or
-                        Intent.FLAG_GRANT_READ_URI_PERMISSION
-            )
-            val takeFlags = Intent.FLAG_GRANT_WRITE_URI_PERMISSION or
+        val uri = data?.data
+        grantUriPermission(
+            packageName, uri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION or
                     Intent.FLAG_GRANT_READ_URI_PERMISSION
-            contentResolver.takePersistableUriPermission(uri!!, takeFlags)
-        }
+        )
+        val takeFlags = Intent.FLAG_GRANT_WRITE_URI_PERMISSION or
+                Intent.FLAG_GRANT_READ_URI_PERMISSION
+        contentResolver.takePersistableUriPermission(uri!!, takeFlags)
     } catch (e: Exception) {
         Log.e("Main", "SD card permission error.", e)
     }

@@ -4,6 +4,9 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import hu.pungor.filemanager.FileManagerActivity
 import hu.pungor.filemanager.R
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import uk.co.samuelwall.materialtaptargetprompt.MaterialTapTargetPrompt
 import uk.co.samuelwall.materialtaptargetprompt.extras.focals.RectanglePromptFocal
 
@@ -75,16 +78,18 @@ fun FileManagerActivity.showTutorial() {
     }.show()
 }
 
-fun FileManagerActivity.loadIntroScreen() {
-    val prefs = getSharedPreferences("prefs", AppCompatActivity.MODE_PRIVATE)
-    val firstStart = prefs.getBoolean("firstStart", true)
+suspend fun FileManagerActivity.loadIntroScreen() {
+    withContext(CoroutineScope(Dispatchers.Main).coroutineContext) {
+        val prefs = getSharedPreferences("prefs", AppCompatActivity.MODE_PRIVATE)
+        val firstStart = prefs.getBoolean("firstStart", true)
 
-    if (firstStart)
-        startActivity(Intent(this, IntroScreenActivity::class.java))
+        if (firstStart)
+            startActivity(Intent(applicationContext, IntroScreenActivity::class.java))
 
-    val editor = prefs.edit()
-    editor.putBoolean("firstStart", false)
-    editor.apply()
+        val editor = prefs.edit()
+        editor.putBoolean("firstStart", false)
+        editor.apply()
+    }
 }
 
 fun FileManagerActivity.loadTutorial() {

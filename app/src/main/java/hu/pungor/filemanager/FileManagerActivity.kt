@@ -34,7 +34,10 @@ import kotlinx.android.synthetic.main.bottom_buttons_layout.*
 import kotlinx.android.synthetic.main.filemanager_recyclerview.*
 import kotlinx.android.synthetic.main.progressbar_layout.cancel_progress
 import kotlinx.android.synthetic.main.top_buttons_layout.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 import permissions.dispatcher.NeedsPermission
 import permissions.dispatcher.OnShowRationale
 import permissions.dispatcher.PermissionRequest
@@ -68,9 +71,9 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_filemanager)
 
+        CoroutineScope(Main).launch { loadIntroScreen() }
         checkPermissionsAndLoadFiles()
         disableSDCardButtonIfNotAvailable()
-        loadIntroScreen()
         loadTutorial()
 
         Internal.setOnClickListener {
@@ -122,7 +125,7 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
         }
 
         cancel_progress.setOnClickListener {
-            if (this::job.isInitialized)
+            if (isJobInitialized())
                 cancelProgress(job)
             if (isSearchResultInitialized()) {
                 searchResult.cancel()
@@ -171,7 +174,7 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
         if (requestCode == 1000)
             loadFiles()
         if (requestCode == 1001)
-            activityResult(requestCode, data)
+            activityResult(data)
     }
 
     @Deprecated("Deprecated in Java")
