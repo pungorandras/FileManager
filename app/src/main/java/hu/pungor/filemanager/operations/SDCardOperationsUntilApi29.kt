@@ -54,8 +54,7 @@ fun FileManagerActivity.getChildren(dstPath: File): DocumentFile? {
     try {
         var id = DocumentsContract.getTreeDocumentId(getUri())
         id += sdCardPath?.let { dstPath.path.removePrefix(it.path) }
-        val childrenUri =
-            DocumentsContract.buildDocumentUriUsingTree(getUri(), id)
+        val childrenUri = DocumentsContract.buildDocumentUriUsingTree(getUri(), id)
         return DocumentFile.fromTreeUri(this, childrenUri)
     } catch (e: Exception) {
         Log.e("Main", "Unable to get child object.", e)
