@@ -26,6 +26,7 @@ fun FileManagerActivity.getSDCardPath(): File? {
         sdCardPermissionsBuilder()
     } else
         return File("/storage/" + getUri()?.path?.let { regex.find(it)?.value })
+
     return null
 }
 
