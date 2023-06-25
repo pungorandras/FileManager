@@ -80,7 +80,7 @@ private fun FileManagerActivity.moveFolderToSDCard(folder: File) {
         if (src.isDirectory)
             dstFile?.parentFile?.let { createFolderOnSDCard(it, src.name) }
         else
-            dstFile?.parentFile?.let { copyToSDCard(it, src) }
+            dstFile?.parentFile?.let { copyToSDCard(src, it) }
 
         if (!job.isActive) {
             return

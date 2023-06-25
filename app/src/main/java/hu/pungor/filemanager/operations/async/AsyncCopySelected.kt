@@ -77,7 +77,7 @@ private fun FileManagerActivity.copyFolderToSDCard(srcPath: File, dstPath: File)
         if (src.isDirectory)
             dstFile?.parentFile?.let { createFolderOnSDCard(it, src.name) }
         else
-            dstFile?.parentFile?.let { copyToSDCard(it, src) }
+            dstFile?.parentFile?.let { copyToSDCard(src, it) }
 
         if (!job.isActive)
             return
@@ -100,6 +100,6 @@ private fun FileManagerActivity.copy(fileObject: AboutFile, dstPath: File) {
         if (dstPath.path.contains(rootPath.path) || vcIsR)
             srcObject.copyTo(dstFile)
         else
-            copyToSDCard(srcObject, dstFile)
+            copyToSDCard(srcObject, dstPath)
     }
 }

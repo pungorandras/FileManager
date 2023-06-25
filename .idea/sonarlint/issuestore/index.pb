@@ -17,7 +17,7 @@ z
 Japp/src/main/java/hu/pungor/filemanager/alertdialog/AlertDialogMessages.kt,4\2\422f5ba9b0ea02b8b227658730326a097760873c
 Å
 Qapp/src/main/java/hu/pungor/filemanager/operations/async/AsyncOperationsHelper.kt,5\3\53fb9230fbf6a3de2eead551438de8bf3f997c93
-<
-build.gradle,f\0\f07866736216be0ee2aba49e392191aeae700a35
 X
 (gradle/wrapper/gradle-wrapper.properties,f\b\fbe448ebfc3eb2d4e308f6b8b043666f5b57235e
+y
+Iapp/src/main/java/hu/pungor/filemanager/permissions/StoragePermissions.kt,6\6\662fb21a128a76453bc2e95b905ad2fff8ed77a7
