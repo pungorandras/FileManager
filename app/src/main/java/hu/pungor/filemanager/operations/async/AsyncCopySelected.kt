@@ -84,22 +84,22 @@ private fun FileManagerActivity.copyFolderToSDCard(srcPath: File, dstPath: File)
     }
 }
 
-private fun FileManagerActivity.copy(fileObject: AboutFile, dstPath: File) {
-    val dstFile = File(dstPath.path + "/" + fileObject.name)
-    val srcObject = File(fileObject.path)
+fun FileManagerActivity.copy(srcObj: AboutFile, dstObj: File) {
+    val dstFile = File(dstObj.path + "/" + srcObj.name)
+    val srcObject = File(srcObj.path)
 
-    if (fileObject.mimeType == TYPE_FOLDER) {
-        if (dstPath.path.contains(rootPath.path) || vcIsR)
-            copyFolderToInternal(srcObject, dstPath)
+    if (srcObj.mimeType == TYPE_FOLDER) {
+        if (dstObj.path.contains(rootPath.path) || vcIsR)
+            copyFolderToInternal(srcObject, dstObj)
         else
-            copyFolderToSDCard(srcObject, dstPath)
+            copyFolderToSDCard(srcObject, dstObj)
     } else {
-        progressState += File(fileObject.path).length()
+        progressState += File(srcObj.path).length()
         setProgressBarState(progressBar, progressState * 100 / selectedListSize)
 
-        if (dstPath.path.contains(rootPath.path) || vcIsR)
+        if (dstObj.path.contains(rootPath.path) || vcIsR)
             srcObject.copyTo(dstFile)
         else
-            copyToSDCard(srcObject, dstPath)
+            copyToSDCard(srcObject, dstObj)
     }
 }
