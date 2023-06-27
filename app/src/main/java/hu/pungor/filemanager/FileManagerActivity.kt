@@ -27,8 +27,8 @@ import hu.pungor.filemanager.operations.async.resetProgressBar
 import hu.pungor.filemanager.operations.async.searchResult
 import hu.pungor.filemanager.operations.async.setProgressLayoutVisibility
 import hu.pungor.filemanager.operations.async.somethingInProgress
-import hu.pungor.filemanager.permissions.activityResult
 import hu.pungor.filemanager.permissions.checkPermissionsAndLoadFiles
+import hu.pungor.filemanager.permissions.grantRWPermissions
 import kotlinx.android.synthetic.main.activity_filemanager.*
 import kotlinx.android.synthetic.main.bottom_buttons_layout.*
 import kotlinx.android.synthetic.main.filemanager_recyclerview.*
@@ -174,7 +174,7 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
         if (requestCode == 1000)
             loadFiles()
         if (requestCode == 1001)
-            activityResult(data)
+            grantRWPermissions(data)
     }
 
     @Deprecated("Deprecated in Java")

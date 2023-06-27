@@ -57,16 +57,18 @@ class FileManagerAdapter : RecyclerView.Adapter<FileManagerAdapter.FileManagerVi
         setDrawableOnLoad(holder, position)
 
         holder.file_icon.setOnClickListener {
-            if (file.selected && !btnCopyPressed && !btnMovePressed && !btnSearchPressed) {
-                file.selected = false
-                removeFromSelectedList(file)
-                setDrawableOnLoad(holder, position)
-            } else if (holder.file_icon.drawable != null && !btnCopyPressed && !btnMovePressed && !btnSearchPressed) {
-                file.selected = true
-                addToSelectedList(file)
-                val layerDrawable = tickOverlay(holder, holder.file_icon.drawable)
-                Glide.with(holder.itemView).load(layerDrawable)
-                    .diskCacheStrategy(DiskCacheStrategy.ALL).into(holder.file_icon)
+            if (!btnCopyPressed && !btnMovePressed && !btnSearchPressed) {
+                if (file.selected) {
+                    file.selected = false
+                    removeFromSelectedList(file)
+                    setDrawableOnLoad(holder, position)
+                } else if (holder.file_icon.drawable != null) {
+                    file.selected = true
+                    addToSelectedList(file)
+                    val layerDrawable = tickOverlay(holder, holder.file_icon.drawable)
+                    Glide.with(holder.itemView).load(layerDrawable)
+                        .diskCacheStrategy(DiskCacheStrategy.ALL).into(holder.file_icon)
+                }
             }
         }
     }

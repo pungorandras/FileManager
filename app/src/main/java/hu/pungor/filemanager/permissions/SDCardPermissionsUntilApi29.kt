@@ -3,7 +3,6 @@ package hu.pungor.filemanager.permissions
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import android.util.Log
 import hu.pungor.filemanager.FileManagerActivity
 import hu.pungor.filemanager.R
@@ -15,7 +14,7 @@ fun FileManagerActivity.getSDCardPath(): File? {
     val pattern = Pattern.compile("([A-Z]|[0-9]){4}-([A-Z]|[0-9]){4}")
     val regex = pattern.toRegex()
 
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+    if (vcIsR) {
         for (element in externalMediaDirs) {
             val path = regex.find(element.path)
             if (path != null) {
@@ -31,8 +30,7 @@ fun FileManagerActivity.getSDCardPath(): File? {
 }
 
 fun FileManagerActivity.getUri(): Uri? {
-    val persistedUriPermissions =
-        contentResolver.persistedUriPermissions
+    val persistedUriPermissions = contentResolver.persistedUriPermissions
     if (persistedUriPermissions.size > 0) {
         val uriPermission = persistedUriPermissions[0]
         return uriPermission.uri
@@ -51,7 +49,7 @@ fun FileManagerActivity.sdCardPermissionsBuilder() {
     ).show()
 }
 
-fun FileManagerActivity.activityResult(data: Intent?) {
+fun FileManagerActivity.grantRWPermissions(data: Intent?) {
     try {
         val uri = data?.data
         grantUriPermission(
