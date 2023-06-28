@@ -17,21 +17,21 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 
-suspend fun FileManagerActivity.asyncCopySelected() {
+suspend fun FileManagerActivity.asyncCopySelected(dstPath: File) {
     progressBar = progressBarBuilder(R.string.copying)
     selectedListSize = 0.0
     progressState = 0.0
 
     job = CoroutineScope(IO).launch {
-        val selectedList = fmAdapter.getSelectedList()
+        val selectedList = fmAdapter.getSelectedList().toList()
         selectedListSize = getSelectedListSize(selectedList)
 
         for (element in selectedList) {
-            val dstObject = File(currentPath.path + "/" + element.name)
+            val dstObject = File(dstPath.path + "/" + element.name)
 
-            if (!currentPath.path.contains(element.path)) {
+            if (!dstPath.path.contains(element.path)) {
                 if (!dstObject.exists())
-                    copy(element, currentPath)
+                    copy(element, dstPath)
                 else
                     withContext(Main) { alreadyExistsDialog(element.name) }
             } else
@@ -84,22 +84,22 @@ private fun FileManagerActivity.copyFolderToSDCard(srcPath: File, dstPath: File)
     }
 }
 
-fun FileManagerActivity.copy(srcObj: AboutFile, dstObj: File) {
-    val dstFile = File(dstObj.path + "/" + srcObj.name)
+fun FileManagerActivity.copy(srcObj: AboutFile, dstPath: File) {
+    val dstFile = File(dstPath.path + "/" + srcObj.name)
     val srcObject = File(srcObj.path)
 
     if (srcObj.mimeType == TYPE_FOLDER) {
-        if (dstObj.path.contains(rootPath.path) || vcIsR)
-            copyFolderToInternal(srcObject, dstObj)
+        if (dstPath.path.contains(rootPath.path) || vcIsR)
+            copyFolderToInternal(srcObject, dstPath)
         else
-            copyFolderToSDCard(srcObject, dstObj)
+            copyFolderToSDCard(srcObject, dstPath)
     } else {
         progressState += File(srcObj.path).length()
         setProgressBarState(progressBar, progressState * 100 / selectedListSize)
 
-        if (dstObj.path.contains(rootPath.path) || vcIsR)
+        if (dstPath.path.contains(rootPath.path) || vcIsR)
             srcObject.copyTo(dstFile)
         else
-            copyToSDCard(srcObject, dstObj)
+            copyToSDCard(srcObject, dstPath)
     }
 }

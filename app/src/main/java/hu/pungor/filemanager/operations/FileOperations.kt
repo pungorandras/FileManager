@@ -159,7 +159,7 @@ suspend fun FileManagerActivity.deleteSelectedFiles() {
 }
 
 suspend fun FileManagerActivity.copySelectedFiles() {
-    asyncCopySelected()
+    asyncCopySelected(currentPath)
 }
 
 suspend fun FileManagerActivity.moveSelectedFiles() {

@@ -130,9 +130,8 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
             if (isSearchResultInitialized()) {
                 searchResult.cancel()
                 setProgressLayoutVisibility(View.GONE)
+                resetProgressBar()
             }
-
-            resetProgressBar()
         }
     }
 
