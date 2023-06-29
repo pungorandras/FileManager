@@ -48,7 +48,7 @@ suspend fun FileManagerActivity.asyncCopySelected(dstPath: File) {
     resetProgressBar()
 }
 
-fun FileManagerActivity.copyFolderToInternal(srcPath: File, dstPath: File) {
+private fun FileManagerActivity.copyFolderToInternal(srcPath: File, dstPath: File) {
     for (src in srcPath.walkTopDown()) {
         val relPath = srcPath.parentFile?.let { src.toRelativeString(it) }
         val dstFile = relPath?.let { File(dstPath, it) }
@@ -66,7 +66,7 @@ fun FileManagerActivity.copyFolderToInternal(srcPath: File, dstPath: File) {
     }
 }
 
-fun FileManagerActivity.copyFolderToSDCard(srcPath: File, dstPath: File) {
+private fun FileManagerActivity.copyFolderToSDCard(srcPath: File, dstPath: File) {
     for (src in srcPath.walkTopDown()) {
         val relPath = srcPath.parentFile?.let { src.toRelativeString(it) }
         val dstFile = relPath?.let { File(dstPath, it) }
