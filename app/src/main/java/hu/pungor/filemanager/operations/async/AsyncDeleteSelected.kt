@@ -86,7 +86,7 @@ fun FileManagerActivity.delete(fileObject: AboutFile, filePath: File) {
                 deleteFolderOnSDCard(sdCardFolder)
         }
     else {
-        progressState += File(fileObject.path).length()
+        progressState += file.length()
         setProgressBarState(progressBar, progressState * 100 / selectedListSize)
 
         if (filePath.path.contains(rootPath.path) || vcIsR)
