@@ -14,18 +14,18 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import java.io.File
 
-suspend fun FileManagerActivity.asyncDeleteSelected() {
+suspend fun FileManagerActivity.asyncDeleteSelected(filePath: File) {
     progressBar = progressBarBuilder(R.string.deleting)
     selectedListSize = 0.0
     progressState = 0.0
 
     job = CoroutineScope(Dispatchers.IO).launch {
-        val selectedList = fmAdapter.getSelectedList()
+        val selectedList = fmAdapter.getSelectedList().toList()
         selectedListSize = getSelectedListSize(selectedList)
 
         for (position in selectedList.indices) {
             val fileObject = selectedList[position]
-            delete(fileObject)
+            delete(fileObject, filePath)
 
             if (!isActive)
                 return@launch
@@ -74,14 +74,14 @@ fun FileManagerActivity.deleteFolderOnSDCard(fileObject: DocumentFile) {
     fileObject.delete()
 }
 
-fun FileManagerActivity.delete(fileObject: AboutFile) {
+fun FileManagerActivity.delete(fileObject: AboutFile, filePath: File) {
     val file = File(fileObject.path)
 
     if (fileObject.mimeType == TYPE_FOLDER)
-        if (currentPath.path.contains(rootPath.path) || vcIsR)
+        if (filePath.path.contains(rootPath.path) || vcIsR)
             deleteFolder(file)
         else {
-            val sdCardFolder = getChildren(currentPath)?.findFile(file.name)
+            val sdCardFolder = getChildren(filePath)?.findFile(file.name)
             if (sdCardFolder != null)
                 deleteFolderOnSDCard(sdCardFolder)
         }
@@ -89,10 +89,10 @@ fun FileManagerActivity.delete(fileObject: AboutFile) {
         progressState += File(fileObject.path).length()
         setProgressBarState(progressBar, progressState * 100 / selectedListSize)
 
-        if (currentPath.path.contains(rootPath.path) || vcIsR)
+        if (filePath.path.contains(rootPath.path) || vcIsR)
             file.delete()
         else
-            deleteOnSDCard(currentPath, file)
+            deleteOnSDCard(filePath, file)
     }
 }
 

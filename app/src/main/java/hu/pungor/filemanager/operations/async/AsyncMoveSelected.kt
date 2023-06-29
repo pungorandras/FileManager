@@ -19,21 +19,21 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 
-suspend fun FileManagerActivity.asyncMoveSelected() {
+suspend fun FileManagerActivity.asyncMoveSelected(dstPath: File) {
     progressBar = progressBarBuilder(R.string.moving)
     selectedListSize = 0.0
     progressState = 0.0
 
     job = CoroutineScope(Dispatchers.IO).launch {
-        val selectedList = fmAdapter.getSelectedList()
+        val selectedList = fmAdapter.getSelectedList().toList()
         selectedListSize = getSelectedListSize(selectedList)
 
         for (element in selectedList) {
-            val dstObj = File(currentPath.path + "/" + element.name)
+            val dstObj = File(dstPath.path + "/" + element.name)
 
-            if (!currentPath.path.contains(element.path)) {
+            if (!dstPath.path.contains(element.path)) {
                 if (!dstObj.exists())
-                    move(element, dstObj)
+                    move(element, dstPath)
                 else
                     withContext(Main) { alreadyExistsDialog(dstObj.name) }
             } else

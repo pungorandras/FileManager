@@ -155,15 +155,15 @@ fun FileManagerActivity.renameFile(view: View, position: Int) {
 }
 
 suspend fun FileManagerActivity.deleteSelectedFiles() {
-    asyncDeleteSelected()
+    asyncDeleteSelected(filePath = currentPath)
 }
 
 suspend fun FileManagerActivity.copySelectedFiles() {
-    asyncCopySelected(currentPath)
+    asyncCopySelected(dstPath = currentPath)
 }
 
 suspend fun FileManagerActivity.moveSelectedFiles() {
-    asyncMoveSelected()
+    asyncMoveSelected(dstPath = currentPath)
 }
 
 suspend fun FileManagerActivity.search(input: String): MutableList<File> {
