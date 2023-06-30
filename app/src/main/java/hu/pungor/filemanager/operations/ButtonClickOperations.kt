@@ -298,7 +298,8 @@ fun FileManagerActivity.internalButtonOperations() {
 
 @SuppressLint("UseCompatLoadingForColorStateLists")
 fun FileManagerActivity.sdCardButtonOperations() {
-    sdCardPath = getSDCardPath()
+    if (sdCardPath.toString().contains("null"))
+        sdCardPath = getSDCardPath()
 
     if (!sdCardPath.toString().contains("null")) {
         Internal.backgroundTintList = resources.getColorStateList(R.color.button)

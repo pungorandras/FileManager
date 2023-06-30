@@ -84,7 +84,7 @@ private fun FileManagerActivity.copyFolderToSDCard(srcPath: File, dstPath: File)
     }
 }
 
-fun FileManagerActivity.copy(srcObj: AboutFile, dstPath: File) {
+private fun FileManagerActivity.copy(srcObj: AboutFile, dstPath: File) {
     val dstFile = File(dstPath.path + "/" + srcObj.name)
     val srcObject = File(srcObj.path)
 

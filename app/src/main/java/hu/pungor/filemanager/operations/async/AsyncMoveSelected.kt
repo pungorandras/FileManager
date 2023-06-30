@@ -33,7 +33,7 @@ suspend fun FileManagerActivity.asyncMoveSelected(dstPath: File) {
 
             if (!dstPath.path.contains(element.path)) {
                 if (!dstObj.exists())
-                    move(element, dstPath)
+                    move(element, dstObj)
                 else
                     withContext(Main) { alreadyExistsDialog(dstObj.name) }
             } else
