@@ -17,7 +17,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 
-suspend fun FileManagerActivity.asyncCopySelected(dstPath: File) {
+suspend fun FileManagerActivity.asyncCopySelected(dstPath: File, updateProgress: Boolean = true) {
     progressBar = progressBarBuilder(R.string.copying)
     selectedListSize = 0.0
     progressState = 0.0
@@ -31,7 +31,7 @@ suspend fun FileManagerActivity.asyncCopySelected(dstPath: File) {
 
             if (!dstPath.path.contains(element.path)) {
                 if (!dstObject.exists())
-                    copy(element, dstPath)
+                    copy(element, dstPath, updateProgress)
                 else
                     withContext(Main) { alreadyExistsDialog(element.name) }
             } else
@@ -48,13 +48,19 @@ suspend fun FileManagerActivity.asyncCopySelected(dstPath: File) {
     resetProgressBar()
 }
 
-private fun FileManagerActivity.copyFolderToInternal(srcPath: File, dstPath: File) {
+private fun FileManagerActivity.copyFolderToInternal(
+    srcPath: File,
+    dstPath: File,
+    updateProgress: Boolean
+) {
     for (src in srcPath.walkTopDown()) {
         val relPath = srcPath.parentFile?.let { src.toRelativeString(it) }
         val dstFile = relPath?.let { File(dstPath, it) }
 
-        progressState += src.length()
-        setProgressBarState(progressBar, progressState * 100 / selectedListSize)
+        if (updateProgress) {
+            progressState += src.length()
+            setProgressBarState(progressBar, progressState * 100 / selectedListSize)
+        }
 
         if (src.isDirectory)
             dstFile?.mkdirs()
@@ -66,13 +72,19 @@ private fun FileManagerActivity.copyFolderToInternal(srcPath: File, dstPath: Fil
     }
 }
 
-private fun FileManagerActivity.copyFolderToSDCard(srcPath: File, dstPath: File) {
+private fun FileManagerActivity.copyFolderToSDCard(
+    srcPath: File,
+    dstPath: File,
+    updateProgress: Boolean
+) {
     for (src in srcPath.walkTopDown()) {
         val relPath = srcPath.parentFile?.let { src.toRelativeString(it) }
         val dstFile = relPath?.let { File(dstPath, it) }
 
-        progressState += src.length()
-        setProgressBarState(progressBar, progressState * 100 / selectedListSize)
+        if (updateProgress) {
+            progressState += src.length()
+            setProgressBarState(progressBar, progressState * 100 / selectedListSize)
+        }
 
         if (src.isDirectory)
             dstFile?.parentFile?.let { createFolderOnSDCard(it, src.name) }
@@ -84,18 +96,20 @@ private fun FileManagerActivity.copyFolderToSDCard(srcPath: File, dstPath: File)
     }
 }
 
-private fun FileManagerActivity.copy(srcObj: AboutFile, dstPath: File) {
+fun FileManagerActivity.copy(srcObj: AboutFile, dstPath: File, updateProgress: Boolean) {
     val dstFile = File(dstPath.path + "/" + srcObj.name)
     val srcObject = File(srcObj.path)
 
     if (srcObj.mimeType == TYPE_FOLDER) {
         if (dstPath.path.contains(rootPath.path) || vcIsR)
-            copyFolderToInternal(srcObject, dstPath)
+            copyFolderToInternal(srcObject, dstPath, updateProgress)
         else
-            copyFolderToSDCard(srcObject, dstPath)
+            copyFolderToSDCard(srcObject, dstPath, updateProgress)
     } else {
-        progressState += srcObject.length()
-        setProgressBarState(progressBar, progressState * 100 / selectedListSize)
+        if (updateProgress) {
+            progressState += srcObject.length()
+            setProgressBarState(progressBar, progressState * 100 / selectedListSize)
+        }
 
         if (dstPath.path.contains(rootPath.path) || vcIsR)
             srcObject.copyTo(dstFile)

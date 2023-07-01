@@ -139,14 +139,17 @@ fun FileManagerActivity.renameFile(view: View, position: Int) {
         positiveButtonFunctionality = {
             val file = File(currentItem.path)
             val newName = dialogView.findViewById<EditText>(R.id.name_input).text.toString()
+            val newFile = File(currentPath.path + "/" + newName)
 
             if (newName.isNotEmpty()) {
-                if (sdCardPath?.let { currentPath.path.contains(it.path) } == true || vcIsR)
-                    file.renameTo(File(currentPath, newName))
-                else
-                    renameOnSDCard(currentItem, newName)
-
-                listFiles()
+                if (!newFile.exists()) {
+                    if (currentPath.path.contains(rootPath.path) || vcIsR)
+                        file.renameTo(File(currentPath, newName))
+                    else
+                        renameOnSDCard(currentItem, newName)
+                    listFiles()
+                } else
+                    alreadyExistsDialog(newName)
             } else
                 nameIsNullDialog()
         },
