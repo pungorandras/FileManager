@@ -48,8 +48,8 @@ suspend fun FileManagerActivity.asyncMoveSelected(dstPath: File) {
 
 private fun FileManagerActivity.move(srcObj: AboutFile, dstPath: File) {
     if (srcObj.path.contains(rootPath.path) && dstPath.path.contains(rootPath.path)) {
-        File(srcObj.path).renameTo(File(dstPath.path + "/" + srcObj.name))
         setProgressBarState(progressBar, 100.0)
+        File(srcObj.path).renameTo(File(dstPath.path + "/" + srcObj.name))
     } else {
         copy(srcObj, dstPath, updateProgress = srcObj.mimeType == TYPE_FOLDER)
         File(srcObj.path).parentFile?.let { delete(srcObj, it) }
