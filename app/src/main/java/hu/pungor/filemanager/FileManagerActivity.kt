@@ -16,10 +16,14 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import hu.pungor.filemanager.adapter.FileManagerAdapter
 import hu.pungor.filemanager.alertdialog.multiThreadedOperationsDialog
+import hu.pungor.filemanager.databinding.ActivityFilemanagerBinding
+import hu.pungor.filemanager.databinding.BottomButtonsLayoutBinding
+import hu.pungor.filemanager.databinding.FilemanagerRecyclerviewBinding
+import hu.pungor.filemanager.databinding.ProgressbarLayoutBinding
+import hu.pungor.filemanager.databinding.TopButtonsLayoutBinding
 import hu.pungor.filemanager.intro.loadIntroScreen
 import hu.pungor.filemanager.intro.loadTutorial
 import hu.pungor.filemanager.model.AboutFile
-import hu.pungor.filemanager.operations.*
 import hu.pungor.filemanager.operations.async.cancelProgress
 import hu.pungor.filemanager.operations.async.isSearchResultInitialized
 import hu.pungor.filemanager.operations.async.listFiles
@@ -27,13 +31,26 @@ import hu.pungor.filemanager.operations.async.resetProgressBar
 import hu.pungor.filemanager.operations.async.searchResult
 import hu.pungor.filemanager.operations.async.setProgressLayoutVisibility
 import hu.pungor.filemanager.operations.async.somethingInProgress
+import hu.pungor.filemanager.operations.copySelectedOperation
+import hu.pungor.filemanager.operations.createFolderDialog
+import hu.pungor.filemanager.operations.createTextFileDialog
+import hu.pungor.filemanager.operations.deleteSelectedDialog
+import hu.pungor.filemanager.operations.disableSDCardButtonIfNotAvailable
+import hu.pungor.filemanager.operations.fileTreeDepth
+import hu.pungor.filemanager.operations.internalButtonOperations
+import hu.pungor.filemanager.operations.moveSelectedOperation
+import hu.pungor.filemanager.operations.openFile
+import hu.pungor.filemanager.operations.openFolder
+import hu.pungor.filemanager.operations.openUnknown
+import hu.pungor.filemanager.operations.renameFile
+import hu.pungor.filemanager.operations.result
+import hu.pungor.filemanager.operations.sdCardButtonOperations
+import hu.pungor.filemanager.operations.searchButtonOperations
+import hu.pungor.filemanager.operations.selectAllOperation
+import hu.pungor.filemanager.operations.shareFile
+import hu.pungor.filemanager.operations.showRationaleForStoragePermissionsDialog
 import hu.pungor.filemanager.permissions.checkPermissionsAndLoadFiles
 import hu.pungor.filemanager.permissions.grantRWPermissions
-import kotlinx.android.synthetic.main.activity_filemanager.*
-import kotlinx.android.synthetic.main.bottom_buttons_layout.*
-import kotlinx.android.synthetic.main.filemanager_recyclerview.*
-import kotlinx.android.synthetic.main.progressbar_layout.cancel_progress
-import kotlinx.android.synthetic.main.top_buttons_layout.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.Job
@@ -45,9 +62,13 @@ import permissions.dispatcher.RuntimePermissions
 import java.io.File
 
 
-@Suppress("DEPRECATION")
 @RuntimePermissions
 class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClickListener {
+
+    private lateinit var recyclerBinding: FilemanagerRecyclerviewBinding
+    private lateinit var progressBinding: ProgressbarLayoutBinding
+    lateinit var topBinding: TopButtonsLayoutBinding
+    lateinit var bottomBinding: BottomButtonsLayoutBinding
 
     val vcIsR = Build.VERSION.SDK_INT >= Build.VERSION_CODES.R
     val fmAdapter = FileManagerAdapter()
@@ -69,62 +90,66 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_filemanager)
+        setContentView(ActivityFilemanagerBinding.inflate(layoutInflater).root)
+        recyclerBinding = FilemanagerRecyclerviewBinding.bind(findViewById(R.id.rvFiles))
+        topBinding = TopButtonsLayoutBinding.bind(findViewById(R.id.top_buttons_layout))
+        bottomBinding = BottomButtonsLayoutBinding.bind(findViewById(R.id.bottom_button_layout))
+        progressBinding = ProgressbarLayoutBinding.bind(findViewById(R.id.progressbar_layout))
 
         CoroutineScope(Main).launch { loadIntroScreen() }
         checkPermissionsAndLoadFiles()
         disableSDCardButtonIfNotAvailable()
         loadTutorial()
 
-        Internal.setOnClickListener {
+        topBinding.Internal.setOnClickListener {
             internalButtonOperations()
         }
 
-        SDCard.setOnClickListener {
+        topBinding.SDCard.setOnClickListener {
             sdCardButtonOperations()
         }
 
-        create_textfile.setOnClickListener {
+        bottomBinding.createTextfile.setOnClickListener {
             createTextFileDialog()
         }
 
-        create_folder.setOnClickListener {
+        bottomBinding.createFolder.setOnClickListener {
             createFolderDialog()
         }
 
-        select_all.setOnClickListener {
+        bottomBinding.selectAll.setOnClickListener {
             selectAllOperation()
         }
 
-        delete_selected.setOnClickListener {
+        bottomBinding.deleteSelected.setOnClickListener {
             if (!somethingInProgress())
                 deleteSelectedDialog()
             else
                 multiThreadedOperationsDialog()
         }
 
-        copy_selected.setOnClickListener {
+        bottomBinding.copySelected.setOnClickListener {
             if (!somethingInProgress())
                 copySelectedOperation()
             else
                 multiThreadedOperationsDialog()
         }
 
-        move_selected.setOnClickListener {
+        bottomBinding.moveSelected.setOnClickListener {
             if (!somethingInProgress())
                 moveSelectedOperation()
             else
                 multiThreadedOperationsDialog()
         }
 
-        search.setOnClickListener {
+        bottomBinding.search.setOnClickListener {
             if (!somethingInProgress())
                 searchButtonOperations()
             else
                 multiThreadedOperationsDialog()
         }
 
-        cancel_progress.setOnClickListener {
+        progressBinding.cancelProgress.setOnClickListener {
             if (isJobInitialized())
                 cancelProgress(job)
             if (isSearchResultInitialized()) {
@@ -141,8 +166,8 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
     )
     fun loadFiles() {
         try {
-            rvFiles.layoutManager = LinearLayoutManager(this)
-            rvFiles.adapter = fmAdapter
+            recyclerBinding.rvFiles.layoutManager = LinearLayoutManager(this)
+            recyclerBinding.rvFiles.adapter = fmAdapter
             listFiles()
             fmAdapter.itemClickListener = this
         } catch (e: Exception) {

@@ -1,22 +1,24 @@
 package hu.pungor.filemanager.intro
 
 import android.os.Bundle
-import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import hu.pungor.filemanager.R
-import kotlinx.android.synthetic.main.activity_intro_screen.*
+import hu.pungor.filemanager.databinding.ActivityIntroScreenBinding
 
-@Suppress("DEPRECATION")
 class IntroScreenActivity : AppCompatActivity() {
+
+    private lateinit var binding: ActivityIntroScreenBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_intro_screen)
+        binding = ActivityIntroScreenBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         val version =
             getString(R.string.version) + packageManager.getPackageInfo(packageName, 0).versionName
-        findViewById<TextView>(R.id.version).text = version
+        binding.version.text = version
 
-        next.setOnClickListener {
+        binding.next.setOnClickListener {
             finish()
         }
     }

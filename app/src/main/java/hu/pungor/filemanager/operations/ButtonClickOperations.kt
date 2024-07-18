@@ -3,7 +3,6 @@ package hu.pungor.filemanager.operations
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
-import android.widget.EditText
 import android.widget.ImageButton
 import hu.pungor.filemanager.FileManagerActivity
 import hu.pungor.filemanager.R
@@ -11,15 +10,14 @@ import hu.pungor.filemanager.alertdialog.alertDialogBuilder
 import hu.pungor.filemanager.alertdialog.nameIsNullDialog
 import hu.pungor.filemanager.alertdialog.noItemsSelectedDialog
 import hu.pungor.filemanager.alertdialog.noResultsDialog
+import hu.pungor.filemanager.databinding.LayoutDialogBinding
+import hu.pungor.filemanager.databinding.LayoutDialogTextfileBinding
 import hu.pungor.filemanager.operations.async.listFiles
 import hu.pungor.filemanager.operations.async.listFilesRunBlocking
 import hu.pungor.filemanager.operations.async.resetProgressBar
 import hu.pungor.filemanager.operations.async.setProgressLayoutVisibility
 import hu.pungor.filemanager.permissions.checkPermissionsAndLoadFiles
 import hu.pungor.filemanager.permissions.getSDCardPath
-import kotlinx.android.synthetic.main.activity_filemanager.*
-import kotlinx.android.synthetic.main.bottom_buttons_layout.*
-import kotlinx.android.synthetic.main.top_buttons_layout.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
@@ -33,15 +31,15 @@ private lateinit var latestPathBeforeAction: File
 
 @SuppressLint("InflateParams")
 fun FileManagerActivity.createTextFileDialog() {
-    val dialogView = LayoutInflater.from(this).inflate(R.layout.layout_dialog_textfile, null)
+    val dialogViewBinding = LayoutDialogTextfileBinding.inflate(LayoutInflater.from(this))
 
     alertDialogBuilder(
         titleText = R.string.create_new_textfile,
-        dialogLayout = dialogView,
+        dialogLayout = dialogViewBinding.root,
         positiveButtonFunctionality = {
             createTextFile(
-                dialogView.findViewById<EditText>(R.id.name_input).text.toString(),
-                dialogView.findViewById<EditText>(R.id.text_input).text.toString()
+                dialogViewBinding.nameInput.text.toString(),
+                dialogViewBinding.textInput.text.toString()
             )
         },
         negativeButtonLabel = R.string.cancel
@@ -50,13 +48,13 @@ fun FileManagerActivity.createTextFileDialog() {
 
 @SuppressLint("InflateParams")
 fun FileManagerActivity.createFolderDialog() {
-    val dialogView = LayoutInflater.from(this).inflate(R.layout.layout_dialog, null)
+    val dialogViewBinding = LayoutDialogBinding.inflate(LayoutInflater.from(this))
 
     alertDialogBuilder(
         titleText = R.string.create_new_folder,
-        dialogLayout = dialogView,
+        dialogLayout = dialogViewBinding.root,
         positiveButtonFunctionality = {
-            createFolder(dialogView.findViewById<EditText>(R.id.name_input).text.toString())
+            createFolder(dialogViewBinding.nameInput.text.toString())
         },
         negativeButtonLabel = R.string.cancel
     ).show()
@@ -116,13 +114,13 @@ fun FileManagerActivity.copySelectedOperation() {
         latestPathBeforeAction = currentPath
 
         revertButtonState(
-            create_textfile,
-            select_all,
-            delete_selected,
-            move_selected
+            bottomBinding.createTextfile,
+            bottomBinding.selectAll,
+            bottomBinding.deleteSelected,
+            bottomBinding.moveSelected
         )
-        search.setImageResource(R.drawable.cancel)
-        copy_selected.setImageResource(R.drawable.ok)
+        bottomBinding.search.setImageResource(R.drawable.cancel)
+        bottomBinding.copySelected.setImageResource(R.drawable.ok)
     } else if (fmAdapter.btnCopyPressed) {
         fmAdapter.clearSelectedList = true
         fmAdapter.btnCopyPressed = false
@@ -130,13 +128,13 @@ fun FileManagerActivity.copySelectedOperation() {
         fmAdapter.popupMenuPressed = false
 
         revertButtonState(
-            create_textfile,
-            select_all,
-            delete_selected,
-            move_selected
+            bottomBinding.createTextfile,
+            bottomBinding.selectAll,
+            bottomBinding.deleteSelected,
+            bottomBinding.moveSelected
         )
-        search.setImageResource(R.drawable.search)
-        copy_selected.setImageResource(R.drawable.copy)
+        bottomBinding.search.setImageResource(R.drawable.search)
+        bottomBinding.copySelected.setImageResource(R.drawable.copy)
     } else
         noItemsSelectedDialog()
 }
@@ -150,13 +148,13 @@ fun FileManagerActivity.moveSelectedOperation() {
         latestPathBeforeAction = currentPath
 
         revertButtonState(
-            create_textfile,
-            select_all,
-            delete_selected,
-            copy_selected
+            bottomBinding.createTextfile,
+            bottomBinding.selectAll,
+            bottomBinding.deleteSelected,
+            bottomBinding.copySelected
         )
-        search.setImageResource(R.drawable.cancel)
-        move_selected.setImageResource(R.drawable.ok)
+        bottomBinding.search.setImageResource(R.drawable.cancel)
+        bottomBinding.moveSelected.setImageResource(R.drawable.ok)
     } else if (fmAdapter.btnMovePressed) {
         fmAdapter.clearSelectedList = true
         fmAdapter.btnMovePressed = false
@@ -164,13 +162,13 @@ fun FileManagerActivity.moveSelectedOperation() {
         fmAdapter.popupMenuPressed = false
 
         revertButtonState(
-            create_textfile,
-            select_all,
-            delete_selected,
-            copy_selected
+            bottomBinding.createTextfile,
+            bottomBinding.selectAll,
+            bottomBinding.deleteSelected,
+            bottomBinding.copySelected
         )
-        search.setImageResource(R.drawable.search)
-        move_selected.setImageResource(R.drawable.move)
+        bottomBinding.search.setImageResource(R.drawable.search)
+        bottomBinding.moveSelected.setImageResource(R.drawable.move)
     } else
         noItemsSelectedDialog()
 }
@@ -184,13 +182,13 @@ fun FileManagerActivity.searchButtonOperations() {
             fmAdapter.clearSelectedList()
 
         revertButtonState(
-            create_textfile,
-            select_all,
-            delete_selected,
-            move_selected
+            bottomBinding.createTextfile,
+            bottomBinding.selectAll,
+            bottomBinding.deleteSelected,
+            bottomBinding.moveSelected
         )
-        search.setImageResource(R.drawable.search)
-        copy_selected.setImageResource(R.drawable.copy)
+        bottomBinding.search.setImageResource(R.drawable.search)
+        bottomBinding.copySelected.setImageResource(R.drawable.copy)
     } else if (fmAdapter.btnMovePressed) {
         fmAdapter.clearSelectedList = true
         fmAdapter.btnMovePressed = false
@@ -198,21 +196,21 @@ fun FileManagerActivity.searchButtonOperations() {
             fmAdapter.clearSelectedList()
 
         revertButtonState(
-            create_textfile,
-            select_all,
-            delete_selected,
-            copy_selected
+            bottomBinding.createTextfile,
+            bottomBinding.selectAll,
+            bottomBinding.deleteSelected,
+            bottomBinding.copySelected
         )
-        search.setImageResource(R.drawable.search)
-        move_selected.setImageResource(R.drawable.move)
+        bottomBinding.search.setImageResource(R.drawable.search)
+        bottomBinding.moveSelected.setImageResource(R.drawable.move)
     } else if (!fmAdapter.btnSearchPressed) {
-        val dialogView = LayoutInflater.from(this).inflate(R.layout.layout_dialog, null)
+        val dialogViewBinding = LayoutDialogBinding.inflate(LayoutInflater.from(this))
 
         alertDialogBuilder(
             titleText = R.string.search,
-            dialogLayout = dialogView,
+            dialogLayout = dialogViewBinding.root,
             positiveButtonFunctionality = {
-                val inputText = dialogView.findViewById<EditText>(R.id.name_input).text.toString()
+                val inputText = dialogViewBinding.nameInput.text.toString()
                 if (inputText.isNotEmpty()) {
                     CoroutineScope(Main).launch {
                         latestPathBeforeAction = currentPath
@@ -226,22 +224,22 @@ fun FileManagerActivity.searchButtonOperations() {
                             fmAdapter.btnSearchPressed = true
                             listFiles(result)
 
-                            Internal.isEnabled = false
-                            Internal.backgroundTintList =
+                            topBinding.Internal.isEnabled = false
+                            topBinding.Internal.backgroundTintList =
                                 resources.getColorStateList(R.color.disabled)
-                            SDCard.isEnabled = false
-                            SDCard.backgroundTintList =
+                            topBinding.SDCard.isEnabled = false
+                            topBinding.SDCard.backgroundTintList =
                                 resources.getColorStateList(R.color.disabled)
 
                             revertButtonState(
-                                create_textfile,
-                                create_folder,
-                                select_all,
-                                delete_selected,
-                                copy_selected,
-                                move_selected
+                                bottomBinding.createTextfile,
+                                bottomBinding.createFolder,
+                                bottomBinding.selectAll,
+                                bottomBinding.deleteSelected,
+                                bottomBinding.copySelected,
+                                bottomBinding.moveSelected
                             )
-                            search.setImageResource(R.drawable.cancel)
+                            bottomBinding.search.setImageResource(R.drawable.cancel)
                         }
                     }
                 } else
@@ -253,28 +251,30 @@ fun FileManagerActivity.searchButtonOperations() {
         currentPath = latestPathBeforeAction
         fmAdapter.btnSearchPressed = false
         listFiles()
-        Internal.isEnabled = true
-        SDCard.isEnabled = true
+        topBinding.Internal.isEnabled = true
+        topBinding.SDCard.isEnabled = true
 
         if (currentPath.toString().contains(rootPath.toString())) {
-            Internal.backgroundTintList = resources.getColorStateList(R.color.button_pressed)
-            SDCard.backgroundTintList = resources.getColorStateList(R.color.button)
+            topBinding.Internal.backgroundTintList =
+                resources.getColorStateList(R.color.button_pressed)
+            topBinding.SDCard.backgroundTintList = resources.getColorStateList(R.color.button)
         } else {
-            Internal.backgroundTintList = resources.getColorStateList(R.color.button)
-            SDCard.backgroundTintList = resources.getColorStateList(R.color.button_pressed)
+            topBinding.Internal.backgroundTintList = resources.getColorStateList(R.color.button)
+            topBinding.SDCard.backgroundTintList =
+                resources.getColorStateList(R.color.button_pressed)
         }
 
         disableSDCardButtonIfNotAvailable()
 
         revertButtonState(
-            create_textfile,
-            create_folder,
-            select_all,
-            delete_selected,
-            copy_selected,
-            move_selected
+            bottomBinding.createTextfile,
+            bottomBinding.createFolder,
+            bottomBinding.selectAll,
+            bottomBinding.deleteSelected,
+            bottomBinding.copySelected,
+            bottomBinding.moveSelected
         )
-        search.setImageResource(R.drawable.search)
+        bottomBinding.search.setImageResource(R.drawable.search)
     }
 
     if (fmAdapter.popupMenuPressed) {
@@ -289,9 +289,9 @@ fun FileManagerActivity.searchButtonOperations() {
 @SuppressLint("UseCompatLoadingForColorStateLists")
 fun FileManagerActivity.internalButtonOperations() {
     currentPath = rootPath
-    Internal.backgroundTintList = resources.getColorStateList(R.color.button_pressed)
+    topBinding.Internal.backgroundTintList = resources.getColorStateList(R.color.button_pressed)
     if (sdCardPath != null)
-        SDCard.backgroundTintList = resources.getColorStateList(R.color.button)
+        topBinding.SDCard.backgroundTintList = resources.getColorStateList(R.color.button)
 
     checkPermissionsAndLoadFiles()
 }
@@ -302,8 +302,8 @@ fun FileManagerActivity.sdCardButtonOperations() {
         sdCardPath = getSDCardPath()
 
     if (!sdCardPath.toString().contains("null")) {
-        Internal.backgroundTintList = resources.getColorStateList(R.color.button)
-        SDCard.backgroundTintList = resources.getColorStateList(R.color.button_pressed)
+        topBinding.Internal.backgroundTintList = resources.getColorStateList(R.color.button)
+        topBinding.SDCard.backgroundTintList = resources.getColorStateList(R.color.button_pressed)
         currentPath = sdCardPath!!
         checkPermissionsAndLoadFiles()
     } else
@@ -313,8 +313,8 @@ fun FileManagerActivity.sdCardButtonOperations() {
 @SuppressLint("UseCompatLoadingForColorStateLists")
 fun FileManagerActivity.disableSDCardButtonIfNotAvailable() {
     if (externalMediaDirs.size < 2) {
-        SDCard.isEnabled = false
-        SDCard.backgroundTintList =
+        topBinding.SDCard.isEnabled = false
+        topBinding.SDCard.backgroundTintList =
             resources.getColorStateList(R.color.disabled)
     }
 }

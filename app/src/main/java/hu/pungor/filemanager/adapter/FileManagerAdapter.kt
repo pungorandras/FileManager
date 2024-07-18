@@ -8,8 +8,7 @@ import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
@@ -21,11 +20,9 @@ import com.bumptech.glide.request.target.Target
 import hu.pungor.filemanager.FileManagerActivity.Companion.TYPE_FOLDER
 import hu.pungor.filemanager.FileManagerActivity.Companion.TYPE_UNKNOWN
 import hu.pungor.filemanager.R
+import hu.pungor.filemanager.databinding.ItemFileBinding
 import hu.pungor.filemanager.model.AboutFile
-import kotlinx.android.synthetic.main.item_file.view.*
 
-
-@Suppress("DEPRECATION")
 class FileManagerAdapter : RecyclerView.Adapter<FileManagerAdapter.FileManagerViewHolder>() {
 
     private val fileList = mutableListOf<AboutFile>()
@@ -41,33 +38,30 @@ class FileManagerAdapter : RecyclerView.Adapter<FileManagerAdapter.FileManagerVi
 
     var itemClickListener: FileItemClickListener? = null
 
-    @SuppressLint("InflateParams")
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FileManagerViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_file, null)
-        return FileManagerViewHolder(view)
+        val binding = ItemFileBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return FileManagerViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: FileManagerViewHolder, position: Int) {
         val file = fileList[position]
-        holder.file_name.text = file.name
-        holder.file_info.text = file.info
-        holder.file = file
+        holder.bind(file)
 
-        Glide.with(holder.file_icon.context).clear(holder.file_icon)
+        Glide.with(holder.binding.fileIcon.context).clear(holder.binding.fileIcon)
         setDrawableOnLoad(holder, position)
 
-        holder.file_icon.setOnClickListener {
+        holder.binding.fileIcon.setOnClickListener {
             if (!btnCopyPressed && !btnMovePressed && !btnSearchPressed) {
                 if (file.selected) {
                     file.selected = false
                     removeFromSelectedList(file)
                     setDrawableOnLoad(holder, position)
-                } else if (holder.file_icon.drawable != null) {
+                } else if (holder.binding.fileIcon.drawable != null) {
                     file.selected = true
                     addToSelectedList(file)
-                    val layerDrawable = tickOverlay(holder, holder.file_icon.drawable)
+                    val layerDrawable = tickOverlay(holder, holder.binding.fileIcon.drawable)
                     Glide.with(holder.itemView).load(layerDrawable)
-                        .diskCacheStrategy(DiskCacheStrategy.ALL).into(holder.file_icon)
+                        .diskCacheStrategy(DiskCacheStrategy.ALL).into(holder.binding.fileIcon)
                 }
             }
         }
@@ -76,19 +70,19 @@ class FileManagerAdapter : RecyclerView.Adapter<FileManagerAdapter.FileManagerVi
     @SuppressLint("IntentReset")
     private fun setDrawableOnLoad(holder: FileManagerViewHolder, position: Int) {
         val file = fileList[position]
-        val intent = Intent(Intent.ACTION_VIEW)
-        intent.data = Uri.parse(file.path)
-        intent.type = file.mimeType
-        val matches = holder.file_icon.context.packageManager.queryIntentActivities(intent, 0)
+        val intent = Intent(Intent.ACTION_VIEW).apply {
+            data = Uri.parse(file.path)
+            type = file.mimeType
+        }
+        val matches =
+            holder.binding.fileIcon.context.packageManager.queryIntentActivities(intent, 0)
 
-        val resource: Any = if (file.mimeType == TYPE_FOLDER)
-            R.drawable.folder
-        else if (file.mimeType == TYPE_UNKNOWN || matches.isNullOrEmpty())
-            R.drawable.file_icon_default
-        else if (mediaFile(file))
-            file.path
-        else
-            matches[0].loadIcon(holder.file_icon.context.packageManager)
+        val resource: Any = when {
+            file.mimeType == TYPE_FOLDER -> R.drawable.folder
+            file.mimeType == TYPE_UNKNOWN || matches.isNullOrEmpty() -> R.drawable.file_icon_default
+            mediaFile(file) -> file.path
+            else -> matches[0].loadIcon(holder.binding.fileIcon.context.packageManager)
+        }
 
         configureGlide(holder, resource, file)
     }
@@ -105,7 +99,7 @@ class FileManagerAdapter : RecyclerView.Adapter<FileManagerAdapter.FileManagerVi
                 ): Boolean {
                     if (file.selected && !popupMenuPressed) {
                         val layerDrawable = tickOverlay(holder, resource)
-                        holder.file_icon.setImageDrawable(layerDrawable)
+                        holder.binding.fileIcon.setImageDrawable(layerDrawable)
                         return true
                     }
                     return false
@@ -118,10 +112,10 @@ class FileManagerAdapter : RecyclerView.Adapter<FileManagerAdapter.FileManagerVi
                     isFirstResource: Boolean
                 ): Boolean {
                     if (file.selected && !popupMenuPressed && mediaFile(file)) {
-                        val r = holder.file_icon.resources
-                        val layerDrawable =
-                            tickOverlay(holder, r.getDrawable(R.drawable.file_icon_default))
-                        holder.file_icon.setImageDrawable(layerDrawable)
+                        val context = holder.binding.fileIcon.context
+                        val drawable = ContextCompat.getDrawable(context, R.drawable.checkmark)
+                        val layerDrawable = tickOverlay(holder, drawable)
+                        holder.binding.fileIcon.setImageDrawable(layerDrawable)
                         return true
                     }
                     return false
@@ -131,43 +125,33 @@ class FileManagerAdapter : RecyclerView.Adapter<FileManagerAdapter.FileManagerVi
         if (mediaFile(file))
             obj = obj.apply(RequestOptions().centerCrop()).placeholder(R.drawable.file_icon_default)
 
-        obj.into(holder.file_icon)
+        obj.into(holder.binding.fileIcon)
     }
 
     private fun mediaFile(file: AboutFile): Boolean {
-        if (file.mimeType.startsWith("image") || file.mimeType.startsWith("video"))
-            return true
-        return false
+        return file.mimeType.startsWith("image") || file.mimeType.startsWith("video")
     }
 
-    @SuppressLint("UseCompatLoadingForDrawables")
     private fun tickOverlay(holder: FileManagerViewHolder, drawable: Drawable?): LayerDrawable {
-        val r = holder.file_icon.resources
+        val context = holder.binding.fileIcon.context
         val layers = arrayOfNulls<Drawable>(2)
         layers[0] = drawable
         layers[0]?.alpha = 50
-        layers[1] = r.getDrawable(R.drawable.checkmark)
-
+        layers[1] = ContextCompat.getDrawable(context, R.drawable.checkmark)
         return LayerDrawable(layers)
     }
 
     private fun setSelectedOnLoad(files: List<AboutFile>): List<AboutFile> {
-        for (element in files) {
-            for (selected in selectedList) {
-                if (element.path == selected.path)
-                    element.selected = true
+        files.forEach { file ->
+            if (selectedList.any { it.path == file.path }) {
+                file.selected = true
             }
         }
         return files
     }
 
     private fun removeFromSelectedList(file: AboutFile) {
-        for (position in selectedList.indices) {
-            if (selectedList[position].path == file.path) {
-                selectedList.removeAt(position)
-                break
-            }
-        }
+        selectedList.removeAll { it.path == file.path }
     }
 
     fun clearSelectedList() {
@@ -211,9 +195,7 @@ class FileManagerAdapter : RecyclerView.Adapter<FileManagerAdapter.FileManagerVi
     }
 
     fun addAllToSelectedList() {
-        for (element in fileList)
-            if (!selectedList.contains(element))
-                addToSelectedList(element)
+        fileList.forEach { if (!selectedList.contains(it)) addToSelectedList(it) }
     }
 
     fun popupMenuPressActions(position: Int) {
@@ -223,10 +205,13 @@ class FileManagerAdapter : RecyclerView.Adapter<FileManagerAdapter.FileManagerVi
         addToSelectedList(getItem(position))
     }
 
-    inner class FileManagerViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        var file_icon: ImageView = itemView.file_icon
-        val file_name: TextView = itemView.file_name
-        val file_info: TextView = itemView.file_info
+    inner class FileManagerViewHolder(val binding: ItemFileBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+        fun bind(file: AboutFile) {
+            binding.fileName.text = file.name
+            binding.fileInfo.text = file.info
+            this.file = file
+        }
 
         var file: AboutFile? = null
 
