@@ -6,7 +6,7 @@ import hu.pungor.filemanager.FileManagerActivity.Companion.TYPE_FOLDER
 import hu.pungor.filemanager.FileManagerActivity.Companion.TYPE_UNKNOWN
 import hu.pungor.filemanager.model.AboutFile
 import java.io.File
-import java.util.*
+import java.util.Locale
 
 fun FileManagerActivity.fillList(fileList: List<File>): List<AboutFile> {
     val mutableFileList = mutableListOf<AboutFile>()
@@ -15,7 +15,7 @@ fun FileManagerActivity.fillList(fileList: List<File>): List<AboutFile> {
         for (currentFile in fileList) {
             val uri = currentFile.path
             val uriWithoutPrefix = uri.removePrefix("/storage/emulated/0/")
-            val extension = uri.substring(uri.lastIndexOf(".") + 1).toLowerCase(Locale.ROOT)
+            val extension = uri.substring(uri.lastIndexOf(".") + 1).lowercase(Locale.ROOT)
             val mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension)
             val name = if (fmAdapter.btnSearchPressed) uriWithoutPrefix else currentFile.name
 
@@ -49,13 +49,13 @@ private fun getSize(file: File): String {
     val size_in_bytes = file.length().toDouble()
 
     if (size_in_bytes > GB)
-        return String.format("%.1f", size_in_bytes / GB) + "\u00A0GB"
+        return String.format(Locale.ROOT, "%.1f", size_in_bytes / GB) + "\u00A0GB"
     else if (size_in_bytes > MB)
-        return String.format("%.1f", size_in_bytes / MB) + "\u00A0MB"
+        return String.format(Locale.ROOT, "%.1f", size_in_bytes / MB) + "\u00A0MB"
     else if (size_in_bytes > kB)
-        return String.format("%.1f", size_in_bytes / kB) + "\u00A0kB"
+        return String.format(Locale.ROOT, "%.1f", size_in_bytes / kB) + "\u00A0kB"
     else
-        return String.format("%.1f", size_in_bytes) + "\u00A0B"
+        return String.format(Locale.ROOT, "%.1f", size_in_bytes) + "\u00A0B"
 }
 
 private fun sortList(list: List<AboutFile>): List<AboutFile> {
