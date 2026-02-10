@@ -250,29 +250,35 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
                         openUnknown(currentItem)
                         true
                     }
+
                     R.id.share -> {
                         shareFile(view, position)
                         true
                     }
+
                     R.id.copy -> {
                         fmAdapter.popupMenuPressActions(position)
                         copySelectedOperation()
                         true
                     }
+
                     R.id.move -> {
                         fmAdapter.popupMenuPressActions(position)
                         moveSelectedOperation()
                         true
                     }
+
                     R.id.rename -> {
                         renameFile(view, position)
                         true
                     }
+
                     R.id.delete -> {
                         fmAdapter.popupMenuPressActions(position)
                         deleteSelectedDialog()
                         true
                     }
+
                     else -> false
                 }
             }

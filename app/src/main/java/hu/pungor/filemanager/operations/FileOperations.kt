@@ -14,7 +14,11 @@ import hu.pungor.filemanager.alertdialog.alertDialogBuilder
 import hu.pungor.filemanager.alertdialog.alreadyExistsDialog
 import hu.pungor.filemanager.alertdialog.nameIsNullDialog
 import hu.pungor.filemanager.model.AboutFile
-import hu.pungor.filemanager.operations.async.*
+import hu.pungor.filemanager.operations.async.asyncCopySelected
+import hu.pungor.filemanager.operations.async.asyncDeleteSelected
+import hu.pungor.filemanager.operations.async.asyncMoveSelected
+import hu.pungor.filemanager.operations.async.asyncSearch
+import hu.pungor.filemanager.operations.async.listFiles
 import hu.pungor.filemanager.permissions.checkPermissionsAndLoadFiles
 import java.io.File
 import java.io.FileWriter
@@ -38,7 +42,7 @@ fun FileManagerActivity.openFile(file: AboutFile) {
     intent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
     try {
         startActivity(intent)
-    } catch (e: ActivityNotFoundException) {
+    } catch (_: ActivityNotFoundException) {
         openUnknown(file)
     }
 
@@ -85,7 +89,7 @@ fun FileManagerActivity.createTextFile(name: String, notes: String) {
                 nameIsNullDialog()
             else
                 alreadyExistsDialog(name)
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             checkPermissionsAndLoadFiles()
         }
     } else {
@@ -106,7 +110,7 @@ fun FileManagerActivity.createFolder(name: String) {
                 nameIsNullDialog()
             else
                 alreadyExistsDialog(name)
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             checkPermissionsAndLoadFiles()
         }
     } else {
