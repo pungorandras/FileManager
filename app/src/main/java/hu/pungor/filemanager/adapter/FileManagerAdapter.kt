@@ -2,6 +2,7 @@ package hu.pungor.filemanager.adapter
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
 import android.graphics.drawable.LayerDrawable
 import android.net.Uri
@@ -18,10 +19,10 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.Target
 import hu.pungor.filemanager.FileManagerActivity.Companion.TYPE_FOLDER
-import hu.pungor.filemanager.FileManagerActivity.Companion.TYPE_UNKNOWN
 import hu.pungor.filemanager.R
 import hu.pungor.filemanager.databinding.ItemFileBinding
 import hu.pungor.filemanager.model.AboutFile
+import java.io.File
 
 class FileManagerAdapter : RecyclerView.Adapter<FileManagerAdapter.FileManagerViewHolder>() {
 
@@ -70,18 +71,28 @@ class FileManagerAdapter : RecyclerView.Adapter<FileManagerAdapter.FileManagerVi
     @SuppressLint("IntentReset")
     private fun setDrawableOnLoad(holder: FileManagerViewHolder, position: Int) {
         val file = fileList[position]
-        val intent = Intent(Intent.ACTION_VIEW).apply {
-            data = Uri.parse(file.path)
-            type = file.mimeType
-        }
-        val matches =
-            holder.binding.fileIcon.context.packageManager.queryIntentActivities(intent, 0)
+        val context = holder.itemView.context
+        val pm = context.packageManager
 
         val resource: Any = when {
             file.mimeType == TYPE_FOLDER -> R.drawable.folder
-            file.mimeType == TYPE_UNKNOWN || matches.isNullOrEmpty() -> R.drawable.file_icon_default
+
             mediaFile(file) -> file.path
-            else -> matches[0].loadIcon(holder.binding.fileIcon.context.packageManager)
+
+            file.path.endsWith(".apk", ignoreCase = true) -> {
+                pm.getPackageArchiveInfo(file.path, 0)?.applicationInfo?.apply {
+                    sourceDir = file.path
+                    publicSourceDir = file.path
+                }?.loadIcon(pm) ?: R.drawable.file_icon_default
+            }
+
+            else -> {
+                val intent = Intent(Intent.ACTION_VIEW).apply {
+                    setDataAndType(Uri.fromFile(File(file.path)), file.mimeType)
+                }
+                pm.resolveActivity(intent, PackageManager.MATCH_DEFAULT_ONLY)?.loadIcon(pm)
+                    ?: R.drawable.file_icon_default
+            }
         }
 
         configureGlide(holder, resource, file)
@@ -221,7 +232,7 @@ class FileManagerAdapter : RecyclerView.Adapter<FileManagerAdapter.FileManagerVi
             }
 
             itemView.setOnLongClickListener { view ->
-                itemClickListener?.onItemLongClick(adapterPosition, view)
+                itemClickListener?.onItemLongClick(getBindingAdapterPosition(), view)
                 true
             }
         }

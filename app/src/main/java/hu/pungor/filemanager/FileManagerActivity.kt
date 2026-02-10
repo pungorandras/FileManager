@@ -2,7 +2,6 @@ package hu.pungor.filemanager
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
@@ -12,6 +11,7 @@ import android.view.Gravity
 import android.view.View
 import android.widget.PopupMenu
 import android.widget.ProgressBar
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import hu.pungor.filemanager.adapter.FileManagerAdapter
@@ -50,7 +50,6 @@ import hu.pungor.filemanager.operations.selectAllOperation
 import hu.pungor.filemanager.operations.shareFile
 import hu.pungor.filemanager.operations.showRationaleForStoragePermissionsDialog
 import hu.pungor.filemanager.permissions.checkPermissionsAndLoadFiles
-import hu.pungor.filemanager.permissions.grantRWPermissions
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.Job
@@ -95,6 +94,7 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
         topBinding = TopButtonsLayoutBinding.bind(findViewById(R.id.top_buttons_layout))
         bottomBinding = BottomButtonsLayoutBinding.bind(findViewById(R.id.bottom_button_layout))
         progressBinding = ProgressbarLayoutBinding.bind(findViewById(R.id.progressbar_layout))
+        onBackPressedDispatcher.addCallback(this, backPressedCallback)
 
         CoroutineScope(Main).launch { loadIntroScreen() }
         checkPermissionsAndLoadFiles()
@@ -192,33 +192,22 @@ class FileManagerActivity : AppCompatActivity(), FileManagerAdapter.FileItemClic
         showRationaleForStoragePermissionsDialog(request)
     }
 
-    @Deprecated("Deprecated in Java")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == 1000)
-            loadFiles()
-        if (requestCode == 1001)
-            grantRWPermissions(data)
-    }
-
-    @Deprecated("Deprecated in Java")
-    override fun onBackPressed() {
-        val currentPathString = currentPath.toString()
-
-        if (currentPath != rootPath && currentPath != sdCardPath && !fmAdapter.btnSearchPressed) {
-            val location = currentPathString.substring(0, currentPathString.lastIndexOf("/") + 1)
-            currentPath = File(location)
-            listFiles()
-        } else if (fmAdapter.btnSearchPressed && fileTreeDepth > 0) {
-            fileTreeDepth--
-
-            if (fileTreeDepth == 0)
-                listFiles(result)
-            else {
-                val location =
-                    currentPathString.substring(0, currentPathString.lastIndexOf("/") + 1)
-                currentPath = File(location)
+    private val backPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            if (currentPath != rootPath && currentPath != sdCardPath && !fmAdapter.btnSearchPressed) {
+                currentPath = currentPath.parentFile ?: currentPath
                 listFiles()
+            } else if (fmAdapter.btnSearchPressed && fileTreeDepth > 0) {
+                fileTreeDepth--
+
+                if (fileTreeDepth == 0) {
+                    listFiles(result)
+                } else {
+                    currentPath = currentPath.parentFile ?: currentPath
+                    listFiles()
+                }
+            } else {
+                finish()
             }
         }
     }

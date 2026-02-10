@@ -1,9 +1,11 @@
 package hu.pungor.filemanager.permissions
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.util.Log
+import androidx.activity.result.contract.ActivityResultContracts
 import hu.pungor.filemanager.FileManagerActivity
 import hu.pungor.filemanager.R
 import hu.pungor.filemanager.alertdialog.alertDialogBuilder
@@ -40,11 +42,19 @@ fun FileManagerActivity.getUri(): Uri? {
 
 @SuppressLint("InflateParams")
 fun FileManagerActivity.sdCardPermissionsBuilder() {
+    val permissionLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            grantRWPermissions(result.data)
+        }
+    }
+
     alertDialogBuilder(
         titleText = R.string.info,
         dialogText = R.string.sdcard_permission,
         positiveButtonFunctionality = {
-            startActivityForResult(Intent(Intent.ACTION_OPEN_DOCUMENT_TREE), 1001)
+            permissionLauncher.launch(Intent(Intent.ACTION_OPEN_DOCUMENT_TREE))
         }
     ).show()
 }
